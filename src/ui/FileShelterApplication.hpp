@@ -19,8 +19,6 @@ class FileShelterApplication : public Wt::WApplication
 
 	private:
 
-		void createLmsUI();
-
 		Database::Handler	_db;
 };
 

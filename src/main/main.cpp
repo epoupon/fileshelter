@@ -65,11 +65,11 @@ int main(int argc, char *argv[])
 		Wt::WServer::instance()->logger().configure("*"); // log everything, TODO configure this
 
 		// Make sure working directory exists
-		boost::filesystem::create_directories(Config::instance().getString("working-dir"));
+		boost::filesystem::create_directories(Config::instance().getPath("working-dir") / "files");
 
 		// Initializing a connection pool to the database that will be shared along services
 		std::unique_ptr<Wt::Dbo::SqlConnectionPool>
-			connectionPool( Database::Handler::createConnectionPool(Config::instance().getString("working-dir") + "/fileshelter.db"));
+			connectionPool( Database::Handler::createConnectionPool(Config::instance().getPath("working-dir") / "fileshelter.db"));
 
 //		Database::Updater& dbUpdater = Database::Updater::instance();
 //		dbUpdater.setConnectionPool(*connectionPool);

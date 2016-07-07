@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<messages xmlns:if="Wt.WTemplate.conditions">
+<!--FORMS message blocks-->
+
+<message id="template-home">
+	<h1>FileShelter</h1>
+	${create-share-btn}
+</message>
+
+<message id="template-share-create">
+	<h1>${title}</h1>
+	<div class="form-horizontal">
+		<div class="form-group">
+			<label class="control-label col-sm-2"  for="${id:name}">
+				Description
+			</label>
+			<div class="col-sm-5">
+				${desc}
+			</div>
+			<div class="help-block col-sm-5">
+				${desc-info}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2"  for="${id:time-validity}">
+				Validity duration
+			</label>
+			<div class="col-sm-5">
+				${time-validity}
+			</div>
+			<div class="help-block col-sm-5">
+				${time-validity-info}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2"  for="${id:hits-validity}">
+				Max downloads
+			</label>
+			<div class="col-sm-5">
+				${hits-validity}
+			</div>
+			<div class="help-block col-sm-5">
+				${hits-validity-info}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2"  for="${id:password}">
+				Password (optional)
+			</label>
+			<div class="col-sm-5">
+				${password}
+			</div>
+			<div class="help-block col-sm-5">
+				${password-info}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2"  for="${id:password-confirm}">
+				Confirm password
+			</label>
+			<div class="col-sm-5">
+				${password-confirm}
+			</div>
+			<div class="help-block col-sm-5">
+				${password-confirm-info}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2"  for="${id:file}">
+				File
+			</label>
+			<div class="col-sm-5">
+				${file}
+			</div>
+			<div class="help-block col-sm-5">
+				${file-info}
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10">
+				${create-btn}
+			</div>
+		</div>
+		${create-error}
+	</div>
+</message>
+
+<message id="template-share-created">
+	<h1>Share successfully created!</h1>
+	<div class="form-horizontal">
+		<div class="form-group">
+			<label class="control-label col-sm-2"  for="${id:public-link}">
+				Public link
+			</label>
+			<div class="col-sm-10 well well-sm">
+				${public-link}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2"  for="${id:edit-link}">
+				Edit link
+			</label>
+			<div class="col-sm-10 well well-sm">
+				${edit-link}
+			</div>
+		</div>
+	</div>
+</message>
+
+<message id="template-share-download">
+	<h1>Download</h1>
+	<div class="form-horizontal">
+		<div class="form-group">
+			<label class="control-label col-sm-2"  for="${id:file-desc}">
+				Description
+			</label>
+			<div class="col-sm-5 well well-sm">
+				${file-desc}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2"  for="${id:file-name}">
+				File name
+			</label>
+			<div class="col-sm-5 well well-sm">
+				${file-name}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2"  for="${id:file-size}">
+				File size
+			</label>
+			<div class="col-sm-5 well well-sm">
+				${file-size} kB
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-5">
+				${download-btn}
+			</div>
+		</div>
+	</div>
+</message>
+
+<message id="template-share-not-found">
+	<h1>File not found!</h1>
+</message>
+
+</messages>

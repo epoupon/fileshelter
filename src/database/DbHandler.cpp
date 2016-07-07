@@ -5,7 +5,7 @@
 
 #include "DbHandler.hpp"
 
-#include "File.hpp"
+#include "Share.hpp"
 
 namespace Database {
 
@@ -13,7 +13,7 @@ Handler::Handler(Wt::Dbo::SqlConnectionPool& connectionPool)
 {
 	_session.setConnectionPool(connectionPool);
 
-	_session.mapClass<Database::File>("file");
+	_session.mapClass<Database::Share>("share");
 
 	try {
 		Wt::Dbo::Transaction transaction(_session);
@@ -29,8 +29,8 @@ Handler::Handler(Wt::Dbo::SqlConnectionPool& connectionPool)
 
 		// Indexes
 		_session.execute("PRAGMA journal_mode=WAL");
-		_session.execute("CREATE INDEX IF NOT EXISTS file_download_uid_idx ON file(download_UID)");
-		_session.execute("CREATE INDEX IF NOT EXISTS file_edit_uid_idx ON file(edit_UID)");
+		_session.execute("CREATE INDEX IF NOT EXISTS share_download_uid_idx ON share(download_UUID)");
+		_session.execute("CREATE INDEX IF NOT EXISTS share_edit_uid_idx ON share(edit_UUID)");
 	}
 }
 
