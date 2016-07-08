@@ -52,9 +52,17 @@ int main(int argc, char *argv[])
 	{
 		Config::instance().setFile(configFilePath);
 
-		std::vector<std::string> wtArgs = getWtArgs(argv[0]);
+		// Make sure working directory exists
+		// TODO check
+		boost::filesystem::create_directories(Config::instance().getPath("working-dir") / "files");
+		boost::filesystem::create_directories(Config::instance().getPath("working-dir") / "tmp");
+
+		// Set the WT_TMP_DIR inside the working dir
+		setenv("WT_TMP_DIR", (Config::instance().getPath("working-dir") / "tmp").string().c_str(), 1);
 
 		// Construct argc/argv for Wt
+		std::vector<std::string> wtArgs = getWtArgs(argv[0]);
+
 		const char* wtArgv[wtArgs.size()];
 		for (std::size_t i = 0; i < wtArgs.size(); ++i)
 			wtArgv[i] = wtArgs[i].c_str();
@@ -63,9 +71,6 @@ int main(int argc, char *argv[])
 		server.setServerConfiguration (wtArgs.size(), const_cast<char**>(wtArgv));
 
 		Wt::WServer::instance()->logger().configure("*"); // log everything, TODO configure this
-
-		// Make sure working directory exists
-		boost::filesystem::create_directories(Config::instance().getPath("working-dir") / "files");
 
 		// Initializing a connection pool to the database that will be shared along services
 		std::unique_ptr<Wt::Dbo::SqlConnectionPool>

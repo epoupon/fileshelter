@@ -5,8 +5,8 @@
 namespace Database {
 
 Share::Share(void)
-: _nbMaxDownloads(0),
-_nbDownloads(00)
+: _hits(0),
+_maxHits(0)
 {
 	// Generate UID
 

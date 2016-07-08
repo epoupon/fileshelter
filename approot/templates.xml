@@ -8,10 +8,12 @@
 </message>
 
 <message id="template-share-create">
-	<h1>${title}</h1>
+	<div class="page-header">
+		<h1>${title}</h1>
+	</div>
 	<div class="form-horizontal">
 		<div class="form-group">
-			<label class="control-label col-sm-2"  for="${id:name}">
+			<label class="control-label col-sm-2"  for="${id:desc}">
 				Description
 			</label>
 			<div class="col-sm-5">
@@ -86,7 +88,9 @@
 </message>
 
 <message id="template-share-created">
-	<h1>Share successfully created!</h1>
+	<div class="page-header">
+		<h1>Share successfully created!</h1>
+	</div>
 	<div class="form-horizontal">
 		<div class="form-group">
 			<label class="control-label col-sm-2"  for="${id:public-link}">
@@ -108,10 +112,12 @@
 </message>
 
 <message id="template-share-download">
-	<h1>Download</h1>
+	<div class="page-header">
+		<h1>Download</h1>
+	</div>
 	<div class="form-horizontal">
 		<div class="form-group">
-			<label class="control-label col-sm-2"  for="${id:file-desc}">
+			<label class="control-label col-sm-2">
 				Description
 			</label>
 			<div class="col-sm-5 well well-sm">
@@ -119,7 +125,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="control-label col-sm-2"  for="${id:file-name}">
+			<label class="control-label col-sm-2">
 				File name
 			</label>
 			<div class="col-sm-5 well well-sm">
@@ -127,7 +133,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="control-label col-sm-2"  for="${id:file-size}">
+			<label class="control-label col-sm-2">
 				File size
 			</label>
 			<div class="col-sm-5 well well-sm">
@@ -142,8 +148,64 @@
 	</div>
 </message>
 
+<message id="template-share-edit">
+	<div class="page-header">
+		<h1>Edit</h1>
+	</div>
+	<div class="form-horizontal">
+		<div class="form-group">
+			<label class="control-label col-sm-2">
+				Description
+			</label>
+			<div class="col-sm-5 well well-sm">
+				${file-desc}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2">
+				File name
+			</label>
+			<div class="col-sm-5 well well-sm">
+				${file-name}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2">
+				File size
+			</label>
+			<div class="col-sm-5 well well-sm">
+				${file-size} kB
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2">
+				Expires on
+			</label>
+			<div class="col-sm-5 well well-sm">
+				${time-validity}
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2">
+				Hits
+			</label>
+			<div class="col-sm-5 well well-sm">
+				${hits} / ${max-hits}
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-5">
+				${delete-btn}
+			</div>
+		</div>
+	</div>
+</message>
+
+
 <message id="template-share-not-found">
-	<h1>File not found!</h1>
+	<div class="page-header">
+		<h1>File not found!</h1>
+	</div>
 </message>
 
 </messages>

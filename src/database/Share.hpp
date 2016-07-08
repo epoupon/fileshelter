@@ -22,22 +22,19 @@ class Share
 		static pointer	delByEditUUID(Wt::Dbo::Session& session, std::string UUID);
 
 		// Getters
-		boost::filesystem::path	getPath(void) const { return _path; }
-		std::string		getFileName(void) const { return _filename; }
-		std::size_t		getFileSize(void) const { return _filesize; }
-
-		bool hasPassword(void) const { return !_password.empty(); }
-		bool verifyPassword(std::string password);
-		std::string getDesc(void) const { return _desc; }
-		boost::posix_time::ptime getCreationTime(void) const { return _creationTime; }
-		boost::posix_time::time_duration getValidityDuration(void) const { return _validityDuration; }
-		bool hasExpired(void) const;
-
-		std::size_t getMaxDownloads(void) const { return _nbMaxDownloads; }
-		std::size_t getNbDownloads(void) const { return _nbDownloads; }
-
-		std::string getDownloadUUID(void) const { return _downloadUUID; }
-		std::string getEditUUID(void) const { return _editUUID; }
+		boost::filesystem::path		getPath(void) const { return _path; }
+		std::string			getFileName(void) const { return _filename; }
+		std::size_t			getFileSize(void) const { return _filesize; }
+		bool				hasPassword(void) const { return !_password.empty(); }
+		bool				verifyPassword(std::string password) const;
+		std::string			getDesc(void) const { return _desc; }
+		boost::posix_time::ptime	getCreationTime(void) const { return _creationTime; }
+		boost::posix_time::ptime	getExpiracyTime(void) const { return _expiracyTime; }
+		bool				hasExpired(void) const;
+		std::size_t			getMaxHits(void) const { return _maxHits; }
+		std::size_t			getHits(void) const { return _hits; }
+		std::string			getDownloadUUID(void) const { return _downloadUUID; }
+		std::string			getEditUUID(void) const { return _editUUID; }
 
 		// Setters
 		void setPath(boost::filesystem::path path) { _path = path.string(); }
@@ -47,8 +44,7 @@ class Share
 		void setDesc(std::string desc) { _desc = desc; }
 		void setCreationTime(boost::posix_time::ptime time);
 		void setValidityDuration(boost::posix_time::ptime time);
-		void setMaxDownloads(std::size_t nbMaxDownloads);
-
+		void setMaxHits(std::size_t maxHits)	{ _maxHits = maxHits; }
 
 
 		template<class Action>
@@ -61,9 +57,9 @@ class Share
 				Wt::Dbo::field(a, _password,		"password");
 				Wt::Dbo::field(a, _desc,		"desc");
 				Wt::Dbo::field(a, _creationTime,	"creation_time");
-				Wt::Dbo::field(a, _validityDuration,	"validity_duration");
-				Wt::Dbo::field(a, _nbMaxDownloads,	"nb_max_downloads");
-				Wt::Dbo::field(a, _nbMaxDownloads,	"nb_downloads");
+				Wt::Dbo::field(a, _expiracyTime,	"expiracy_time");
+				Wt::Dbo::field(a, _maxHits,		"max_hits");
+				Wt::Dbo::field(a, _hits,		"hits");
 				Wt::Dbo::field(a, _downloadUUID,	"download_UUID");
 				Wt::Dbo::field(a, _editUUID,		"edit_UUID");
 			}
@@ -78,10 +74,10 @@ class Share
 		std::string				_desc;		// optional
 
 		boost::posix_time::ptime		_creationTime;
-		boost::posix_time::time_duration	_validityDuration;
+		boost::posix_time::ptime		_expiracyTime;
 
-		int					_nbMaxDownloads; //optional
-		int					_nbDownloads;
+		int					_hits;
+		int					_maxHits;	//optional
 
 		std::string		_downloadUUID;
 		std::string		_editUUID;

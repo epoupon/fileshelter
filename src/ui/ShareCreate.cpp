@@ -7,6 +7,7 @@
 #include <Wt/WDateEdit>
 #include <Wt/WSpinBox>
 #include <Wt/WIntValidator>
+#include <Wt/WAbstractItemModel>
 
 #include "utils/Config.hpp"
 #include "utils/Logger.hpp"
@@ -175,6 +176,7 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 				share.modify()->setPath(storePath);
 				share.modify()->setFileName(upload->clientFileName().toUTF8());
 				share.modify()->setFileSize(boost::filesystem::file_size(storePath));
+				share.modify()->setMaxHits(Wt::asNumber(_model->value(ShareCreateFormModel::HitsValidityField)));
 
 				transaction.commit();
 

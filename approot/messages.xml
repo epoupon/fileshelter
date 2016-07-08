@@ -6,6 +6,7 @@
 <message id="msg-create-share">New share</message>
 <message id="msg-upload">Upload</message>
 <message id="msg-download">Download</message>
+<message id="msg-delete">Delete</message>
 <message id="msg-create-share-too-large">File to large!</message>
 <message id="msg-create-share-failed">Failed to create the share!</message>
 

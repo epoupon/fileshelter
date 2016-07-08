@@ -9,6 +9,7 @@
 #include "ShareCreate.hpp"
 #include "ShareCreated.hpp"
 #include "ShareDownload.hpp"
+#include "ShareEdit.hpp"
 
 #include "FileShelterApplication.hpp"
 
@@ -36,7 +37,7 @@ enum Idx
 	IdxShareCreate		= 1,
 	IdxShareCreated		= 2,
 	IdxShareDownload	= 3,
-	IdxShareEdit		= 5,
+	IdxShareEdit		= 4,
 };
 
 void
@@ -48,7 +49,7 @@ handlePathChange(Wt::WStackedWidget* stack)
 		{ "/share-create",	IdxShareCreate },
 		{ "/share-created",	IdxShareCreated },
 		{ "/share-download",	IdxShareDownload },
-//		{ "/share-edit",	IdxShareEdit },
+		{ "/share-edit",	IdxShareEdit },
 	};
 
 	for (auto index : indexes)
@@ -60,8 +61,8 @@ handlePathChange(Wt::WStackedWidget* stack)
 		}
 	}
 
-	// Redirect bad paths to the home
-	stack->setCurrentIndex(IdxHome);
+	// Redirect bad path to the home
+	wApp->setInternalPath("/home", true);
 }
 
 /*
@@ -97,6 +98,7 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 	mainStack->addWidget(new ShareCreate());
 	mainStack->addWidget(new ShareCreated());
 	mainStack->addWidget(new ShareDownload());
+	mainStack->addWidget(new ShareEdit());
 
 	internalPathChanged().connect(std::bind([=]
 	{
