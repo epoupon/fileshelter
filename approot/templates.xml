@@ -3,8 +3,10 @@
 <!--FORMS message blocks-->
 
 <message id="template-home">
-	<h1>FileShelter</h1>
-	${create-share-btn}
+	<div class="jumbotron">
+		<h1>FileShelter</h1>
+		${create-share-btn}
+	</div>
 </message>
 
 <message id="template-share-create">
@@ -115,6 +117,11 @@
 	<div class="page-header">
 		<h1>Download</h1>
 	</div>
+	${<if-error>}
+	<div class="alert alert-danger">
+		${error}
+	</div>
+	${</if-error>}
 	<div class="form-horizontal">
 		<div class="form-group">
 			<label class="control-label col-sm-2">

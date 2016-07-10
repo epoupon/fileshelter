@@ -45,6 +45,7 @@ class Share
 		void setCreationTime(boost::posix_time::ptime time);
 		void setValidityDuration(boost::posix_time::ptime time);
 		void setMaxHits(std::size_t maxHits)	{ _maxHits = maxHits; }
+		void incHits()				{ _hits++; }
 
 
 		template<class Action>

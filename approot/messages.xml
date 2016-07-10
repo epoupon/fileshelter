@@ -9,5 +9,6 @@
 <message id="msg-delete">Delete</message>
 <message id="msg-create-share-too-large">File to large!</message>
 <message id="msg-create-share-failed">Failed to create the share!</message>
+<message id="msg-share-no-longer-available">This share is no longer available!</message>
 
 </messages>

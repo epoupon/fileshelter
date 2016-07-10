@@ -1,12 +1,12 @@
 #include <Wt/WTemplate>
 #include <Wt/WAnchor>
 #include <Wt/WPushButton>
-#include <Wt/WFileResource>
 
 #include "utils/Logger.hpp"
 #include "database/Share.hpp"
 
 #include "FileShelterApplication.hpp"
+#include "ShareResource.hpp"
 
 #include "ShareDownload.hpp"
 
@@ -52,10 +52,18 @@ ShareDownload::refresh(void)
 	t->bindString("file-size", std::to_string(share->getFileSize() / 1000));
 
 	auto *downloadBtn = new Wt::WPushButton(tr("msg-download"));
-	auto *fileResource = new Wt::WFileResource(share->getPath().string());
-	fileResource->suggestFileName(share->getFileName());
 
-	downloadBtn->setResource(fileResource);
+	if (share->hasExpired())
+	{
+		t->setCondition("if-error", true);
+		t->bindString("error", tr("msg-share-no-longer-available"));
+		downloadBtn->setEnabled(false);
+	}
+	else
+	{
+		downloadBtn->setResource(new ShareResource(downloadUUID));
+	}
+
 	downloadBtn->addStyleClass("btn btn-primary");
 	t->bindWidget("download-btn", downloadBtn);
 
