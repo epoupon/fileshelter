@@ -53,8 +53,11 @@ int main(int argc, char *argv[])
 		Config::instance().setFile(configFilePath);
 
 		// Make sure working directory exists
-		// TODO check
+		// TODO check with boost::system::error_code ec;
 		boost::filesystem::create_directories(Config::instance().getPath("working-dir") / "files");
+
+		// Recreate the tmp directory in order to flush it
+		boost::filesystem::remove_all(Config::instance().getPath("working-dir") / "tmp");
 		boost::filesystem::create_directories(Config::instance().getPath("working-dir") / "tmp");
 
 		// Set the WT_TMP_DIR inside the working dir
