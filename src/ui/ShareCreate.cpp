@@ -102,10 +102,10 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 		upload->changed().connect(_applyInfo, &Wt::WWidget::hide);
 
 		// Time validity
-		Wt::WDateEdit *timeValidity = new Wt::WDateEdit();
-		setFormWidget(ShareCreateFormModel::ExpiracyDateField, timeValidity);
-		timeValidity->setDate(Wt::WDate::currentDate().addDays(7));
-		timeValidity->changed().connect(_applyInfo, &Wt::WWidget::hide);
+		Wt::WDateEdit *expiracyDate = new Wt::WDateEdit();
+		setFormWidget(ShareCreateFormModel::ExpiracyDateField, expiracyDate);
+		expiracyDate->setDate(Wt::WDate::currentDate().addDays(7));
+		expiracyDate->changed().connect(_applyInfo, &Wt::WWidget::hide);
 
 		// Hits validity
 		Wt::WSpinBox *hitsValidity = new Wt::WSpinBox();
@@ -177,7 +177,9 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 				share.modify()->setFileName(upload->clientFileName().toUTF8());
 				share.modify()->setFileSize(boost::filesystem::file_size(storePath));
 				share.modify()->setMaxHits(Wt::asNumber(_model->value(ShareCreateFormModel::HitsValidityField)));
-				share.modify()->setExpiracyDate(boost::gregorian::from_string(Wt::asString(_model->value(ShareCreateFormModel::ExpiracyDateField)).toUTF8()));
+
+				Wt::WDate date = expiracyDate->date();
+				share.modify()->setExpiracyDate(boost::gregorian::date(date.year(), date.month(), date.day()));
 
 				transaction.commit();
 

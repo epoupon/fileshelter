@@ -57,11 +57,12 @@ int main(int argc, char *argv[])
 		boost::filesystem::create_directories(Config::instance().getPath("working-dir") / "files");
 
 		// Recreate the tmp directory in order to flush it
-		boost::filesystem::remove_all(Config::instance().getPath("working-dir") / "tmp");
-		boost::filesystem::create_directories(Config::instance().getPath("working-dir") / "tmp");
+		auto tmpDir = Config::instance().getPath("working-dir") / "tmp";
+		boost::filesystem::remove_all(tmpDir);
+		boost::filesystem::create_directories(tmpDir);
 
-		// Set the WT_TMP_DIR inside the working dir
-		setenv("WT_TMP_DIR", (Config::instance().getPath("working-dir") / "tmp").string().c_str(), 1);
+		// Set the WT_TMP_DIR inside the working dir, used to upload files
+		setenv("WT_TMP_DIR", tmpDir.string().c_str(), 1);
 
 		// Construct argc/argv for Wt
 		std::vector<std::string> wtArgs = getWtArgs(argv[0]);
