@@ -29,7 +29,7 @@ class Share
 		bool				verifyPassword(std::string password) const;
 		std::string			getDesc(void) const { return _desc; }
 		boost::posix_time::ptime	getCreationTime(void) const { return _creationTime; }
-		boost::posix_time::ptime	getExpiracyTime(void) const { return _expiracyTime; }
+		boost::gregorian::date		getExpiracyDate(void) const { return _expiracyTime.date(); }
 		bool				hasExpired(void) const;
 		std::size_t			getMaxHits(void) const { return _maxHits; }
 		std::size_t			getHits(void) const { return _hits; }
@@ -46,6 +46,7 @@ class Share
 		void setValidityDuration(boost::posix_time::ptime time);
 		void setMaxHits(std::size_t maxHits)	{ _maxHits = maxHits; }
 		void incHits()				{ _hits++; }
+		void setExpiracyDate(boost::gregorian::date date) { _expiracyTime = boost::posix_time::ptime(date); }
 
 
 		template<class Action>

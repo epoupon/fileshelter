@@ -6,21 +6,16 @@ namespace Database {
 
 Share::Share(void)
 : _hits(0),
-_maxHits(0)
+_maxHits(0),
+_downloadUUID(generateUUID()),
+_editUUID(generateUUID())
 {
-	// Generate UID
-
 }
 
 Share::pointer
 Share::create(Wt::Dbo::Session& session)
 {
-	Share* share = new Share();
-
-	share->_downloadUUID = generateUUID();
-	share->_editUUID = generateUUID();
-
-	return session.add(share);
+	return session.add(new Share());
 }
 
 
@@ -40,6 +35,10 @@ bool
 Share::hasExpired(void) const
 {
 	if (_maxHits > 0 && _hits >= _maxHits)
+		return true;
+
+	auto currentDate = boost::gregorian::day_clock::universal_day();
+	if (currentDate >= _expiracyTime.date())
 		return true;
 
 	return false;
