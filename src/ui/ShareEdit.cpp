@@ -46,7 +46,11 @@ ShareEdit::refresh(void)
 	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-edit"), this);
 	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
-	t->bindString("file-desc", share->getDesc());
+	if (!share->getDesc().empty())
+	{
+		t->setCondition("if-desc", true);
+		t->bindString("file-desc", share->getDesc());
+	}
 	t->bindString("file-name", share->getFileName());
 	t->bindString("file-size", std::to_string(share->getFileSize() / 1000));
 	t->bindString("expiracy-date", boost::gregorian::to_simple_string(share->getExpiracyDate()));

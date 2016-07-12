@@ -73,12 +73,6 @@ class ShareCreateFormModel : public Wt::WFormModel
 
 		}
 
-		void saveData(void)
-		{
-			Wt::Dbo::Transaction transaction(DboSession());
-
-//			CurrentUser().modify()->setAudioBitrate( Wt::asNumber(value(BitrateField)));
-		}
 };
 
 const Wt::WFormModel::Field ShareCreateFormModel::DescriptionField = "desc";

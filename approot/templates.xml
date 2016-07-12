@@ -123,6 +123,7 @@
 	</div>
 	${</if-error>}
 	<div class="form-horizontal">
+		${<if-desc>}
 		<div class="form-group">
 			<label class="control-label col-sm-2">
 				${tr:msg-description}
@@ -131,6 +132,7 @@
 				${file-desc}
 			</div>
 		</div>
+		${</if-desc>}
 		<div class="form-group">
 			<label class="control-label col-sm-2">
 				${tr:msg-file-name}
@@ -160,6 +162,7 @@
 		<h1>${tr:msg-share-edit}</h1>
 	</div>
 	<div class="form-horizontal">
+		${<if-desc>}
 		<div class="form-group">
 			<label class="control-label col-sm-2">
 				${tr:msg-description}
@@ -168,6 +171,7 @@
 				${file-desc}
 			</div>
 		</div>
+		${</if-desc>}
 		<div class="form-group">
 			<label class="control-label col-sm-2">
 				${tr:msg-file-name}
