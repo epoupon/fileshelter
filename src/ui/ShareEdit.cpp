@@ -1,5 +1,6 @@
 #include <Wt/WTemplate>
 #include <Wt/WPushButton>
+#include <Wt/WMessageBox>
 
 #include "utils/Logger.hpp"
 #include "database/Share.hpp"
@@ -39,7 +40,8 @@ ShareEdit::refresh(void)
 	if (!share || !boost::filesystem::exists(share->getPath()))
 	{
 		FS_LOG(UI, ERROR) << "Edit UUID '" << editUUID << "' not found";
-		this->addWidget(new Wt::WTemplate(tr("template-share-not-found")));
+		Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-not-found"), this);
+		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 		return;
 	}
 
@@ -60,6 +62,35 @@ ShareEdit::refresh(void)
 	auto *deleteBtn = new Wt::WPushButton(tr("msg-delete"));
 	deleteBtn->addStyleClass("btn btn-danger");
 	t->bindWidget("delete-btn", deleteBtn);
+
+	deleteBtn->clicked().connect(std::bind([=] ()
+	{
+		Wt::WMessageBox *messageBox = new Wt::WMessageBox
+			(tr("msg-share-delete"),
+			tr("msg-confirm-action"),
+			 Wt::Question, Wt::Yes | Wt::No);
+
+		messageBox->setModal(true);
+
+		messageBox->buttonClicked().connect(std::bind([=] ()
+		{
+			if (messageBox->buttonResult() == Wt::Yes)
+			{
+				Wt::Dbo::Transaction transaction(DboSession());
+
+				Database::Share::pointer share = Database::Share::getByEditUUID(DboSession(), editUUID);
+
+				if (share)
+					share.remove();
+
+				wApp->setInternalPath("/home", true);
+			}
+
+			delete messageBox;
+		}));
+
+		messageBox->show();
+	}));
 
 }
 

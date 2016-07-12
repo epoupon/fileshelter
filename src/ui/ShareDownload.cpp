@@ -41,7 +41,9 @@ ShareDownload::refresh(void)
 	if (!share || !boost::filesystem::exists(share->getPath()))
 	{
 		FS_LOG(UI, ERROR) << "Download UUID '" << downloadUUID << "' not found";
-		this->addWidget(new Wt::WTemplate(tr("template-share-not-found")));
+		Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-not-found"), this);
+		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
+
 		return;
 	}
 

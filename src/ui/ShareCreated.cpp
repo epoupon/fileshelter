@@ -40,7 +40,8 @@ ShareCreated::refresh(void)
 	if (!share)
 	{
 		FS_LOG(UI, ERROR) << "Edit UUID '" << editUUID << "' not found";
-		this->addWidget(new Wt::WTemplate(tr("template-share-not-found")));
+		Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-not-found"), this);
+		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 		return;
 	}
 

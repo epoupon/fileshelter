@@ -16,6 +16,8 @@
 <message id="msg-share-download">Download</message>
 <message id="msg-share-edit">Edit</message>
 <message id="msg-share-not-found">Share not found!</message>
+<message id="msg-share-delete">Delete share</message>
+<message id="msg-confirm-action">Are you sure?</message>
 
 <message id="msg-expiracy-date">Expiracy date</message>
 <message id="msg-max-hits">Max downloads</message>
