@@ -7,6 +7,7 @@
 #include <Wt/WDateEdit>
 #include <Wt/WSpinBox>
 #include <Wt/WIntValidator>
+#include <Wt/WDateValidator>
 #include <Wt/WAbstractItemModel>
 
 #include "utils/Config.hpp"
@@ -42,12 +43,29 @@ class ShareCreateFormModel : public Wt::WFormModel
 			addField(PasswordField);
 			addField(PasswordConfirmField);
 
-			auto histValidator = new Wt::WIntValidator(0, 30);
-			histValidator->setMandatory(true);
-			setValidator(HitsValidityField, histValidator);
+			auto maxHits = Config::instance().getULong("max-validity-hits", 0);
+			auto maxDurationDays = Config::instance().getULong("max-validity-days", 0);
 
-//			setValidator(BitrateField, new Wt::WValidator(true)); // mandatory
-//			setValidator(EncodingField, new Wt::WValidator(true)); // mandatory
+			auto hitsValidator = new Wt::WIntValidator();
+			hitsValidator->setMandatory(true);
+			if (maxHits > 0)
+			{
+				hitsValidator->setBottom(1);
+				hitsValidator->setTop(maxHits);
+			}
+			else
+			{
+				hitsValidator->setBottom(0);
+			}
+			setValidator(HitsValidityField, hitsValidator);
+
+			auto dateValidator = new Wt::WDateValidator();
+			dateValidator->setMandatory(true);
+			dateValidator->setBottom(Wt::WDate::currentServerDate().addDays(1));
+			if (maxDurationDays > 0)
+				dateValidator->setTop(Wt::WDate::currentServerDate().addDays(maxDurationDays));
+			setValidator(ExpiracyDateField, dateValidator);
+
 
 			// Default values
 			setValue(ExpiracyDateField, Wt::WDate::currentServerDate().addDays(7));
@@ -96,7 +114,7 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 
 		// File
 		Wt::WFileUpload *upload = new Wt::WFileUpload();
-		upload->setFileTextSize(1000000); // TODO CONFIG OR CONSTRUCTOR
+		upload->setFileTextSize(80);
 		upload->setProgressBar(new Wt::WProgressBar());
 		setFormWidget(ShareCreateFormModel::FileField, upload);
 		upload->changed().connect(_applyInfo, &Wt::WWidget::hide);
@@ -104,7 +122,6 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 		// Time validity
 		Wt::WDateEdit *expiracyDate = new Wt::WDateEdit();
 		setFormWidget(ShareCreateFormModel::ExpiracyDateField, expiracyDate);
-		expiracyDate->setDate(Wt::WDate::currentDate().addDays(7));
 		expiracyDate->changed().connect(_applyInfo, &Wt::WWidget::hide);
 
 		// Hits validity
@@ -136,61 +153,61 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 
 			if (_model->validate())
 			{
-			FS_LOG(UI, DEBUG) << "validation OK";
+				FS_LOG(UI, DEBUG) << "validation OK";
 
-			upload->upload();
-			uploadBtn->disable();
+				upload->upload();
+				uploadBtn->disable();
 
-			upload->uploaded().connect(std::bind([=] ()
-			{
-				FS_LOG(UI, DEBUG) << "Uploaded!";
-
-				Wt::Dbo::Transaction transaction(DboSession());
-
-				Database::Share::pointer share = Database::Share::create(DboSession());
-
-				// Filename is the DownloadUID
-				auto curPath = boost::filesystem::path(upload->spoolFileName());
-				auto storePath = Config::instance().getPath("working-dir") / "files" / share->getDownloadUUID();
-
-				boost::system::error_code ec;
-				boost::filesystem::rename(curPath, storePath, ec);
-				if (ec)
+				upload->uploaded().connect(std::bind([=] ()
 				{
-				FS_LOG(UI, INFO) << "Move file failed from " << curPath << " to " << storePath << ": " << ec.message();
+					FS_LOG(UI, DEBUG) << "Uploaded!";
 
-				// fallback on copy
-				boost::filesystem::copy_file(curPath, storePath, ec);
-				if (ec)
+					Wt::Dbo::Transaction transaction(DboSession());
+
+					Database::Share::pointer share = Database::Share::create(DboSession());
+
+					// Filename is the DownloadUID
+					auto curPath = boost::filesystem::path(upload->spoolFileName());
+					auto storePath = Config::instance().getPath("working-dir") / "files" / share->getDownloadUUID();
+
+					boost::system::error_code ec;
+					boost::filesystem::rename(curPath, storePath, ec);
+					if (ec)
+					{
+						FS_LOG(UI, INFO) << "Move file failed from " << curPath << " to " << storePath << ": " << ec.message();
+
+						// fallback on copy
+						boost::filesystem::copy_file(curPath, storePath, ec);
+						if (ec)
+						{
+							FS_LOG(UI, ERROR) << "Copy file failed from " << curPath << " to " << storePath << ": " << ec.message();
+							_applyInfo->show();
+							_applyInfo->setText( tr("msg-create-share-failed"));
+							return;
+						}
+					}
+					else
+						upload->stealSpooledFile();
+
+					share.modify()->setDesc(_model->valueText(ShareCreateFormModel::DescriptionField).toUTF8());
+					share.modify()->setPath(storePath);
+					share.modify()->setFileName(upload->clientFileName().toUTF8());
+					share.modify()->setFileSize(boost::filesystem::file_size(storePath));
+					share.modify()->setMaxHits(Wt::asNumber(_model->value(ShareCreateFormModel::HitsValidityField)));
+
+					Wt::WDate date = expiracyDate->date();
+					share.modify()->setExpiracyDate(boost::gregorian::date(date.year(), date.month(), date.day()));
+
+					transaction.commit();
+
+					wApp->setInternalPath("/share-created/" + share->getEditUUID(), true);
+				}));
+
+				upload->fileTooLarge().connect(std::bind([=] ()
 				{
-					FS_LOG(UI, ERROR) << "Copy file failed from " << curPath << " to " << storePath << ": " << ec.message();
 					_applyInfo->show();
-					_applyInfo->setText( tr("msg-create-share-failed"));
-					return;
-				}
-				}
-				else
-					upload->stealSpooledFile();
-
-				share.modify()->setDesc(_model->valueText(ShareCreateFormModel::DescriptionField).toUTF8());
-				share.modify()->setPath(storePath);
-				share.modify()->setFileName(upload->clientFileName().toUTF8());
-				share.modify()->setFileSize(boost::filesystem::file_size(storePath));
-				share.modify()->setMaxHits(Wt::asNumber(_model->value(ShareCreateFormModel::HitsValidityField)));
-
-				Wt::WDate date = expiracyDate->date();
-				share.modify()->setExpiracyDate(boost::gregorian::date(date.year(), date.month(), date.day()));
-
-				transaction.commit();
-
-				wApp->setInternalPath("/share-created/" + share->getEditUUID(), true);
-			}));
-
-			upload->fileTooLarge().connect(std::bind([=] ()
-			{
-				_applyInfo->show();
-				_applyInfo->setText( tr("msg-create-share-too-large"));
-			}));
+					_applyInfo->setText( tr("msg-create-share-too-large"));
+				}));
 			}
 			else
 			{
