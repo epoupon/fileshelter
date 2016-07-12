@@ -16,7 +16,7 @@
 	<div class="form-horizontal">
 		<div class="form-group">
 			<label class="control-label col-sm-2"  for="${id:desc}">
-				Description
+				${tr:msg-description}
 			</label>
 			<div class="col-sm-5">
 				${desc}
@@ -27,7 +27,7 @@
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-2"  for="${id:expiracy-date}">
-				Validity duration
+				${tr:msg-expiracy-date}
 			</label>
 			<div class="col-sm-5">
 				${expiracy-date}
@@ -38,7 +38,7 @@
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-2"  for="${id:hits-validity}">
-				Max downloads
+				${tr:msg-max-hits}
 			</label>
 			<div class="col-sm-5">
 				${hits-validity}
@@ -49,7 +49,7 @@
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-2"  for="${id:password}">
-				Password (optional)
+				${tr:msg-password}
 			</label>
 			<div class="col-sm-5">
 				${password}
@@ -60,7 +60,7 @@
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-2"  for="${id:password-confirm}">
-				Confirm password
+				${tr:msg-password-confirm}
 			</label>
 			<div class="col-sm-5">
 				${password-confirm}
@@ -71,7 +71,7 @@
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-2"  for="${id:file}">
-				File
+				${tr:msg-file}
 			</label>
 			<div class="col-sm-5">
 				${file}
@@ -96,15 +96,15 @@
 	<div class="form-horizontal">
 		<div class="form-group">
 			<label class="control-label col-sm-2"  for="${id:public-link}">
-				Public link
+				${tr:msg-download-link}
 			</label>
 			<div class="col-sm-10 well well-sm">
-				${public-link}
+				${download-link}
 			</div>
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-2"  for="${id:edit-link}">
-				Edit link
+				${tr:msg-edit-link}
 			</label>
 			<div class="col-sm-10 well well-sm">
 				${edit-link}
@@ -125,7 +125,7 @@
 	<div class="form-horizontal">
 		<div class="form-group">
 			<label class="control-label col-sm-2">
-				Description
+				${tr:msg-description}
 			</label>
 			<div class="col-sm-5 well well-sm">
 				${file-desc}
@@ -133,7 +133,7 @@
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-2">
-				File name
+				${tr:msg-file-name}
 			</label>
 			<div class="col-sm-5 well well-sm">
 				${file-name}
@@ -141,7 +141,7 @@
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-2">
-				File size
+				${tr:msg-file-size}
 			</label>
 			<div class="col-sm-5 well well-sm">
 				${file-size} kB
@@ -162,7 +162,7 @@
 	<div class="form-horizontal">
 		<div class="form-group">
 			<label class="control-label col-sm-2">
-				Description
+				${tr:msg-description}
 			</label>
 			<div class="col-sm-5 well well-sm">
 				${file-desc}
@@ -170,7 +170,7 @@
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-2">
-				File name
+				${tr:msg-file-name}
 			</label>
 			<div class="col-sm-5 well well-sm">
 				${file-name}
@@ -178,7 +178,7 @@
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-2">
-				File size
+				${tr:msg-file-size}
 			</label>
 			<div class="col-sm-5 well well-sm">
 				${file-size} kB
@@ -186,7 +186,7 @@
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-2">
-				Expires on
+				${tr:msg-expiracy-date}
 			</label>
 			<div class="col-sm-5 well well-sm">
 				${expiracy-date}
@@ -194,7 +194,7 @@
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-2">
-				Hits
+				${tr:msg-hits}
 			</label>
 			<div class="col-sm-5 well well-sm">
 				${hits} / ${max-hits}

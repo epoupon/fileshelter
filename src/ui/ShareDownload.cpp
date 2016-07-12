@@ -47,6 +47,8 @@ ShareDownload::refresh(void)
 
 	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-download"), this);
 
+	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
+
 	t->bindString("file-desc", share->getDesc());
 	t->bindString("file-name", share->getFileName());
 	t->bindString("file-size", std::to_string(share->getFileSize() / 1000));

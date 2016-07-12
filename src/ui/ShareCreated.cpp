@@ -45,11 +45,12 @@ ShareCreated::refresh(void)
 	}
 
 	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-created"), this);
+	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
 	std::string downloadPath = "/share-download/" + share->getDownloadUUID();
 	std::string editPath = "/share-edit/" + share->getEditUUID();
 
-	t->bindWidget("public-link", new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, downloadPath), wApp->environment().headerValue("Host") + downloadPath));
+	t->bindWidget("download-link", new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, downloadPath), wApp->environment().headerValue("Host") + downloadPath));
 	t->bindWidget("edit-link", new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, editPath), wApp->environment().headerValue("Host") + editPath));
 }
 

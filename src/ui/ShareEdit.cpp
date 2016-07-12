@@ -44,6 +44,7 @@ ShareEdit::refresh(void)
 	}
 
 	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-edit"), this);
+	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
 	t->bindString("file-desc", share->getDesc());
 	t->bindString("file-name", share->getFileName());
