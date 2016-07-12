@@ -36,11 +36,11 @@ class ShareCreateFormModel : public Wt::WFormModel
 		ShareCreateFormModel(Wt::WObject *parent = 0)
 			: Wt::WFormModel(parent)
 		{
-			addField(DescriptionField);
+			addField(DescriptionField, Wt::WString::tr("msg-optional"));
 			addField(FileField);
 			addField(ExpiracyDateField);
 			addField(HitsValidityField);
-			addField(PasswordField);
+			addField(PasswordField, Wt::WString::tr("msg-optional"));
 			addField(PasswordConfirmField);
 
 			auto maxHits = Config::instance().getULong("max-validity-hits", 0);

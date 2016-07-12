@@ -11,6 +11,7 @@
 <message id="msg-file-name">File name</message>
 <message id="msg-file-size">File size</message>
 <message id="msg-file">File</message>
+<message id="msg-optional">Optional</message>
 <message id="msg-hits">Downloads</message>
 <message id="msg-share-create">New share</message>
 <message id="msg-share-download">Download</message>
