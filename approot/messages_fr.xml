@@ -1,0 +1,49 @@
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<messages xmlns:if="Wt.WTemplate.conditions">
+<!--FORMS message blocks-->
+
+<message id="msg-create-share">Nouveau partage</message>
+<message id="msg-upload">Envoyer</message>
+<message id="msg-download">Télécharger</message>
+<message id="msg-delete">Supprimer</message>
+<message id="msg-description">Description</message>
+<message id="msg-file-name">Nom</message>
+<message id="msg-file-size">Taille</message>
+<message id="msg-file">Fichier</message>
+<message id="msg-hits">Téléchargements</message>
+<message id="msg-share-create">Nouveau partage</message>
+<message id="msg-share-download">Téléchargement</message>
+<message id="msg-share-edit">Edition</message>
+<message id="msg-share-not-found">Partage non trouvé!</message>
+<message id="msg-share-delete">Supprimer le partage</message>
+<message id="msg-confirm-action">Etes vous sûr ?</message>
+
+<message id="msg-expiracy-date">Date d'expiration</message>
+<message id="msg-max-hits">Limite de téléchargements</message>
+<message id="msg-password">Mot de passe</message>
+<message id="msg-password-confirm">Confirmation du mot de passe</message>
+
+<message id="msg-download-link">Lien de téléchargement public</message>
+<message id="msg-edit-link">Lien d'édition privé</message>
+
+
+<message id="msg-create-share-too-large">Fichier trop gros !</message>
+<message id="msg-create-share-failed">Impossible de créer le partage !</message>
+<message id="msg-share-no-longer-available">Ce partage n'est plus disponible !</message>
+<message id="msg-create-share-success">Partage créé avec succès !</message>
+
+<message id="Wt.WMessageBox.Yes">Oui</message>
+<message id="Wt.WMessageBox.No">Non</message>
+<message id="Wt.WValidator.Invalid">Ce champ ne peut pas être vide</message>
+<message id="Wt.WDateValidator.DateTooEarly">La date doit être après {1}</message>
+<message id="Wt.WDateValidator.DateTooLate">La date doit être avant {1}</message>
+<message id="Wt.WDateValidator.WrongDateRange">La date doit être comprise entre {1} et {2}</message>
+<message id="Wt.WDateValidator.WrongFormat">Le format doit être '{1}'</message>
+
+<message id="Wt.WIntValidator.NotAnInteger">Doit être un nombre entier</message>
+<message id="Wt.WIntValidator.TooSmall">Le nombre doit être plus grand que {1}</message>
+<message id="Wt.WIntValidator.BadRange">Le nombre doit être compris entre {1} et {2}</message>
+<message id="Wt.WIntValidator.TooLarge">Le nombre doit être plus petit que {1}</message>
+
+</messages>

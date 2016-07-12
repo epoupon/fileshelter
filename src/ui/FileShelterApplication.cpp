@@ -84,7 +84,13 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 
 	// Resouce bundles
 	messageResourceBundle().use(appRoot() + "templates");
-	messageResourceBundle().use(appRoot() + "messages");
+
+	FS_LOG(UI, INFO) << "Locale = " << env.locale().name();
+
+	if (env.locale().name().find("fr") != std::string::npos)
+		messageResourceBundle().use(appRoot() + "messages_fr");
+	else
+		messageResourceBundle().use(appRoot() + "messages_en");
 
 	setTitle("FileShelter");
 
