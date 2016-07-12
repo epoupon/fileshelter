@@ -11,7 +11,7 @@
 
 <message id="template-share-create">
 	<div class="page-header">
-		<h1>${title}</h1>
+		<h1>${tr:msg-share-create}</h1>
 	</div>
 	<div class="form-horizontal">
 		<div class="form-group">
@@ -91,7 +91,7 @@
 
 <message id="template-share-created">
 	<div class="page-header">
-		<h1>Share successfully created!</h1>
+		<h1>${tr:msg-create-share-success}</h1>
 	</div>
 	<div class="form-horizontal">
 		<div class="form-group">
@@ -115,7 +115,7 @@
 
 <message id="template-share-download">
 	<div class="page-header">
-		<h1>Download</h1>
+		<h1>${tr:msg-share-download}</h1>
 	</div>
 	${<if-error>}
 	<div class="alert alert-danger">
@@ -157,7 +157,7 @@
 
 <message id="template-share-edit">
 	<div class="page-header">
-		<h1>Edit</h1>
+		<h1>${tr:msg-share-edit}</h1>
 	</div>
 	<div class="form-horizontal">
 		<div class="form-group">
@@ -211,7 +211,7 @@
 
 <message id="template-share-not-found">
 	<div class="page-header">
-		<h1>File not found!</h1>
+		<h1>${tr:msg-share-not-found}</h1>
 	</div>
 </message>
 

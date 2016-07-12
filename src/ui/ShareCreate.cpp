@@ -141,9 +141,7 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 		setFormWidget(ShareCreateFormModel::PasswordConfirmField, password);
 		passwordConfirm->changed().connect(_applyInfo, &Wt::WWidget::hide);
 
-		// Title & Buttons
-		bindString("title", Wt::WString::tr("msg-create-share"));
-
+		// Buttons
 		Wt::WPushButton *uploadBtn = new Wt::WPushButton(tr("msg-upload"));
 		uploadBtn->setStyleClass("btn-primary");
 		bindWidget("create-btn", uploadBtn);
