@@ -55,8 +55,6 @@ ShareResource::handleRequest(const Wt::Http::Request& request,
 	}
 	else
 	{
-		FS_LOG(UI, INFO) << "[" << _downloadUUID << "] - continuation!";
-
 		if (_path.empty())
 		{
 			FS_LOG(UI, ERROR) << "Path not set!";
