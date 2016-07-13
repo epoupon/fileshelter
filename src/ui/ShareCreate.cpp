@@ -218,7 +218,8 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 
 			Wt::WDate date = expiracyDate->date();
 			share.modify()->setExpiracyDate(boost::gregorian::date(date.year(), date.month(), date.day()));
-			share.modify()->setPassword(model->valueText(ShareCreateFormModel::PasswordField));
+			if (!model->valueText(ShareCreateFormModel::PasswordField).empty())
+				share.modify()->setPassword(model->valueText(ShareCreateFormModel::PasswordField));
 
 			transaction.commit();
 
