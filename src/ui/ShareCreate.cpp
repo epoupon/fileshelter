@@ -174,12 +174,20 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 		{
 			FS_LOG(UI, DEBUG) << "Uploaded!";
 
+			// Filename is the DownloadUID
+			auto curPath = boost::filesystem::path(upload->spoolFileName());
+			// Special case: the user did not choose a file
+			if (!boost::filesystem::exists(curPath))
+			{
+				FS_LOG(UI, ERROR) << "User did not select a file";
+				failed().emit(Wt::WString::tr("msg-no-file-selected"));
+				return;
+			}
+
 			Wt::Dbo::Transaction transaction(DboSession());
 
 			Database::Share::pointer share = Database::Share::create(DboSession());
 
-			// Filename is the DownloadUID
-			auto curPath = boost::filesystem::path(upload->spoolFileName());
 			auto storePath = Config::instance().getPath("working-dir") / "files" / share->getDownloadUUID();
 
 			boost::system::error_code ec;
@@ -194,11 +202,13 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 				{
 					FS_LOG(UI, ERROR) << "Copy file failed from " << curPath << " to " << storePath << ": " << ec.message();
 					failed().emit(Wt::WString::tr("msg-internal-error"));
+					share.remove();
 					return;
 				}
 			}
 			else
 				upload->stealSpooledFile();
+
 
 			share.modify()->setDesc(model->valueText(ShareCreateFormModel::DescriptionField).toUTF8());
 			share.modify()->setPath(storePath);

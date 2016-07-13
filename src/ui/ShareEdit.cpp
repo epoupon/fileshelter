@@ -40,8 +40,7 @@ ShareEdit::refresh(void)
 	if (!share || !boost::filesystem::exists(share->getPath()))
 	{
 		FS_LOG(UI, ERROR) << "Edit UUID '" << editUUID << "' not found";
-		Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-not-found"), this);
-		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
+		displayNotFound();
 		return;
 	}
 
@@ -74,7 +73,10 @@ ShareEdit::refresh(void)
 
 		messageBox->buttonClicked().connect(std::bind([=] ()
 		{
-			if (messageBox->buttonResult() == Wt::Yes)
+			auto result = messageBox->buttonResult();
+			delete messageBox;
+
+			if (result == Wt::Yes)
 			{
 				Wt::Dbo::Transaction transaction(DboSession());
 
@@ -83,16 +85,34 @@ ShareEdit::refresh(void)
 				if (share)
 					share.remove();
 
-				wApp->setInternalPath("/home", true);
+				displayRemoved();
 			}
 
-			delete messageBox;
 		}));
 
 		messageBox->show();
 	}));
 
 }
+
+void
+ShareEdit::displayRemoved(void)
+{
+	clear();
+
+	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-removed"), this);
+	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
+}
+
+void
+ShareEdit::displayNotFound(void)
+{
+	clear();
+
+	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-not-found"), this);
+	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
+}
+
 
 } // namespace UserInterface
 

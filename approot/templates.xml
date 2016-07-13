@@ -253,4 +253,11 @@
 	</div>
 </message>
 
+<message id="template-share-removed">
+	<div class="page-header">
+		<h1>${tr:msg-delete-share-success}</h1>
+	</div>
+</message>
+
+
 </messages>
