@@ -10,6 +10,7 @@ fileshelter_SOURCES = \
 	$(srcdir)/ui/ShareCreated.cpp		\
 	$(srcdir)/ui/ShareDownload.cpp		\
 	$(srcdir)/ui/ShareEdit.cpp		\
+	$(srcdir)/ui/SharePasswordFormView.cpp	\
 	$(srcdir)/ui/ShareResource.cpp		\
 	$(srcdir)/utils/Config.cpp		\
 	$(srcdir)/utils/Logger.cpp		\

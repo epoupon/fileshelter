@@ -6,6 +6,7 @@
 <message id="msg-upload">Envoyer</message>
 <message id="msg-download">Télécharger</message>
 <message id="msg-delete">Supprimer</message>
+<message id="msg-unlock">Dévérouiller</message>
 <message id="msg-description">Description</message>
 <message id="msg-file-name">Nom</message>
 <message id="msg-file-size">Taille</message>
@@ -18,8 +19,10 @@
 <message id="msg-share-not-found">Partage non trouvé!</message>
 <message id="msg-share-delete">Supprimer le partage</message>
 <message id="msg-confirm-action">Etes vous sûr ?</message>
+<message id="msg-bad-password">Mot de passe invalide</message>
 <message id="msg-passwords-dont-match">Les mots de passe ne correspondent pas</message>
 <message id="msg-internal-error">Erreur interne !</message>
+<message id="msg-share-protected-by-password">Ce partage est protégé par un mot de passe</message>
 
 <message id="msg-expiracy-date">Date d'expiration</message>
 <message id="msg-max-hits">Limite de téléchargements</message>

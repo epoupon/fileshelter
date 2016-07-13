@@ -26,7 +26,7 @@ class Share
 		std::string			getFileName(void) const { return _filename; }
 		std::size_t			getFileSize(void) const { return _filesize; }
 		bool				hasPassword(void) const { return !_password.empty(); }
-		bool				verifyPassword(std::string password) const;
+		bool				verifyPassword(Wt::WString password) const;
 		std::string			getDesc(void) const { return _desc; }
 		boost::posix_time::ptime	getCreationTime(void) const { return _creationTime; }
 		boost::gregorian::date		getExpiracyDate(void) const { return _expiracyTime.date(); }
@@ -40,7 +40,7 @@ class Share
 		void setPath(boost::filesystem::path path) { _path = path.string(); }
 		void setFileName(std::string name) { _filename = name; }
 		void setFileSize(std::size_t size) { _filesize = size; }
-		void setPassword(std::string password);
+		void setPassword(Wt::WString password);
 		void setDesc(std::string desc) { _desc = desc; }
 		void setCreationTime(boost::posix_time::ptime time);
 		void setValidityDuration(boost::posix_time::ptime time);
@@ -57,6 +57,8 @@ class Share
 				Wt::Dbo::field(a, _checksum,		"checksum");
 				Wt::Dbo::field(a, _path,		"path");
 				Wt::Dbo::field(a, _password,		"password");
+				Wt::Dbo::field(a, _salt,		"salt");
+				Wt::Dbo::field(a, _hashFunc,		"hash_func");
 				Wt::Dbo::field(a, _desc,		"desc");
 				Wt::Dbo::field(a, _creationTime,	"creation_time");
 				Wt::Dbo::field(a, _expiracyTime,	"expiracy_time");
@@ -73,6 +75,8 @@ class Share
 		std::string				_checksum;
 		std::string				_path;
 		std::string				_password;	// optional
+		std::string				_salt;
+		std::string				_hashFunc;
 		std::string				_desc;		// optional
 
 		boost::posix_time::ptime		_creationTime;

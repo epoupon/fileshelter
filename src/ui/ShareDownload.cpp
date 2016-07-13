@@ -7,6 +7,7 @@
 
 #include "FileShelterApplication.hpp"
 #include "ShareResource.hpp"
+#include "SharePasswordFormView.hpp"
 
 #include "ShareDownload.hpp"
 
@@ -33,17 +34,33 @@ ShareDownload::refresh(void)
 
 	std::string downloadUUID = wApp->internalPathNextPart("/share-download/");
 
-	FS_LOG(UI, DEBUG) << "downloadUUID = '" << downloadUUID << "'";
-
 	Wt::Dbo::Transaction transaction(DboSession());
 
 	Database::Share::pointer share = Database::Share::getByDownloadUUID(DboSession(), downloadUUID);
-	if (!share || !boost::filesystem::exists(share->getPath()))
+	if (!share)
 	{
-		FS_LOG(UI, ERROR) << "Download UUID '" << downloadUUID << "' not found";
-		Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-not-found"), this);
-		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
+		displayNotFound();
+		return;
+	}
 
+	if (share->hasPassword())
+		displayPassword();
+	else
+		displayDownload();
+}
+
+void
+ShareDownload::displayDownload(void)
+{
+	clear();
+
+	std::string downloadUUID = wApp->internalPathNextPart("/share-download/");
+
+	Wt::Dbo::Transaction transaction(DboSession());
+	Database::Share::pointer share = Database::Share::getByDownloadUUID(DboSession(), downloadUUID);
+	if (!share)
+	{
+		displayNotFound();
 		return;
 	}
 
@@ -74,8 +91,29 @@ ShareDownload::refresh(void)
 
 	downloadBtn->addStyleClass("btn btn-primary");
 	t->bindWidget("download-btn", downloadBtn);
-
 }
+
+void
+ShareDownload::displayNotFound()
+{
+	clear();
+	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-not-found"), this);
+	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
+}
+
+
+void
+ShareDownload::displayPassword()
+{
+	clear();
+
+	auto view = new SharePasswordFormView(this);
+	view->success().connect(std::bind([=]
+	{
+		displayDownload();
+	}));
+}
+
 
 } // namespace UserInterface
 

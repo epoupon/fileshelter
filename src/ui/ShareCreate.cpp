@@ -121,7 +121,7 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 	ShareCreateFormView(Wt::WContainerWidget *parent = 0)
 	: Wt::WTemplateFormView(parent)
 	{
-		auto _model = new ShareCreateFormModel(this);
+		auto model = new ShareCreateFormModel(this);
 
 		setTemplateText(tr("template-share-create"));
 		addFunction("id", &WTemplate::Functions::id);
@@ -161,9 +161,9 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 		bindWidget("create-btn", uploadBtn);
 		uploadBtn->clicked().connect(std::bind([=]
 		{
-			updateModel(_model);
+			updateModel(model);
 
-			if (_model->validate())
+			if (model->validate())
 			{
 				FS_LOG(UI, DEBUG) << "validation OK";
 
@@ -171,7 +171,7 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 				uploadBtn->disable();
 			}
 
-			updateView(_model);
+			updateView(model);
 		}));
 
 		upload->fileTooLarge().connect(std::bind([=] ()
@@ -210,21 +210,22 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 			else
 				upload->stealSpooledFile();
 
-			share.modify()->setDesc(_model->valueText(ShareCreateFormModel::DescriptionField).toUTF8());
+			share.modify()->setDesc(model->valueText(ShareCreateFormModel::DescriptionField).toUTF8());
 			share.modify()->setPath(storePath);
 			share.modify()->setFileName(upload->clientFileName().toUTF8());
 			share.modify()->setFileSize(boost::filesystem::file_size(storePath));
-			share.modify()->setMaxHits(Wt::asNumber(_model->value(ShareCreateFormModel::HitsValidityField)));
+			share.modify()->setMaxHits(Wt::asNumber(model->value(ShareCreateFormModel::HitsValidityField)));
 
 			Wt::WDate date = expiracyDate->date();
 			share.modify()->setExpiracyDate(boost::gregorian::date(date.year(), date.month(), date.day()));
+			share.modify()->setPassword(model->valueText(ShareCreateFormModel::PasswordField));
 
 			transaction.commit();
 
 			wApp->setInternalPath("/share-created/" + share->getEditUUID(), true);
 		}));
 
-		updateView(_model);
+		updateView(model);
 
 	}
 
@@ -235,16 +236,18 @@ ShareCreate::ShareCreate(Wt::WContainerWidget* parent)
 {
 	refresh();
 
-	wApp->internalPathChanged().connect(std::bind([=] (std::string path)
+	wApp->internalPathChanged().connect(std::bind([=]
 	{
-		if (wApp->internalPathMatches("/share-create"))
 			refresh();
-	}, std::placeholders::_1));
+	}));
 }
 
 void
 ShareCreate::refresh(void)
 {
+	if (!wApp->internalPathMatches("/share-create"))
+		return;
+
 	clear();
 
 	ShareCreateFormView* form = new ShareCreateFormView(this);

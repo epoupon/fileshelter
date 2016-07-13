@@ -7,6 +7,7 @@
 <message id="msg-upload">Upload</message>
 <message id="msg-download">Download</message>
 <message id="msg-delete">Delete</message>
+<message id="msg-unlock">Unlock</message>
 <message id="msg-description">Description</message>
 <message id="msg-file-name">File name</message>
 <message id="msg-file-size">File size</message>
@@ -20,7 +21,9 @@
 <message id="msg-share-delete">Delete share</message>
 <message id="msg-confirm-action">Are you sure?</message>
 <message id="msg-passwords-dont-match">Passwords do not match</message>
+<message id="msg-bad-password">Bad password</message>
 <message id="msg-internal-error">Internal error!</message>
+<message id="msg-share-protected-by-password">This share is protected by a password</message>
 
 <message id="msg-expiracy-date">Expiracy date</message>
 <message id="msg-max-hits">Max downloads</message>

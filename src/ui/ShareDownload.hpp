@@ -12,6 +12,9 @@ class ShareDownload : public Wt::WContainerWidget
 	private:
 		void refresh(void);
 
+		void displayNotFound();
+		void displayPassword();
+		void displayDownload();
 };
 
 } // namespace UserInterface

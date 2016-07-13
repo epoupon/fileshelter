@@ -1,6 +1,11 @@
-#include "Share.hpp"
+#include <Wt/Auth/PasswordVerifier>
+#include <Wt/Auth/HashFunction>
 
+#include "utils/Config.hpp"
+#include "utils/Logger.hpp"
 #include "utils/UUID.hpp"
+
+#include "Share.hpp"
 
 namespace Database {
 
@@ -44,6 +49,33 @@ Share::hasExpired(void) const
 	return false;
 
 }
+
+void
+Share::setPassword(Wt::WString password)
+{
+	auto hashFunc = new Wt::Auth::BCryptHashFunction(Config::instance().getULong("bcrypt-count", 12));
+	Wt::Auth::PasswordVerifier verifier;
+	verifier.addHashFunction(hashFunc);
+
+	auto hash = verifier.hashPassword(password);
+
+	_password = hash.value();
+	_salt = hash.salt();
+	_hashFunc = hash.function();
+}
+
+bool
+Share::verifyPassword(Wt::WString password) const
+{
+	auto hashFunc = new Wt::Auth::BCryptHashFunction();
+	Wt::Auth::PasswordVerifier verifier;
+	verifier.addHashFunction(hashFunc);
+
+	Wt::Auth::PasswordHash hash(_hashFunc, _salt, _password);
+
+	return verifier.verify(password, hash);
+}
+
 
 
 } // namespace Database
