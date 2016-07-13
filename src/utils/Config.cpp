@@ -11,6 +11,12 @@ Config::Config()
 {
 }
 
+Config::~Config()
+{
+	if (_config != nullptr)
+		delete _config;
+}
+
 Config&
 Config::instance()
 {

@@ -10,6 +10,7 @@ class Config
 
 		Config(const Config&) = delete;
 		Config& operator=(const Config&) = delete;
+		~Config();
 
 		static Config& instance();
 
