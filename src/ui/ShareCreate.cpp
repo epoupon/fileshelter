@@ -76,20 +76,10 @@ class ShareCreateFormModel : public Wt::WFormModel
 		{
 			Wt::WString error; // empty means validated
 
-			if (field == PasswordField)
+			if (field == PasswordConfirmField)
 			{
-				if (!valueText(PasswordField).empty())
-				{
-					// TODO add some checks in order not to allow a weak password?
-				}
-			}
-			else if (field == PasswordConfirmField)
-			{
-				if (validation(PasswordField).state() == Wt::WValidator::Valid)
-				{
-					if (valueText(PasswordField) != valueText(PasswordConfirmField))
-						error = Wt::WString::tr("msg-passwords-dont-match");
-				}
+				if (valueText(PasswordField) != valueText(PasswordConfirmField))
+					error = Wt::WString::tr("msg-passwords-dont-match");
 			}
 			else
 			{
