@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <Wt/WSignal>
+#include <Wt/WString>
 #include <Wt/WContainerWidget>
 
 
@@ -12,6 +12,8 @@ class ShareCreate : public Wt::WContainerWidget
 	public:
 		ShareCreate(Wt::WContainerWidget *parent = 0);
 
+	private:
+		void refresh(void);
 };
 
 

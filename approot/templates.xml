@@ -85,7 +85,6 @@
 				${create-btn}
 			</div>
 		</div>
-		${create-error}
 	</div>
 </message>
 
@@ -212,6 +211,14 @@
 	</div>
 </message>
 
+<message id="template-share-not-created">
+	<div class="page-header">
+		<h1>${tr:msg-create-share-failed}</h1>
+	</div>
+	<div class="alert alert-danger">
+		${error}
+	</div>
+</message>
 
 <message id="template-share-not-found">
 	<div class="page-header">

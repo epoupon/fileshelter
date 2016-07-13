@@ -19,6 +19,8 @@
 <message id="msg-share-not-found">Share not found!</message>
 <message id="msg-share-delete">Delete share</message>
 <message id="msg-confirm-action">Are you sure?</message>
+<message id="msg-passwords-dont-match">Passwords do not match</message>
+<message id="msg-internal-error">Internal error!</message>
 
 <message id="msg-expiracy-date">Expiracy date</message>
 <message id="msg-max-hits">Max downloads</message>
@@ -28,9 +30,8 @@
 <message id="msg-download-link">Public link</message>
 <message id="msg-edit-link">Private edit link</message>
 
-
-<message id="msg-create-share-too-large">File to large!</message>
-<message id="msg-create-share-failed">Failed to create the share!</message>
+<message id="msg-create-share-too-large">File too large!</message>
+<message id="msg-create-share-failed">Failed to create share!</message>
 <message id="msg-share-no-longer-available">This share is no longer available!</message>
 <message id="msg-create-share-success">Share successfully created!</message>
 

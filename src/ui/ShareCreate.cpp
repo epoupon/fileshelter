@@ -1,4 +1,5 @@
 #include <Wt/WFormModel>
+#include <Wt/WSignal>
 #include <Wt/WTemplateFormView>
 #include <Wt/WPushButton>
 #include <Wt/WLineEdit>
@@ -66,11 +67,37 @@ class ShareCreateFormModel : public Wt::WFormModel
 				dateValidator->setTop(Wt::WDate::currentServerDate().addDays(maxDurationDays));
 			setValidator(ExpiracyDateField, dateValidator);
 
-
-			// Default values
 			setValue(ExpiracyDateField, Wt::WDate::currentServerDate().addDays(7));
 			setValue(HitsValidityField, 30);
 
+		}
+
+		bool validateField(Field field)
+		{
+			Wt::WString error; // empty means validated
+
+			if (field == PasswordField)
+			{
+				if (!valueText(PasswordField).empty())
+				{
+					// TODO add some checks in order not to allow a weak password?
+				}
+			}
+			else if (field == PasswordConfirmField)
+			{
+				if (validation(PasswordField).state() == Wt::WValidator::Valid)
+				{
+					if (valueText(PasswordField) != valueText(PasswordConfirmField))
+						error = Wt::WString::tr("msg-passwords-dont-match");
+				}
+			}
+			else
+			{
+				return Wt::WFormModel::validateField(field);
+			}
+
+			setValidation(field, Wt::WValidator::Result( error.empty() ? Wt::WValidator::Valid : Wt::WValidator::Invalid, error));
+			return validation(field).state() == Wt::WValidator::Valid;
 		}
 
 };
@@ -84,7 +111,12 @@ const Wt::WFormModel::Field ShareCreateFormModel::PasswordConfirmField = "passwo
 
 class ShareCreateFormView : public Wt::WTemplateFormView
 {
+	private:
+		Wt::Signal<Wt::WString> _sigFailed;
+
 	public:
+
+	Wt::Signal<Wt::WString>& failed() { return _sigFailed;}
 
 	ShareCreateFormView(Wt::WContainerWidget *parent = 0)
 	: Wt::WTemplateFormView(parent)
@@ -95,45 +127,33 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 		addFunction("id", &WTemplate::Functions::id);
 		addFunction("block", &WTemplate::Functions::id);
 
-		auto _applyInfo = new Wt::WText();
-		_applyInfo->setInline(false);
-		_applyInfo->setStyleClass("alert alert-danger");
-		_applyInfo->hide();
-		bindWidget("create-error", _applyInfo);
-
 		// Desc
 		Wt::WLineEdit *desc = new Wt::WLineEdit();
 		setFormWidget(ShareCreateFormModel::DescriptionField, desc);
-		desc->changed().connect(_applyInfo, &Wt::WWidget::hide);
 
 		// File
 		Wt::WFileUpload *upload = new Wt::WFileUpload();
 		upload->setFileTextSize(80);
 		upload->setProgressBar(new Wt::WProgressBar());
 		setFormWidget(ShareCreateFormModel::FileField, upload);
-		upload->changed().connect(_applyInfo, &Wt::WWidget::hide);
 
 		// Time validity
 		Wt::WDateEdit *expiracyDate = new Wt::WDateEdit();
 		setFormWidget(ShareCreateFormModel::ExpiracyDateField, expiracyDate);
-		expiracyDate->changed().connect(_applyInfo, &Wt::WWidget::hide);
 
 		// Hits validity
 		Wt::WSpinBox *hitsValidity = new Wt::WSpinBox();
 		setFormWidget(ShareCreateFormModel::HitsValidityField, hitsValidity);
-		hitsValidity->changed().connect(_applyInfo, &Wt::WWidget::hide);
 
 		// Password
 		Wt::WLineEdit *password = new Wt::WLineEdit();
 		password->setEchoMode(Wt::WLineEdit::Password);
 		setFormWidget(ShareCreateFormModel::PasswordField, password);
-		password->changed().connect(_applyInfo, &Wt::WWidget::hide);
 
 		// Password confirm
 		Wt::WLineEdit *passwordConfirm = new Wt::WLineEdit();
 		passwordConfirm->setEchoMode(Wt::WLineEdit::Password);
-		setFormWidget(ShareCreateFormModel::PasswordConfirmField, password);
-		passwordConfirm->changed().connect(_applyInfo, &Wt::WWidget::hide);
+		setFormWidget(ShareCreateFormModel::PasswordConfirmField, passwordConfirm);
 
 		// Buttons
 		Wt::WPushButton *uploadBtn = new Wt::WPushButton(tr("msg-upload"));
@@ -149,90 +169,93 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 
 				upload->upload();
 				uploadBtn->disable();
-
-				upload->uploaded().connect(std::bind([=] ()
-				{
-					FS_LOG(UI, DEBUG) << "Uploaded!";
-
-					Wt::Dbo::Transaction transaction(DboSession());
-
-					Database::Share::pointer share = Database::Share::create(DboSession());
-
-					// Filename is the DownloadUID
-					auto curPath = boost::filesystem::path(upload->spoolFileName());
-					auto storePath = Config::instance().getPath("working-dir") / "files" / share->getDownloadUUID();
-
-					boost::system::error_code ec;
-					boost::filesystem::rename(curPath, storePath, ec);
-					if (ec)
-					{
-						FS_LOG(UI, INFO) << "Move file failed from " << curPath << " to " << storePath << ": " << ec.message();
-
-						// fallback on copy
-						boost::filesystem::copy_file(curPath, storePath, ec);
-						if (ec)
-						{
-							FS_LOG(UI, ERROR) << "Copy file failed from " << curPath << " to " << storePath << ": " << ec.message();
-							_applyInfo->show();
-							_applyInfo->setText( tr("msg-create-share-failed"));
-							return;
-						}
-					}
-					else
-						upload->stealSpooledFile();
-
-					share.modify()->setDesc(_model->valueText(ShareCreateFormModel::DescriptionField).toUTF8());
-					share.modify()->setPath(storePath);
-					share.modify()->setFileName(upload->clientFileName().toUTF8());
-					share.modify()->setFileSize(boost::filesystem::file_size(storePath));
-					share.modify()->setMaxHits(Wt::asNumber(_model->value(ShareCreateFormModel::HitsValidityField)));
-
-					Wt::WDate date = expiracyDate->date();
-					share.modify()->setExpiracyDate(boost::gregorian::date(date.year(), date.month(), date.day()));
-
-					transaction.commit();
-
-					wApp->setInternalPath("/share-created/" + share->getEditUUID(), true);
-				}));
-
-				upload->fileTooLarge().connect(std::bind([=] ()
-				{
-					_applyInfo->show();
-					_applyInfo->setText( tr("msg-create-share-too-large"));
-				}));
-			}
-			else
-			{
-				FS_LOG(UI, DEBUG) << "validation KO";
-
-				_applyInfo->show();
-				_applyInfo->setText( tr("msg-create-share-failed"));
 			}
 
 			updateView(_model);
+		}));
 
+		upload->fileTooLarge().connect(std::bind([=] ()
+		{
+			FS_LOG(UI, DEBUG) << "File too large!";
+			failed().emit(Wt::WString::tr("msg-create-share-too-large"));
+		}));
+
+		upload->uploaded().connect(std::bind([=] ()
+		{
+			FS_LOG(UI, DEBUG) << "Uploaded!";
+
+			Wt::Dbo::Transaction transaction(DboSession());
+
+			Database::Share::pointer share = Database::Share::create(DboSession());
+
+			// Filename is the DownloadUID
+			auto curPath = boost::filesystem::path(upload->spoolFileName());
+			auto storePath = Config::instance().getPath("working-dir") / "files" / share->getDownloadUUID();
+
+			boost::system::error_code ec;
+			boost::filesystem::rename(curPath, storePath, ec);
+			if (ec)
+			{
+				FS_LOG(UI, INFO) << "Move file failed from " << curPath << " to " << storePath << ": " << ec.message();
+
+				// fallback on copy
+				boost::filesystem::copy_file(curPath, storePath, ec);
+				if (ec)
+				{
+					FS_LOG(UI, ERROR) << "Copy file failed from " << curPath << " to " << storePath << ": " << ec.message();
+					failed().emit(Wt::WString::tr("msg-internal-error"));
+					return;
+				}
+			}
+			else
+				upload->stealSpooledFile();
+
+			share.modify()->setDesc(_model->valueText(ShareCreateFormModel::DescriptionField).toUTF8());
+			share.modify()->setPath(storePath);
+			share.modify()->setFileName(upload->clientFileName().toUTF8());
+			share.modify()->setFileSize(boost::filesystem::file_size(storePath));
+			share.modify()->setMaxHits(Wt::asNumber(_model->value(ShareCreateFormModel::HitsValidityField)));
+
+			Wt::WDate date = expiracyDate->date();
+			share.modify()->setExpiracyDate(boost::gregorian::date(date.year(), date.month(), date.day()));
+
+			transaction.commit();
+
+			wApp->setInternalPath("/share-created/" + share->getEditUUID(), true);
 		}));
 
 		updateView(_model);
 
 	}
-};
 
+};
 
 ShareCreate::ShareCreate(Wt::WContainerWidget* parent)
 : Wt::WContainerWidget(parent)
 {
-	addWidget(new ShareCreateFormView());
+	refresh();
 
 	wApp->internalPathChanged().connect(std::bind([=] (std::string path)
 	{
-		FS_LOG(UI, DEBUG) << "New path = " << path;
-
 		if (wApp->internalPathMatches("/share-create"))
-		{
-			clear();
-			addWidget(new ShareCreateFormView());
-		}
+			refresh();
+	}, std::placeholders::_1));
+}
+
+void
+ShareCreate::refresh(void)
+{
+	clear();
+
+	ShareCreateFormView* form = new ShareCreateFormView(this);
+
+	form->failed().connect(std::bind([=] (Wt::WString error)
+	{
+		FS_LOG(UI, DEBUG) << "Handling error: " << error;
+		clear();
+		Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-not-created"), this);
+		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
+		t->bindString("error", error);
 	}, std::placeholders::_1));
 }
 
