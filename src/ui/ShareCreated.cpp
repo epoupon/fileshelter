@@ -51,8 +51,8 @@ ShareCreated::refresh(void)
 	std::string downloadPath = "/share-download/" + share->getDownloadUUID();
 	std::string editPath = "/share-edit/" + share->getEditUUID();
 
-	t->bindWidget("download-link", new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, downloadPath), wApp->environment().headerValue("Host") + downloadPath));
-	t->bindWidget("edit-link", new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, editPath), wApp->environment().headerValue("Host") + editPath));
+	t->bindWidget("download-link", new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, downloadPath), wApp->environment().hostName() + downloadPath));
+	t->bindWidget("edit-link", new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, editPath), wApp->environment().hostName() + editPath));
 }
 
 } // namespace UserInterface
