@@ -17,9 +17,6 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <array>
-
-#include "logger/Logger.hpp"
 #include <boost/asio/placeholders.hpp>
 #include "utils/Logger.hpp"
 
