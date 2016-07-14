@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <boost/filesystem/path.hpp>
 
 #include <Wt/Dbo/Dbo>
@@ -20,6 +21,8 @@ class Share
 		static pointer	getByEditUUID(Wt::Dbo::Session& session, std::string UUID);
 		static pointer	getByDownloadUUID(Wt::Dbo::Session& session, std::string UUID);
 		static pointer	delByEditUUID(Wt::Dbo::Session& session, std::string UUID);
+
+		static std::vector<pointer> getAll(Wt::Dbo::Session& session);
 
 		// Getters
 		boost::filesystem::path		getPath(void) const { return _path; }

@@ -6,7 +6,7 @@
 #include "utils/Logger.hpp"
 
 #include "database/DbHandler.hpp"
-#include "database/DbUpdater.hpp"
+#include "database/DbCleaner.hpp"
 
 #include "ui/FileShelterApplication.hpp"
 
@@ -80,16 +80,15 @@ int main(int argc, char *argv[])
 		std::unique_ptr<Wt::Dbo::SqlConnectionPool>
 			connectionPool( Database::Handler::createConnectionPool(Config::instance().getPath("working-dir") / "fileshelter.db"));
 
-//		Database::Updater& dbUpdater = Database::Updater::instance();
-//		dbUpdater.setConnectionPool(*connectionPool);
+		Database::Cleaner dbCleaner(*connectionPool);
 
 		// bind entry point
 		server.addEntryPoint(Wt::Application, boost::bind(UserInterface::FileShelterApplication::create,
 					_1, boost::ref(*connectionPool)));
 
 		// Start
-		FS_LOG(MAIN, INFO) << "Starting database updater...";
-//		dbUpdater.start();
+		FS_LOG(MAIN, INFO) << "Starting database cleaner...";
+		dbCleaner.start();
 
 		FS_LOG(MAIN, INFO) << "Starting server...";
 		server.start();
@@ -102,8 +101,8 @@ int main(int argc, char *argv[])
 		FS_LOG(MAIN, INFO) << "Stopping server...";
 		server.stop();
 
-		FS_LOG(MAIN, INFO) << "Stopping database updater...";
-//		dbUpdater.stop();
+		FS_LOG(MAIN, INFO) << "Stopping database cleaner...";
+		dbCleaner.stop();
 
 		res = EXIT_SUCCESS;
 	}

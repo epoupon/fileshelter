@@ -2,6 +2,7 @@ bin_PROGRAMS = fileshelter
 
 fileshelter_SOURCES = \
 	$(srcdir)/main/main.cpp			\
+	$(srcdir)/database/DbCleaner.cpp	\
 	$(srcdir)/database/DbHandler.cpp	\
 	$(srcdir)/database/Share.cpp		\
 	$(srcdir)/ui/FileShelterApplication.cpp	\

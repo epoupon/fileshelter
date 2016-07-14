@@ -15,7 +15,8 @@ Handler::Handler(Wt::Dbo::SqlConnectionPool& connectionPool)
 
 	_session.mapClass<Database::Share>("share");
 
-	try {
+	try
+	{
 		Wt::Dbo::Transaction transaction(_session);
 
 	        _session.createTables();

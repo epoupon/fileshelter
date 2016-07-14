@@ -36,6 +36,13 @@ Share::getByDownloadUUID(Wt::Dbo::Session& session, std::string UUID)
 	return session.find<Share>().where("download_UUID = ?").bind(UUID);
 }
 
+std::vector<Share::pointer>
+Share::getAll(Wt::Dbo::Session& session)
+{
+	Wt::Dbo::collection<pointer> res = session.find<Share>();
+	return std::vector<pointer>(res.begin(), res.end());
+}
+
 bool
 Share::hasExpired(void) const
 {
