@@ -64,6 +64,11 @@ Cleaner::process(boost::system::error_code err)
 		if (share->hasExpired())
 		{
 			FS_LOG(DB, INFO) << "Deleting expired share " << share->getDownloadUUID();
+
+			boost::filesystem::remove(share->getPath(), err);
+			if (err)
+				FS_LOG(DB, ERROR) << "Cannot remove file " << share->getPath() << ": " << err.message();
+
 			share.remove();
 		}
 	}
