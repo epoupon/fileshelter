@@ -2,6 +2,13 @@
 <messages xmlns:if="Wt.WTemplate.conditions">
 <!--FORMS message blocks-->
 
+<message id="msg-title-home">
+	<i class="fa fa-home fa-lg" style="line-height:32px"> Accueil</i>
+</message>
+<message id="msg-title-create-share">
+	<i class="fa fa-upload fa-lg" style="line-height:32px"> Nouveau partage</i>
+</message>
+
 <message id="msg-create-share">Nouveau partage</message>
 <message id="msg-upload">Envoyer</message>
 <message id="msg-download">Télécharger</message>

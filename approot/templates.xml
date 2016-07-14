@@ -2,6 +2,14 @@
 <messages xmlns:if="Wt.WTemplate.conditions">
 <!--FORMS message blocks-->
 
+<message id="template-navbar-contents">
+	<ul class="nav navbar-nav">
+		<li><a href="home">Home</a></li>
+		<li><a href="share-create">New share<span class="sr-only">(current)</span></a></li>
+	</ul>
+</message>
+
+
 <message id="template-home">
 	<div class="jumbotron">
 		<h1>FileShelter</h1>

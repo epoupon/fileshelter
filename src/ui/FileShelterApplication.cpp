@@ -20,6 +20,9 @@
 #include <Wt/WEnvironment>
 #include <Wt/WBootstrapTheme>
 #include <Wt/WStackedWidget>
+#include <Wt/WNavigationBar>
+#include <Wt/WAnchor>
+#include <Wt/WTemplate>
 
 #include "utils/Logger.hpp"
 
@@ -105,7 +108,7 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 
 	FS_LOG(UI, INFO) << "Locale = " << env.locale().name();
 
-	if (env.locale().name().find("fr") != std::string::npos)
+	if (env.locale().name().find_first_of("fr") == 0)
 		messageResourceBundle().use(appRoot() + "messages_fr");
 	else
 		messageResourceBundle().use(appRoot() + "messages_en");
@@ -114,10 +117,21 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 
 	enableInternalPaths();
 
-	root()->addStyleClass("container");
+	auto navbar = new Wt::WNavigationBar(root());
+	navbar->setResponsive(true);
+	navbar->setTitle("FileShelter", "https://github.com/epoupon/fileshelter");
+
+	auto homeAnchor = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/home"), Wt::WString::tr("msg-title-home"));
+	navbar->addWidget(homeAnchor);
+
+	auto createShareAnchor = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/share-create"), Wt::WString::tr("msg-title-create-share"));
+	navbar->addWidget(createShareAnchor);
+
+	auto container = new Wt::WContainerWidget(root());
+	container->addStyleClass("container");
 
 	// Same order as Idx enum
-	Wt::WStackedWidget* mainStack = new Wt::WStackedWidget(root());
+	Wt::WStackedWidget* mainStack = new Wt::WStackedWidget(container);
 	mainStack->addWidget(new Home());
 	mainStack->addWidget(new ShareCreate());
 	mainStack->addWidget(new ShareCreated());
