@@ -73,13 +73,16 @@ Cleaner::process(boost::system::error_code err)
 	if (err)
 		return;
 
+	boost::gregorian::date currentDate = boost::gregorian::day_clock::universal_day();
 	FS_LOG(DB, INFO) << "Cleaning expired shares...";
 	Wt::Dbo::Transaction transaction(_db.getSession());
 
 	auto shares = Database::Share::getAll(_db.getSession());
 	for (auto share : shares)
 	{
-		if (share->hasExpired())
+		// In order not to delete a share that is being downloaded,
+		// really remove the share at least a day after it has expired
+		if (share->hasExpired() && share->getExpiracyDate() != currentDate)
 		{
 			FS_LOG(DB, INFO) << "Deleting expired share " << share->getDownloadUUID();
 
