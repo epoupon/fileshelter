@@ -37,7 +37,7 @@ Home::Home(Wt::WContainerWidget* parent)
 
 	home->bindWidget("share-create-btn", createBtn);
 
-	home->bindWidget("github-link", new Wt::WAnchor("https://github.com/epoupon/fileshelter", "<i class=\"fa fa-github\"></i>"));
+	home->bindWidget("github-link", new Wt::WAnchor("https://github.com/epoupon/fileshelter", "<i class=\"fa fa-github\"> Github</i>"));
 }
 
 } // namespace UserInterface

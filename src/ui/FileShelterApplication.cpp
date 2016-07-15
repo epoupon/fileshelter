@@ -114,6 +114,7 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 		messageResourceBundle().use(appRoot() + "messages_en");
 
 	setTitle("FileShelter");
+	addMetaHeader("viewport", "width=device-width, initial-scale=1, maximum-scale=1");
 
 	enableInternalPaths();
 

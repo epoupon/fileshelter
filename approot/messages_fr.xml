@@ -8,8 +8,8 @@
 </message>
 
 <message id="msg-home-desc">
-	<p>FileShelter vous permet de partager facilement des fichiers sur Internet.</p>
-	<p>Uploadez un fichier et obtenez un lien permettant de le télécharger en retour !</p>
+	<p>FileShelter vous permet de partager facilement des fichiers par Internet.</p>
+	<p>Uploadez un fichier et obtenez en retour un lien permettant de le télécharger !</p>
 </message>
 
 <message id="msg-share-create"><i class="fa fa-upload"> Nouveau partage</i></message>
