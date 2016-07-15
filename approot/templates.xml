@@ -4,7 +4,7 @@
 
 <message id="template-home">
 	<div class="jumbotron">
-		<h1>FileShelter</h1>
+		<h1><i class="fa fa-external-link"> FileShelter</i></h1>
 		${tr:msg-home-desc}
 		${share-create-btn}
 	</div>

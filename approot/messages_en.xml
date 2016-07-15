@@ -9,7 +9,7 @@
 
 <message id="msg-home-desc">
 	<p>FileShelter allows you to easily share files over the Internet.</p>
-	<p>Just upload a file and get a download URL back!</p>
+	<p>Just upload a file and get an URL back!</p>
 </message>
 
 <message id="msg-share-create"><i class="fa fa-upload"> New share</i></message>
