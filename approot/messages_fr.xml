@@ -2,14 +2,17 @@
 <messages xmlns:if="Wt.WTemplate.conditions">
 <!--FORMS message blocks-->
 
-<message id="msg-title-home">
-	<i class="fa fa-home fa-lg" style="line-height:32px"> Accueil</i>
-</message>
-<message id="msg-title-create-share">
-	<i class="fa fa-upload fa-lg" style="line-height:32px"> Nouveau partage</i>
+<message id="msg-nav-title"><i class="fa fa-external-link"> FileShelter</i></message>
+<message id="msg-nav-home"><i class="fa fa-home fa-lg" style="line-height:32px"> Accueil</i></message>
+<message id="msg-nav-share-create"><i class="fa fa-upload fa-lg" style="line-height:32px"> Nouveau partage</i>
 </message>
 
-<message id="msg-create-share">Nouveau partage</message>
+<message id="msg-share-create"><i class="fa fa-upload"> Nouveau partage</i></message>
+<message id="msg-share-edit"><i class="fa fa-edit"> Edition</i></message>
+<message id="msg-share-download"><i class="fa fa-download"> Téléchargement</i></message>
+<message id="msg-share-not-found"><i class="fa fa-exclamation-triangle"> Partage non trouvé !</i></message>
+<message id="msg-share-deleted"><i class="fa fa-remove"> Partage supprimé !</i></message>
+<message id="msg-share-create-success"><i class="fa fa-check"> Partage créé !</i></message>
 <message id="msg-upload">Envoyer</message>
 <message id="msg-download">Télécharger</message>
 <message id="msg-delete">Supprimer</message>
@@ -20,14 +23,10 @@
 <message id="msg-file">Fichier</message>
 <message id="msg-optional">Optionnel</message>
 <message id="msg-hits">Téléchargements</message>
-<message id="msg-share-create">Nouveau partage</message>
-<message id="msg-share-download">Téléchargement</message>
-<message id="msg-share-edit">Edition</message>
-<message id="msg-share-not-found">Partage non trouvé!</message>
 <message id="msg-share-delete">Supprimer le partage</message>
 <message id="msg-confirm-action">Etes vous sûr ?</message>
-<message id="msg-bad-password">Mot de passe invalide</message>
 <message id="msg-passwords-dont-match">Les mots de passe ne correspondent pas</message>
+<message id="msg-bad-password">Mot de passe invalide</message>
 <message id="msg-internal-error">Erreur interne !</message>
 <message id="msg-share-protected-by-password">Ce partage est protégé par un mot de passe</message>
 <message id="msg-no-file-selected">Aucun fichier selectionné !</message>
@@ -37,15 +36,13 @@
 <message id="msg-password">Mot de passe</message>
 <message id="msg-password-confirm">Confirmation du mot de passe</message>
 
-<message id="msg-download-link">Lien de téléchargement public</message>
-<message id="msg-edit-link">Lien d'édition privé</message>
+<message id="msg-download-link"><i class="fa fa-download"></i> Lien de téléchargement public</message>
+<message id="msg-edit-link"><i class="fa fa-edit"></i> Lien d'édition privé</message>
 
 
-<message id="msg-create-share-too-large">Fichier trop volumineux !</message>
-<message id="msg-create-share-failed">Impossible de créer le partage !</message>
+<message id="msg-share-create-too-large">Fichier trop volumineux !</message>
+<message id="msg-share-create-failed">Impossible de créer le partage !</message>
 <message id="msg-share-no-longer-available">Ce partage n'est plus disponible !</message>
-<message id="msg-create-share-success">Partage créé avec succès !</message>
-<message id="msg-delete-share-success">Partage supprimé !</message>
 
 <message id="Wt.WMessageBox.Yes">Oui</message>
 <message id="Wt.WMessageBox.No">Non</message>

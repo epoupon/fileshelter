@@ -119,12 +119,12 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 
 	auto navbar = new Wt::WNavigationBar(root());
 	navbar->setResponsive(true);
-	navbar->setTitle("FileShelter", "https://github.com/epoupon/fileshelter");
+	navbar->setTitle(Wt::WString::tr("msg-nav-title"), "/home");
 
-	auto homeAnchor = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/home"), Wt::WString::tr("msg-title-home"));
+	auto homeAnchor = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/home"), Wt::WString::tr("msg-nav-home"));
 	navbar->addWidget(homeAnchor);
 
-	auto createShareAnchor = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/share-create"), Wt::WString::tr("msg-title-create-share"));
+	auto createShareAnchor = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/share-create"), Wt::WString::tr("msg-nav-share-create"));
 	navbar->addWidget(createShareAnchor);
 
 	auto container = new Wt::WContainerWidget(root());

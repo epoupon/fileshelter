@@ -29,11 +29,11 @@ Home::Home(Wt::WContainerWidget* parent)
 {
 	Wt::WTemplate *home = new Wt::WTemplate(Wt::WString::tr("template-home"), this);
 
-	Wt::WPushButton *createBtn = new Wt::WPushButton(Wt::WString::tr("msg-create-share"));
+	Wt::WPushButton *createBtn = new Wt::WPushButton(Wt::WString::tr("msg-share-create"), Wt::XHTMLText);
 	createBtn->addStyleClass("btn-primary");
 	createBtn->setLink( Wt::WLink(Wt::WLink::InternalPath, "/share-create") );
 
-	home->bindWidget("create-share-btn", createBtn);
+	home->bindWidget("share-create-btn", createBtn);
 }
 
 } // namespace UserInterface
