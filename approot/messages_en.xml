@@ -7,6 +7,11 @@
 <message id="msg-nav-home"><i class="fa fa-home fa-lg" style="line-height:32px"> Home</i></message>
 <message id="msg-nav-share-create"><i class="fa fa-upload fa-lg" style="line-height:32px"> New share</i></message>
 
+<message id="msg-home-desc">
+	<p>FileShelter allows you to easily share files over the Internet.</p>
+	<p>Just upload a file and get a download URL back!</p>
+</message>
+
 <message id="msg-share-create"><i class="fa fa-upload"> New share</i></message>
 <message id="msg-share-edit"><i class="fa fa-edit"> Edit</i></message>
 <message id="msg-share-download"><i class="fa fa-download"> Download</i></message>

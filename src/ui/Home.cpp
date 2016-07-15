@@ -19,6 +19,7 @@
 
 #include <Wt/WTemplate>
 #include <Wt/WPushButton>
+#include <Wt/WAnchor>
 
 #include "Home.hpp"
 
@@ -28,12 +29,15 @@ Home::Home(Wt::WContainerWidget* parent)
 : Wt::WContainerWidget( parent)
 {
 	Wt::WTemplate *home = new Wt::WTemplate(Wt::WString::tr("template-home"), this);
+	home->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
 	Wt::WPushButton *createBtn = new Wt::WPushButton(Wt::WString::tr("msg-share-create"), Wt::XHTMLText);
 	createBtn->addStyleClass("btn-primary");
 	createBtn->setLink( Wt::WLink(Wt::WLink::InternalPath, "/share-create") );
 
 	home->bindWidget("share-create-btn", createBtn);
+
+	home->bindWidget("github-link", new Wt::WAnchor("https://github.com/epoupon/fileshelter", "<i class=\"fa fa-github\"></i>"));
 }
 
 } // namespace UserInterface
