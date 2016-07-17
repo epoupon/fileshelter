@@ -8,8 +8,9 @@ fileshelter_approotdir=$(pkgdatadir)/approot
 
 fileshelter_approot_DATA = \
 		approot/templates.xml	\
-		approot/messages_fr.xml	\
-		approot/messages_en.xml
+		approot/messages.xml	\
+		approot/messages_fr.xml \
+		approot/tos.xml
 
 sysconf_DATA = \
 	        $(top_srcdir)/conf/fileshelter.conf

@@ -6,7 +6,6 @@ fileshelter_SOURCES = \
 	$(srcdir)/database/DbHandler.cpp	\
 	$(srcdir)/database/Share.cpp		\
 	$(srcdir)/ui/FileShelterApplication.cpp	\
-	$(srcdir)/ui/Home.cpp			\
 	$(srcdir)/ui/ShareCreate.cpp		\
 	$(srcdir)/ui/ShareCreated.cpp		\
 	$(srcdir)/ui/ShareDownload.cpp		\

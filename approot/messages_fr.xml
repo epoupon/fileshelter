@@ -12,6 +12,8 @@
 	<p>Uploadez un fichier et obtenez en retour un lien permettant de le télécharger !</p>
 </message>
 
+<message id="msg-tos">Conditions d'utilisation</message>
+
 <message id="msg-share-create"><i class="fa fa-upload"> Nouveau partage</i></message>
 <message id="msg-share-edit"><i class="fa fa-edit"> Edition</i></message>
 <message id="msg-share-download"><i class="fa fa-download"> Téléchargement</i></message>

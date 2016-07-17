@@ -23,10 +23,10 @@
 #include <Wt/WNavigationBar>
 #include <Wt/WAnchor>
 #include <Wt/WTemplate>
+#include <Wt/WPushButton>
 
 #include "utils/Logger.hpp"
 
-#include "Home.hpp"
 #include "ShareCreate.hpp"
 #include "ShareCreated.hpp"
 #include "ShareDownload.hpp"
@@ -59,9 +59,33 @@ enum Idx
 	IdxShareCreated		= 2,
 	IdxShareDownload	= 3,
 	IdxShareEdit		= 4,
+	IdxToS			= 5,
 };
 
-void
+
+static Wt::WWebWidget* createHome()
+{
+	Wt::WTemplate *home = new Wt::WTemplate(Wt::WString::tr("template-home"));
+	home->addFunction("tr", &Wt::WTemplate::Functions::tr);
+
+	Wt::WPushButton *createBtn = new Wt::WPushButton(Wt::WString::tr("msg-share-create"), Wt::XHTMLText);
+	createBtn->addStyleClass("btn-primary");
+	createBtn->setLink( Wt::WLink(Wt::WLink::InternalPath, "/share-create") );
+
+	home->bindWidget("share-create-btn", createBtn);
+
+	return home;
+}
+
+static Wt::WWebWidget* createToS(void)
+{
+	Wt::WTemplate *tos = new Wt::WTemplate(Wt::WString::tr("template-tos"));
+	tos->addFunction("tr", &Wt::WTemplate::Functions::tr);
+
+	return tos;
+}
+
+static void
 handlePathChange(Wt::WStackedWidget* stack)
 {
 	static std::map<std::string, int> indexes =
@@ -71,6 +95,7 @@ handlePathChange(Wt::WStackedWidget* stack)
 		{ "/share-created",	IdxShareCreated },
 		{ "/share-download",	IdxShareDownload },
 		{ "/share-edit",	IdxShareEdit },
+		{ "/tos",		IdxToS },
 	};
 
 	for (auto index : indexes)
@@ -108,19 +133,21 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 
 	FS_LOG(UI, INFO) << "Locale = " << env.locale().name();
 
-	if (env.locale().name().find_first_of("fr") == 0)
-		messageResourceBundle().use(appRoot() + "messages_fr");
-	else
-		messageResourceBundle().use(appRoot() + "messages_en");
+	messageResourceBundle().use(appRoot() + "messages");
+	messageResourceBundle().use(appRoot() + "tos");
 
 	setTitle("FileShelter");
-	addMetaHeader("viewport", "width=device-width, initial-scale=1, maximum-scale=1");
+	removeMetaHeader(Wt::MetaName, "viewport");
+	addMetaHeader(Wt::MetaName, "viewport", "width=device-width, initial-scale=1.0, user-scalable=no");
 
 	enableInternalPaths();
 
-	auto navbar = new Wt::WNavigationBar(root());
+	auto main = new Wt::WTemplate(Wt::WString::tr("template-main"), root());
+
+	auto navbar = new Wt::WNavigationBar();
+	main->bindWidget("navbar-top", navbar);
 	navbar->setResponsive(true);
-	navbar->setTitle(Wt::WString::tr("msg-nav-title"), "/home");
+	navbar->setTitle(Wt::WString::tr("msg-nav-title"), Wt::WLink(Wt::WLink::InternalPath, "/home"));
 
 	auto homeAnchor = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/home"), Wt::WString::tr("msg-nav-home"));
 	navbar->addWidget(homeAnchor);
@@ -128,16 +155,20 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 	auto createShareAnchor = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/share-create"), Wt::WString::tr("msg-nav-share-create"));
 	navbar->addWidget(createShareAnchor);
 
-	auto container = new Wt::WContainerWidget(root());
-	container->addStyleClass("container");
+	auto container = new Wt::WContainerWidget();
+	main->bindWidget("contents", container);
+
+	main->bindWidget("github-link", new Wt::WAnchor("https://github.com/epoupon/fileshelter", "<i class=\"fa fa-github\"> Github</i>"));
+	main->bindWidget("tos", new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/tos"), Wt::WString::tr("msg-tos")));
 
 	// Same order as Idx enum
 	Wt::WStackedWidget* mainStack = new Wt::WStackedWidget(container);
-	mainStack->addWidget(new Home());
+	mainStack->addWidget(createHome());
 	mainStack->addWidget(new ShareCreate());
 	mainStack->addWidget(new ShareCreated());
 	mainStack->addWidget(new ShareDownload());
 	mainStack->addWidget(new ShareEdit());
+	mainStack->addWidget(createToS());
 
 	internalPathChanged().connect(std::bind([=]
 	{

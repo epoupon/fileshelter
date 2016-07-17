@@ -12,6 +12,8 @@
 	<p>Just upload a file and get an URL back!</p>
 </message>
 
+<message id="msg-tos">Terms of Service</message>
+
 <message id="msg-share-create"><i class="fa fa-upload"> New share</i></message>
 <message id="msg-share-edit"><i class="fa fa-edit"> Edit</i></message>
 <message id="msg-share-download"><i class="fa fa-download"> Download</i></message>

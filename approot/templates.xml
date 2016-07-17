@@ -2,19 +2,24 @@
 <messages xmlns:if="Wt.WTemplate.conditions">
 <!--FORMS message blocks-->
 
-<message id="template-home">
-	<div class="jumbotron">
-		<h1><i class="fa fa-external-link"> FileShelter</i></h1>
-		${tr:msg-home-desc}
-		${share-create-btn}
+<message id="template-main">
+	${navbar-top}
+	<div class="container">
+		<div class="jumbotron">
+			${contents}
+		</div>
+		<p class="text-right">${tos} | ${github-link}</p>
 	</div>
-	${github-link}
+</message>
+
+<message id="template-home">
+	<h1><i class="fa fa-external-link"> FileShelter</i></h1>
+	${tr:msg-home-desc}
+	${share-create-btn}
 </message>
 
 <message id="template-share-create">
-	<div class="page-header">
-		<h1>${tr:msg-share-create}</h1>
-	</div>
+	<h1>${tr:msg-share-create}</h1>
 	<div class="form-horizontal">
 		<div class="form-group">
 			<label class="control-label col-sm-2"  for="${id:desc}">
@@ -91,9 +96,7 @@
 </message>
 
 <message id="template-share-created">
-	<div class="page-header">
-		<h1>${tr:msg-share-create-success}</h1>
-	</div>
+	<h1>${tr:msg-share-create-success}</h1>
 	<div class="form-horizontal">
 		<div class="form-group">
 			<label class="control-label col-sm-2"  for="${id:public-link}">
@@ -115,9 +118,7 @@
 </message>
 
 <message id="template-share-download-password">
-	<div class="page-header">
-		<h1>${tr:msg-share-download}</h1>
-	</div>
+	<h1>${tr:msg-share-download}</h1>
 	<div class="alert alert-info">
 		${tr:msg-share-protected-by-password}
 	</div>
@@ -142,9 +143,7 @@
 </message>
 
 <message id="template-share-download">
-	<div class="page-header">
-		<h1>${tr:msg-share-download}</h1>
-	</div>
+	<h1>${tr:msg-share-download}</h1>
 	${<if-error>}
 	<div class="alert alert-danger">
 		${error}
@@ -186,9 +185,7 @@
 </message>
 
 <message id="template-share-edit">
-	<div class="page-header">
-		<h1>${tr:msg-share-edit}</h1>
-	</div>
+	<h1>${tr:msg-share-edit}</h1>
 	<div class="form-horizontal">
 		${<if-desc>}
 		<div class="form-group">
@@ -241,24 +238,18 @@
 </message>
 
 <message id="template-share-not-created">
-	<div class="page-header">
-		<h1>${tr:msg-share-create-failed}</h1>
-	</div>
+	<h1>${tr:msg-share-create-failed}</h1>
 	<div class="alert alert-danger">
 		${error}
 	</div>
 </message>
 
 <message id="template-share-not-found">
-	<div class="page-header">
-		<h1>${tr:msg-share-not-found}</h1>
-	</div>
+	<h1>${tr:msg-share-not-found}</h1>
 </message>
 
 <message id="template-share-removed">
-	<div class="page-header">
-		<h1>${tr:msg-share-deleted}</h1>
-	</div>
+	<h1>${tr:msg-share-deleted}</h1>
 </message>
 
 

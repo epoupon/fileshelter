@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<messages xmlns:if="Wt.WTemplate.conditions">
+<!--FORMS message blocks-->
+
+<!-- This license text is under Creative Commons - Attribution 3.0 Unported.
+ * It has been based on this work: https://gitlab.com/mojo42/Jirafeau/raw/master/tos_text.php -->
+<message id="msg-tos-org">**[ORG]**</message>
+<message id="msg-tos-url">**[URL]**</message>
+<message id="msg-tos-contact">**[SUPPORT EMAIL ADDRESS]**</message>
+<message id="template-tos">
+<h1>TERMS OF SERVICE</h1>
+
+<h2>1. ACCEPTANCE OF TERMS</h2>
+<p>${tr:msg-tos-org} provides the information on this Web site as provided in these Terms of Service ("TOS"). ${tr:msg-tos-org} may update the TOS at any time and without prior notice by posting a new version at ${tr:msg-tos-url}. The information on this site and your use of it is subject to the most recent version of the TOS posted.</p>
+
+<h2>2. DESCRIPTION OF SERVICE</h2>
+<p>${tr:msg-tos-org} provides you an upload service and a variety of other services. ("${tr:msg-tos-org} Service"). Unless explicitly stated otherwise, any new features that augment or enhance the current ${tr:msg-tos-org} Service shall be subject to the TOS.</p>
+
+<h2>3. CONDUCT</h2>
+<p>You understand that all information, data, text, software, graphics or other materials ("Content"), whether publicly posted or privately transmitted, are the sole responsibility of the person from whom such Content originated. This means that you, and not ${tr:msg-tos-org}, are entirely responsible for all Content that you upload, post, email, transmit or otherwise make available via the ${tr:msg-tos-org} Service. ${tr:msg-tos-org} does not control the Content posted via the ${tr:msg-tos-org} Service and, as such, does not guarantee the accuracy, integrity or quality of such Content. Under no circumstances will ${tr:msg-tos-org} be liable in any way for any Content, including, but not limited to, any errors or omissions in any Content, or any loss or damage of any kind incurred as a result of the use of any Content posted, emailed, transmitted or otherwise made available via the ${tr:msg-tos-org} Service. You agree to not use the ${tr:msg-tos-org} Service to:
+	<ul>
+		<li><p>upload, post, email, transmit or otherwise make available any Content that is unlawful, harmful, threatening, abusive, harassing, tortuous, defamatory, vulgar, obscene, libelous, invasive of another's privacy, hateful, or racially, ethnically or otherwise objectionable or harm minors;</p></li>
+		<li><p>impersonate any person or entity or falsely state or otherwise misrepresent your affiliation with a person or entity;</p></li>
+		<li><p>forge headers or otherwise manipulate identifiers in order to disguise the origin of any Content transmitted through the ${tr:msg-tos-org} Service;</p></li>
+		<li><p>upload, post, email, transmit or otherwise make available any Content that you do not have a right to make available under any law or under contractual or other relationships;</p></li>
+		<li><p>upload, post, email, transmit or otherwise make available any Content that infringes any patent, trademark, trade secret, copyright or other proprietary rights of any party;</p></li>
+		<li><p>upload, post, email, transmit or otherwise make available any unsolicited or unauthorized advertising, promotional materials, "junk mail," "spam," or any other form of solicitation;</p></li>
+		<li><p>upload, post, email, transmit or otherwise make available any material that contains software viruses or any other computer code, files or programs designed to interrupt, destroy or limit the functionality of any computer software or hardware or telecommunications equipment;</p></li>
+		<li><p>disrupt the normal flow of dialogue, or otherwise act in a manner that negatively affects other users' ability to engage in discussions or exchanges;</p></li>
+ 		<li><p>interfere with or disrupt the ${tr:msg-tos-org} Service or servers or networks connected to the ${tr:msg-tos-org} Service, or disobey any requirements, procedures, policies or regulations of networks connected to the ${tr:msg-tos-org} Service;</p></li>
+		<li><p>intentionally or unintentionally violate any applicable local, state, national or international law,</p></li>
+		<li><p>"stalk" or otherwise harass another; and/or</p></li>
+		<li><p>collect or store personal data about other users in connection with the prohibited conduct and activities set forth in paragraphs above. You acknowledge that ${tr:msg-tos-org} may or may not pre-screen Content, but that ${tr:msg-tos-org} and its designees shall have the right (but not the obligation) in their sole discretion to pre-screen, refuse, move, or remove any Content that is available via the ${tr:msg-tos-org} Service and which violates the TOS. You agree that you must evaluate, and bear all risks associated with, the use of any Content, including any reliance on the accuracy, completeness, or usefulness of such Content. You acknowledge, consent and agree that ${tr:msg-tos-org} may access, preserve and disclose your account information and Content if required to do so by law or in a good faith belief that such access preservation or disclosure is reasonably necessary to:
+			<ul>
+				<li><p>comply with legal process;</p></li>
+				<li><p>enforce the TOS;</p></li>
+				<li><p>respond to claims that any Content violates the rights of third parties;</p></li>
+				<li><p>respond to your requests for customer service; or (e) protect the rights, property or personal safety of ${tr:msg-tos-org} its users and the public.</p></li>
+			</ul>
+		</p></li>
+	</ul>
+</p>
+
+<h2>4. CONTENT MADE AVAILABLE FOR INCLUSION ON THE ${tr:msg-tos-org} SERVICE</h2>
+<p>${tr:msg-tos-org} does not claim ownership of Content you submit or make available for inclusion via the ${tr:msg-tos-org} Service. However, with respect to Content you submit or make available for inclusion on the publicly available ${tr:msg-tos-org} Service, you irrevocably grant ${tr:msg-tos-org} the perpetual, worldwide, royalty-free and non-exclusive license, with the right to sublicense through multiple tiers of sublicensees, to use, distribute, reproduce, modify, adapt, publicly perform and publicly display such Content, in whole or in part, on the ${tr:msg-tos-org} Service or other publications by ${tr:msg-tos-org} in any media whether now existing or which come into the existence into the future and to provide that information under the license set forth on the initial page of the ${tr:msg-tos-url} Web site. And for Content you submit for private discussions, you grant ${tr:msg-tos-org} the worldwide, royalty-free and non-exclusive license to use, distribute, reproduce, modify, adapt, publicly perform and publicly display such Content on the associated private discussion group.</p>
+
+<h2>5. INDEMNITY</h2>
+<p>You agree to indemnify and hold ${tr:msg-tos-org} and its subsidiaries, affiliates, officers, agents, employees, partners and licensors harmless from any claim or demand, including but not limited to reasonable attorneys' fees, made by any third party due to or arising out of Content you submit, post, transmit or otherwise make available through the Service, your use of the ${tr:msg-tos-org} Service, your connection to the Service, your violation of the TOS, or your violation of any rights of another.</p>
+
+<h2>6. MODIFICATIONS TO ${tr:msg-tos-org} SERVICE</h2>
+<p>You acknowledge that ${tr:msg-tos-org} may establish general practices and limits concerning use of the ${tr:msg-tos-org} Service, including without limitation the maximum number of days that email messages, message board postings or other uploaded Content will be retained by the ${tr:msg-tos-org} Service.. You further acknowledge that ${tr:msg-tos-org} reserves the right to modify these general practices and limits from time to time. ${tr:msg-tos-org} reserves the right at any time and from time to time to modify or discontinue, temporarily or permanently, the ${tr:msg-tos-org} Service (or any part thereof) with or without notice. You agree that ${tr:msg-tos-org} shall not be liable to you or to any third party for any modification, suspension or discontinuance of the ${tr:msg-tos-org} Service.</p>
+
+<h2>7. TERMINATION</h2>
+<p>You agree that ${tr:msg-tos-org} may terminate your access to the ${tr:msg-tos-org} Service for violations of the TOS and/or requests by authorized law enforcement or other government agencies.</p>
+
+<h2>8. LINKS</h2>
+<p>The ${tr:msg-tos-org} Service may provide, or third parties may provide, links to other World Wide Web sites or resources. Because ${tr:msg-tos-org} has no control over such sites and resources, you acknowledge and agree that ${tr:msg-tos-org} is not responsible for the availability of such external sites or resources, and does not endorse and is not responsible or liable for any Content, advertising, products or other materials on or available from such sites or resources. You further acknowledge and agree that ${tr:msg-tos-org} shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with use of or reliance on any such Content, goods or services available on or through any such site or resource.</p>
+
+<h2>9. DISCLAIMER OF WARRANTIES</h2>
+<p>You expressly understand and agree that: Your use of the ${tr:msg-tos-org} service is at your sole risk. ${tr:msg-tos-org} service is provided on an "as is" and "as available" basis. ${tr:msg-tos-org} and its subsidiaries, affiliates, officers, employees and licensors expressly disclaim all warranties of any kind, whether express or implied, including, but not limited to the implied warranties of merchantability, fitness for a particular purpose and non-infringement. ${tr:msg-tos-org} and its subsidiaries, affiliates, officers, employees and licensors make no warranty that
+	<ul>
+		<li><p>The ${tr:msg-tos-org} service will meet your requirements;</p></li>
+		<li><p>The ${tr:msg-tos-org} service will be uninterrupted, timely, secure or error-free and</p></li>
+		<li><p>The results that may be obtained from the use of the ${tr:msg-tos-org} service will be accurate or reliable. No advice or information, whether oral or written, obtained by you from ${tr:msg-tos-org} or through or from the service shall create any warranty not expressly stated in the TOS.</p></li>
+	</ul>
+</p>
+
+<h2>10. LIMITATION OF LIABILITY</h2>
+<p>You expressly understand and agree that ${tr:msg-tos-org} and its subsidiaries, affiliates, officers, employees, agents, partners and licensors shall not be liable to you for any direct, indirect, incidental, special, consequential or exemplary damages, including, but not limited to, damages for loss of profits, goodwill, use, data or other intangible losses (even if ${tr:msg-tos-org} has been advised of the possibility of such damages), resulting from the use or the inability to use the ${tr:msg-tos-org} service.</p>
+
+<h2>11. NOTICE AND PROCEDURE FOR MAKING CLAIMS OF COPYRIGHT INFRINGEMENT</h2>
+<p>${tr:msg-tos-org} respects the copyright of others, and we ask our users to do the same. ${tr:msg-tos-org} may, in appropriate circumstances and at its discretion, disable and/or terminate the access of users who may be repeat infringers. If you believe that your work has been copied in a way that constitutes copyright infringement, please provide ${tr:msg-tos-org}'s Copyright Agent the following information: an electronic or physical signature of the person authorized to act on behalf of the owner of the copyright; a description of the copyrighted work that you claim has been infringed; a description of where the material that you claim is infringing is located on the site; your address, telephone number, and email address; a statement by you that you have a good faith belief that the disputed use is not authorized by the copyright owner, its agent, or the law; a statement by you, made under penalty of perjury, that the above information in your Notice is accurate and that you are the copyright owner or authorized to act on the copyright owner's behalf.</p>
+
+<p>${tr:msg-tos-org}'s Agent for Notice of claims of copyright infringement can be reached as follows:</p>
+
+<p>${tr:msg-tos-contact}</p>
+</message>
+</messages>
