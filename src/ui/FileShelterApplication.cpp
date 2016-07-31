@@ -68,7 +68,7 @@ static Wt::WWebWidget* createHome()
 	Wt::WTemplate *home = new Wt::WTemplate(Wt::WString::tr("template-home"));
 	home->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
-	Wt::WPushButton *createBtn = new Wt::WPushButton(Wt::WString::tr("msg-share-create"), Wt::XHTMLText);
+	Wt::WPushButton *createBtn = new Wt::WPushButton("<i class=\"fa fa-upload\"></i> " + Wt::WString::tr("msg-share-create"), Wt::XHTMLText);
 	createBtn->addStyleClass("btn-primary");
 	createBtn->setLink( Wt::WLink(Wt::WLink::InternalPath, "/share-create") );
 
@@ -126,6 +126,7 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 	bootstrapTheme->setResponsive(true);
 	setTheme(bootstrapTheme);
 
+	useStyleSheet("css/fileshelter.css");
 	useStyleSheet("resources/font-awesome/css/font-awesome.min.css");
 
 	// Resouce bundles
@@ -147,12 +148,14 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 	auto navbar = new Wt::WNavigationBar();
 	main->bindWidget("navbar-top", navbar);
 	navbar->setResponsive(true);
-	navbar->setTitle(Wt::WString::tr("msg-nav-title"), Wt::WLink(Wt::WLink::InternalPath, "/home"));
+	navbar->setTitle("<i class=\"fa fa-external-link\"></i> " + Wt::WString::tr("msg-app-name"), Wt::WLink(Wt::WLink::InternalPath, "/home"));
 
-	auto homeAnchor = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/home"), Wt::WString::tr("msg-nav-home"));
+	auto homeAnchor = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/home"), "<i class=\"fa fa-home fa-lg\"></i> " + Wt::WString::tr("msg-home"));
+	homeAnchor->addStyleClass("fs-nav");
 	navbar->addWidget(homeAnchor);
 
-	auto createShareAnchor = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/share-create"), Wt::WString::tr("msg-nav-share-create"));
+	auto createShareAnchor = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/share-create"), "<i class=\"fa fa-upload fa-lg\"></i> " + Wt::WString::tr("msg-share-create"));
+	createShareAnchor->addStyleClass("fs-nav");
 	navbar->addWidget(createShareAnchor);
 
 	auto container = new Wt::WContainerWidget();

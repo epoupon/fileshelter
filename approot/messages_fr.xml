@@ -2,11 +2,6 @@
 <messages xmlns:if="Wt.WTemplate.conditions">
 <!--FORMS message blocks-->
 
-<message id="msg-nav-title"><i class="fa fa-external-link"> FileShelter</i></message>
-<message id="msg-nav-home"><i class="fa fa-home fa-lg" style="line-height:32px"> Accueil</i></message>
-<message id="msg-nav-share-create"><i class="fa fa-upload fa-lg" style="line-height:32px"> Nouveau partage</i>
-</message>
-
 <message id="msg-home-desc">
 	<p>FileShelter vous permet de partager facilement des fichiers par Internet.</p>
 	<p>Uploadez un fichier et obtenez en retour un lien permettant de le télécharger !</p>
@@ -14,12 +9,14 @@
 
 <message id="msg-tos">Conditions d'utilisation</message>
 
-<message id="msg-share-create"><i class="fa fa-upload"> Nouveau partage</i></message>
-<message id="msg-share-edit"><i class="fa fa-edit"> Edition</i></message>
-<message id="msg-share-download"><i class="fa fa-download"> Téléchargement</i></message>
-<message id="msg-share-not-found"><i class="fa fa-exclamation-triangle"> Partage non trouvé !</i></message>
-<message id="msg-share-deleted"><i class="fa fa-remove"> Partage supprimé !</i></message>
-<message id="msg-share-create-success"><i class="fa fa-check"> Partage créé !</i></message>
+<message id="msg-home">Accueil</message>
+
+<message id="msg-share-create">Nouveau partage</message>
+<message id="msg-share-edit">Edition</message>
+<message id="msg-share-download">Téléchargement</message>
+<message id="msg-share-not-found">Partage non trouvé !</message>
+<message id="msg-share-deleted">Partage supprimé !</message>
+<message id="msg-share-create-success">Partage créé !</message>
 <message id="msg-upload">Envoyer</message>
 <message id="msg-download">Télécharger</message>
 <message id="msg-delete">Supprimer</message>
@@ -43,8 +40,8 @@
 <message id="msg-password">Mot de passe</message>
 <message id="msg-password-confirm">Confirmation du mot de passe</message>
 
-<message id="msg-download-link"><i class="fa fa-download"></i> Lien de téléchargement public</message>
-<message id="msg-edit-link"><i class="fa fa-edit"></i> Lien d'édition privé</message>
+<message id="msg-download-link">Lien de téléchargement public</message>
+<message id="msg-edit-link">Lien d'édition privé</message>
 
 
 <message id="msg-share-create-too-large">Fichier trop volumineux !</message>

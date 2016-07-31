@@ -186,7 +186,7 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 		upload->fileTooLarge().connect(std::bind([=] ()
 		{
 			FS_LOG(UI, DEBUG) << "File too large!";
-			failed().emit(Wt::WString::tr("msg-create-share-too-large"));
+			failed().emit(Wt::WString::tr("msg-share-create-too-large"));
 		}));
 
 		upload->uploaded().connect(std::bind([=] ()

@@ -45,7 +45,6 @@ void
 ShareResource::handleRequest(const Wt::Http::Request& request,
 				  Wt::Http::Response& response)
 {
-
 	if (!request.continuation())
 	{
 		FS_LOG(UI, INFO) << "[" << _downloadUUID << "] - Not a continuation...";

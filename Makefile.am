@@ -6,6 +6,11 @@ SUBDIRS = src
 fileshelter_docrootdir=$(pkgdatadir)/docroot
 fileshelter_approotdir=$(pkgdatadir)/approot
 
+fileshelter_cssdir=$(fileshelter_docrootdir)/css
+
+fileshelter_css_DATA = \
+		 docroot/css/fileshelter.css
+
 fileshelter_approot_DATA = \
 		approot/templates.xml	\
 		approot/messages.xml	\

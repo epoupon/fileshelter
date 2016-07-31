@@ -13,13 +13,13 @@
 </message>
 
 <message id="template-home">
-	<h1><i class="fa fa-external-link"> FileShelter</i></h1>
+	<h1><i class="fa fa-external-link"></i> ${tr:msg-app-name}</h1>
 	${tr:msg-home-desc}
 	${share-create-btn}
 </message>
 
 <message id="template-share-create">
-	<h1>${tr:msg-share-create}</h1>
+	<h1><i class="fa fa-upload"></i> ${tr:msg-share-create}</h1>
 	<div class="form-horizontal">
 		<div class="form-group">
 			<label class="control-label col-sm-2"  for="${id:desc}">
@@ -96,11 +96,11 @@
 </message>
 
 <message id="template-share-created">
-	<h1>${tr:msg-share-create-success}</h1>
+	<h1><i class="fa fa-check"></i> ${tr:msg-share-create-success}</h1>
 	<div class="form-horizontal">
 		<div class="form-group">
 			<label class="control-label col-sm-2"  for="${id:public-link}">
-				${tr:msg-download-link}
+				<i class="fa fa-download"></i> ${tr:msg-download-link}
 			</label>
 			<div class="col-sm-10 well well-sm">
 				${download-link}
@@ -108,7 +108,7 @@
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-2"  for="${id:edit-link}">
-				${tr:msg-edit-link}
+				<i class="fa fa-edit"></i> ${tr:msg-edit-link}
 			</label>
 			<div class="col-sm-10 well well-sm">
 				${edit-link}
@@ -118,7 +118,7 @@
 </message>
 
 <message id="template-share-download-password">
-	<h1>${tr:msg-share-download}</h1>
+	<h1><i class="fa fa-download"></i> ${tr:msg-share-download}</h1>
 	<div class="alert alert-info">
 		${tr:msg-share-protected-by-password}
 	</div>
@@ -143,7 +143,7 @@
 </message>
 
 <message id="template-share-download">
-	<h1>${tr:msg-share-download}</h1>
+	<h1><i class="fa fa-download"></i> ${tr:msg-share-download}</h1>
 	${<if-error>}
 	<div class="alert alert-danger">
 		${error}
@@ -185,7 +185,7 @@
 </message>
 
 <message id="template-share-edit">
-	<h1>${tr:msg-share-edit}</h1>
+	<h1><i class="fa fa-edit"></i> ${tr:msg-share-edit}</h1>
 	<div class="form-horizontal">
 		${<if-desc>}
 		<div class="form-group">
@@ -238,18 +238,18 @@
 </message>
 
 <message id="template-share-not-created">
-	<h1>${tr:msg-share-create-failed}</h1>
+	<h1><i class="fa fa-remove"></i> ${tr:msg-share-create-failed}</h1>
 	<div class="alert alert-danger">
 		${error}
 	</div>
 </message>
 
 <message id="template-share-not-found">
-	<h1>${tr:msg-share-not-found}</h1>
+	<h1><i class="fa fa-exclamation-triangle"></i> ${tr:msg-share-not-found}</h1>
 </message>
 
 <message id="template-share-removed">
-	<h1>${tr:msg-share-deleted}</h1>
+	<h1><i class="fa fa-remove"></i> ${tr:msg-share-deleted}</h1>
 </message>
 
 

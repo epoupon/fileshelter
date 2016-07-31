@@ -3,10 +3,6 @@
 <messages xmlns:if="Wt.WTemplate.conditions">
 <!--FORMS message blocks-->
 
-<message id="msg-nav-title"><i class="fa fa-external-link"> FileShelter</i></message>
-<message id="msg-nav-home"><i class="fa fa-home fa-lg" style="line-height:32px"> Home</i></message>
-<message id="msg-nav-share-create"><i class="fa fa-upload fa-lg" style="line-height:32px"> New share</i></message>
-
 <message id="msg-home-desc">
 	<p>FileShelter allows you to easily share files over the Internet.</p>
 	<p>Just upload a file and get an URL back!</p>
@@ -14,12 +10,14 @@
 
 <message id="msg-tos">Terms of Service</message>
 
-<message id="msg-share-create"><i class="fa fa-upload"> New share</i></message>
-<message id="msg-share-edit"><i class="fa fa-edit"> Edit</i></message>
-<message id="msg-share-download"><i class="fa fa-download"> Download</i></message>
-<message id="msg-share-not-found"><i class="fa fa-exclamation-triangle"> Share not found!</i></message>
-<message id="msg-share-deleted"><i class="fa fa-remove"> Share successfully removed!</i></message>
-<message id="msg-share-create-success"><i class="fa fa-check"> Share successfully created!</i></message>
+<message id="msg-home">Home</message>
+<message id="msg-app-name">FileShelter</message>
+<message id="msg-share-create">New share</message>
+<message id="msg-share-edit">Edit</message>
+<message id="msg-share-download">Download</message>
+<message id="msg-share-not-found">Share not found!</message>
+<message id="msg-share-deleted">Share successfully removed!</message>
+<message id="msg-share-create-success">Share successfully created!</message>
 <message id="msg-upload">Upload</message>
 <message id="msg-download">Download</message>
 <message id="msg-delete">Delete</message>
@@ -43,8 +41,8 @@
 <message id="msg-password">Password</message>
 <message id="msg-password-confirm">Confirm password</message>
 
-<message id="msg-download-link"><i class="fa fa-download"></i> Public download link</message>
-<message id="msg-edit-link"><i class="fa fa-edit"></i> Private edit link</message>
+<message id="msg-download-link">Public download link</message>
+<message id="msg-edit-link">Private edit link</message>
 
 <message id="msg-share-create-too-large">File too large!</message>
 <message id="msg-share-create-failed">Failed to create share!</message>
