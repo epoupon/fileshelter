@@ -36,6 +36,21 @@
 
 namespace UserInterface {
 
+// This theme is a workaround to correctly apply the viewport meta header
+class FsTheme : public Wt::WBootstrapTheme
+{
+	public:
+		FsTheme(Wt::WObject *parent = 0) : Wt::WBootstrapTheme(parent) {}
+
+		std::vector< Wt::WCssStyleSheet > styleSheets(void) const
+		{
+			auto res = Wt::WBootstrapTheme::styleSheets();
+			Wt::WApplication::instance()->addMetaHeader("viewport", "width=device-width, initial-scale=1.0, user-scalable=no");
+			return res;
+		}
+};
+
+
 Wt::WApplication*
 FileShelterApplication::create(const Wt::WEnvironment& env, Wt::Dbo::SqlConnectionPool& connectionPool)
 {
@@ -121,7 +136,7 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 : Wt::WApplication(env),
   _db(connectionPool)
 {
-	Wt::WBootstrapTheme *bootstrapTheme = new Wt::WBootstrapTheme(this);
+	auto bootstrapTheme = new FsTheme(this);
 	bootstrapTheme->setVersion(Wt::WBootstrapTheme::Version3);
 	bootstrapTheme->setResponsive(true);
 	setTheme(bootstrapTheme);
@@ -138,8 +153,6 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 	messageResourceBundle().use(appRoot() + "tos");
 
 	setTitle("FileShelter");
-	removeMetaHeader(Wt::MetaName, "viewport");
-	addMetaHeader(Wt::MetaName, "viewport", "width=device-width, initial-scale=1.0, user-scalable=no");
 
 	enableInternalPaths();
 
