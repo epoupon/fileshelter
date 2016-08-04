@@ -82,7 +82,7 @@ Cleaner::process(boost::system::error_code err)
 	{
 		// In order not to delete a share that is being downloaded,
 		// really remove the share at least a day after it has expired
-		if (share->hasExpired() && share->getExpiracyDate() < currentDate)
+		if (share->hasExpired() && share->getExpiryDate() < currentDate)
 		{
 			FS_LOG(DB, INFO) << "Deleting expired share " << share->getDownloadUUID();
 

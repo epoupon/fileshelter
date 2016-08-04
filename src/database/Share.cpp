@@ -69,7 +69,7 @@ Share::hasExpired(void) const
 		return true;
 
 	auto currentDate = boost::gregorian::day_clock::universal_day();
-	if (currentDate >= _expiracyTime.date())
+	if (currentDate >= _expiryTime.date())
 		return true;
 
 	return false;

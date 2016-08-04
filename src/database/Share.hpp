@@ -51,7 +51,7 @@ class Share
 		bool				verifyPassword(Wt::WString password) const;
 		std::string			getDesc(void) const { return _desc; }
 		boost::posix_time::ptime	getCreationTime(void) const { return _creationTime; }
-		boost::gregorian::date		getExpiracyDate(void) const { return _expiracyTime.date(); }
+		boost::gregorian::date		getExpiryDate(void) const { return _expiryTime.date(); }
 		bool				hasExpired(void) const;
 		std::size_t			getMaxHits(void) const { return _maxHits; }
 		std::size_t			getHits(void) const { return _hits; }
@@ -68,7 +68,7 @@ class Share
 		void setValidityDuration(boost::posix_time::ptime time);
 		void setMaxHits(std::size_t maxHits)	{ _maxHits = maxHits; }
 		void incHits()				{ _hits++; }
-		void setExpiracyDate(boost::gregorian::date date) { _expiracyTime = boost::posix_time::ptime(date); }
+		void setExpiryDate(boost::gregorian::date date) { _expiryTime = boost::posix_time::ptime(date); }
 
 
 		template<class Action>
@@ -83,7 +83,7 @@ class Share
 				Wt::Dbo::field(a, _hashFunc,		"hash_func");
 				Wt::Dbo::field(a, _desc,		"desc");
 				Wt::Dbo::field(a, _creationTime,	"creation_time");
-				Wt::Dbo::field(a, _expiracyTime,	"expiracy_time");
+				Wt::Dbo::field(a, _expiryTime,		"expiry_time");
 				Wt::Dbo::field(a, _maxHits,		"max_hits");
 				Wt::Dbo::field(a, _hits,		"hits");
 				Wt::Dbo::field(a, _downloadUUID,	"download_UUID");
@@ -102,7 +102,7 @@ class Share
 		std::string				_desc;		// optional
 
 		boost::posix_time::ptime		_creationTime;
-		boost::posix_time::ptime		_expiracyTime;
+		boost::posix_time::ptime		_expiryTime;
 
 		int					_hits;
 		int					_maxHits;	//optional

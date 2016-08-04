@@ -37,7 +37,7 @@
 <message id="msg-no-file-selected">No file has been selected!</message>
 <message id="msg-max-file-size">File must be less than {1} MB</message>
 
-<message id="msg-expiracy-date">Expiracy date</message>
+<message id="msg-expiry-date">Expiry date</message>
 <message id="msg-max-hits">Max downloads</message>
 <message id="msg-password">Password</message>
 <message id="msg-password-confirm">Confirm password</message>

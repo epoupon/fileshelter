@@ -73,7 +73,7 @@ ShareEdit::refresh(void)
 	}
 	t->bindString("file-name", share->getFileName());
 	t->bindString("file-size", std::to_string(share->getFileSize() / 1000));
-	t->bindString("expiracy-date", boost::gregorian::to_simple_string(share->getExpiracyDate()));
+	t->bindString("expiry-date", boost::gregorian::to_simple_string(share->getExpiryDate()));
 	t->bindString("hits", std::to_string(share->getHits()));
 	t->bindString("max-hits", std::to_string(share->getMaxHits()));
 

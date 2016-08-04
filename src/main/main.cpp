@@ -35,6 +35,7 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 	std::vector<std::string> args;
 
 	boost::filesystem::path wtConfigPath = Config::instance().getPath("working-dir") / "wt_config.xml";
+	boost::filesystem::path wtLogFilePath = Config::instance().getPath("working-dir") / "fileshelter.log";
 
 	args.push_back(execPath);
 	args.push_back("--config=" + wtConfigPath.string());
@@ -59,7 +60,7 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 	boost::property_tree::ptree pt;
 
 	pt.put("server.application-settings.<xmlattr>.location", "*");
-	pt.put("server.application-settings.log-file", Config::instance().getPath("log-file"));
+	pt.put("server.application-settings.log-file", wtLogFilePath.string());
 	pt.put("server.application-settings.max-request-size", Config::instance().getULong("max-file-size", 100) * 1024 /* kB */);
 	pt.put("server.application-settings.behind-reverse-proxy", Config::instance().getBool("behind-reverse-proxy", false));
 	pt.put("server.application-settings.progressive-bootstrap", true);
@@ -86,7 +87,7 @@ int main(int argc, char *argv[])
 	{
 		Config::instance().setFile(configFilePath);
 
-		// Make sure working directory exists
+		// Make sure the working directory exists
 		// TODO check with boost::system::error_code ec;
 		boost::filesystem::create_directories(Config::instance().getPath("working-dir") / "files");
 

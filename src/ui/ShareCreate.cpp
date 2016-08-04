@@ -48,7 +48,7 @@ class ShareCreateFormModel : public Wt::WFormModel
 		// Associate each field with a unique string literal.
 		static const Field DescriptionField;
 		static const Field FileField;
-		static const Field ExpiracyDateField;
+		static const Field ExpiryDateField;
 		static const Field HitsValidityField;
 		static const Field PasswordField;
 		static const Field PasswordConfirmField;
@@ -58,7 +58,7 @@ class ShareCreateFormModel : public Wt::WFormModel
 		{
 			addField(DescriptionField, Wt::WString::tr("msg-optional"));
 			addField(FileField, Wt::WString::tr("msg-max-file-size").arg( Config::instance().getULong("max-file-size", 100) ));
-			addField(ExpiracyDateField);
+			addField(ExpiryDateField);
 			addField(HitsValidityField);
 			addField(PasswordField, Wt::WString::tr("msg-optional"));
 			addField(PasswordConfirmField);
@@ -84,9 +84,9 @@ class ShareCreateFormModel : public Wt::WFormModel
 			dateValidator->setBottom(Wt::WDate::currentServerDate().addDays(1));
 			if (maxDurationDays > 0)
 				dateValidator->setTop(Wt::WDate::currentServerDate().addDays(maxDurationDays));
-			setValidator(ExpiracyDateField, dateValidator);
+			setValidator(ExpiryDateField, dateValidator);
 
-			setValue(ExpiracyDateField, Wt::WDate::currentServerDate().addDays(7));
+			setValue(ExpiryDateField, Wt::WDate::currentServerDate().addDays(7));
 			setValue(HitsValidityField, 30);
 
 		}
@@ -113,7 +113,7 @@ class ShareCreateFormModel : public Wt::WFormModel
 
 const Wt::WFormModel::Field ShareCreateFormModel::DescriptionField = "desc";
 const Wt::WFormModel::Field ShareCreateFormModel::FileField = "file";
-const Wt::WFormModel::Field ShareCreateFormModel::ExpiracyDateField = "expiracy-date";
+const Wt::WFormModel::Field ShareCreateFormModel::ExpiryDateField = "expiry-date";
 const Wt::WFormModel::Field ShareCreateFormModel::HitsValidityField = "hits-validity";
 const Wt::WFormModel::Field ShareCreateFormModel::PasswordField = "password";
 const Wt::WFormModel::Field ShareCreateFormModel::PasswordConfirmField = "password-confirm";
@@ -147,8 +147,8 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 		setFormWidget(ShareCreateFormModel::FileField, upload);
 
 		// Time validity
-		Wt::WDateEdit *expiracyDate = new Wt::WDateEdit();
-		setFormWidget(ShareCreateFormModel::ExpiracyDateField, expiracyDate);
+		Wt::WDateEdit *expiryDate = new Wt::WDateEdit();
+		setFormWidget(ShareCreateFormModel::ExpiryDateField, expiryDate);
 
 		// Hits validity
 		Wt::WSpinBox *hitsValidity = new Wt::WSpinBox();
@@ -235,8 +235,8 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 			share.modify()->setFileSize(boost::filesystem::file_size(storePath));
 			share.modify()->setMaxHits(Wt::asNumber(model->value(ShareCreateFormModel::HitsValidityField)));
 
-			Wt::WDate date = expiracyDate->date();
-			share.modify()->setExpiracyDate(boost::gregorian::date(date.year(), date.month(), date.day()));
+			Wt::WDate date = expiryDate->date();
+			share.modify()->setExpiryDate(boost::gregorian::date(date.year(), date.month(), date.day()));
 			if (!model->valueText(ShareCreateFormModel::PasswordField).empty())
 				share.modify()->setPassword(model->valueText(ShareCreateFormModel::PasswordField));
 
@@ -258,7 +258,7 @@ ShareCreate::ShareCreate(Wt::WContainerWidget* parent)
 
 	wApp->internalPathChanged().connect(std::bind([=]
 	{
-			refresh();
+		refresh();
 	}));
 }
 

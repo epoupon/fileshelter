@@ -33,14 +33,14 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="control-label col-sm-2"  for="${id:expiracy-date}">
-				${tr:msg-expiracy-date}
+			<label class="control-label col-sm-2"  for="${id:expiry-date}">
+				${tr:msg-expiry-date}
 			</label>
 			<div class="col-sm-5">
-				${expiracy-date}
+				${expiry-date}
 			</div>
 			<div class="help-block col-sm-5">
-				${expiracy-date-info}
+				${expiry-date-info}
 			</div>
 		</div>
 		<div class="form-group">
@@ -215,10 +215,10 @@
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-2">
-				${tr:msg-expiracy-date}
+				${tr:msg-expiry-date}
 			</label>
 			<div class="col-sm-5 well well-sm">
-				${expiracy-date}
+				${expiry-date}
 			</div>
 		</div>
 		<div class="form-group">
