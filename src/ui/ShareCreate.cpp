@@ -57,7 +57,7 @@ class ShareCreateFormModel : public Wt::WFormModel
 			: Wt::WFormModel(parent)
 		{
 			addField(DescriptionField, Wt::WString::tr("msg-optional"));
-			addField(FileField);
+			addField(FileField, Wt::WString::tr("msg-max-file-size").arg( Config::instance().getULong("max-file-size", 100) ));
 			addField(ExpiracyDateField);
 			addField(HitsValidityField);
 			addField(PasswordField, Wt::WString::tr("msg-optional"));

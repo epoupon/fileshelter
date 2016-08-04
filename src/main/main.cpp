@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <boost/property_tree/xml_parser.hpp>
 
 #include <Wt/WServer>
 
@@ -29,12 +30,14 @@
 
 #include "ui/FileShelterApplication.hpp"
 
-static std::vector<std::string> getWtArgs(std::string path)
+std::vector<std::string> generateWtConfig(std::string execPath)
 {
 	std::vector<std::string> args;
 
-	args.push_back(path);
-	args.push_back("-c" + Config::instance().getString("wt-config"));
+	boost::filesystem::path wtConfigPath = Config::instance().getPath("working-dir") / "wt_config.xml";
+
+	args.push_back(execPath);
+	args.push_back("--config=" + wtConfigPath.string());
 	args.push_back("--docroot=" + Config::instance().getString("docroot"));
 	args.push_back("--approot=" + Config::instance().getString("approot"));
 
@@ -51,6 +54,18 @@ static std::vector<std::string> getWtArgs(std::string path)
 		args.push_back("--http-port=" + std::to_string( Config::instance().getULong("listen-port", 5081)));
 		args.push_back("--http-address=" + Config::instance().getString("listen-addr", "0.0.0.0"));
 	}
+
+	// Generate the wt_config.xml file
+	boost::property_tree::ptree pt;
+
+	pt.put("server.application-settings.<xmlattr>.location", "*");
+	pt.put("server.application-settings.log-file", Config::instance().getPath("log-file"));
+	pt.put("server.application-settings.max-request-size", Config::instance().getULong("max-file-size", 100) * 1024 /* kB */);
+	pt.put("server.application-settings.behind-reverse-proxy", Config::instance().getBool("behind-reverse-proxy", false));
+	pt.put("server.application-settings.progressive-bootstrap", true);
+
+	std::ofstream oss(wtConfigPath.string().c_str(), std::ios::out);
+	boost::property_tree::xml_parser::write_xml(oss, pt);
 
 	return args;
 }
@@ -83,17 +98,20 @@ int main(int argc, char *argv[])
 		// Set the WT_TMP_DIR inside the working dir, used to upload files
 		setenv("WT_TMP_DIR", tmpDir.string().c_str(), 1);
 
-		// Construct argc/argv for Wt
-		std::vector<std::string> wtArgs = getWtArgs(argv[0]);
+		// Construct WT configuration and get the argc/argv back
+		std::vector<std::string> wtServerArgs = generateWtConfig(argv[0]);
 
-		const char* wtArgv[wtArgs.size()];
-		for (std::size_t i = 0; i < wtArgs.size(); ++i)
-			wtArgv[i] = wtArgs[i].c_str();
+		const char* wtArgv[wtServerArgs.size()];
+		for (std::size_t i = 0; i < wtServerArgs.size(); ++i)
+		{
+			std::cout << "ARG = " << wtServerArgs[i] << std::endl;
+			wtArgv[i] = wtServerArgs[i].c_str();
+		}
 
 		Wt::WServer server(argv[0]);
-		server.setServerConfiguration (wtArgs.size(), const_cast<char**>(wtArgv));
+		server.setServerConfiguration (wtServerArgs.size(), const_cast<char**>(wtArgv));
 
-		Wt::WServer::instance()->logger().configure("*"); // log everything, TODO configure this
+		Wt::WServer::instance()->logger().configure("*"); // log everything, TODO configure this?
 
 		// Initializing a connection pool to the database that will be shared along services
 		std::unique_ptr<Wt::Dbo::SqlConnectionPool>
