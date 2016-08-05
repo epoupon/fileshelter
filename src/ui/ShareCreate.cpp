@@ -86,9 +86,25 @@ class ShareCreateFormModel : public Wt::WFormModel
 				dateValidator->setTop(Wt::WDate::currentServerDate().addDays(maxDurationDays));
 			setValidator(ExpiryDateField, dateValidator);
 
-			setValue(ExpiryDateField, Wt::WDate::currentServerDate().addDays(7));
-			setValue(HitsValidityField, 30);
+			auto maxValidityDays = Config::instance().getULong("max-validity-days", 30);
+			auto suggestedExpiryDate = Wt::WDate::currentServerDate();
 
+			if (maxValidityDays != 0 && maxValidityDays < 7)
+				suggestedExpiryDate = suggestedExpiryDate.addDays(maxValidityDays);
+			else
+				suggestedExpiryDate = suggestedExpiryDate.addDays(7);
+
+			setValue(ExpiryDateField, suggestedExpiryDate);
+
+			auto maxValidityHits = Config::instance().getULong("max-validity-hits", 10);
+			int suggestedValidityHits;
+
+			if (maxValidityHits != 0 && maxValidityHits < 10)
+				suggestedValidityHits = maxValidityHits;
+			else
+				suggestedValidityHits = 10;
+
+			setValue(HitsValidityField, suggestedValidityHits);
 		}
 
 		bool validateField(Field field)
