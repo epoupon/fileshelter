@@ -5,7 +5,7 @@
 <!-- This license text is under Creative Commons - Attribution 3.0 Unported.
  * It has been based on this work: https://gitlab.com/mojo42/Jirafeau/raw/master/tos_text.php -->
 <message id="msg-tos-org">**[ORG]**</message>
-<message id="msg-tos-url">**[URL]**</message>
+<message id="msg-tos-url">**[URL]**/tos</message>
 <message id="msg-tos-contact">**[SUPPORT EMAIL ADDRESS]**</message>
 <message id="template-tos">
 <h1>TERMS OF SERVICE</h1>

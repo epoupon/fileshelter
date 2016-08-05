@@ -4,9 +4,9 @@ Just upload a file and get an URL back!
 
 The aim is to provide a very simple web application, with few package dependencies, so that anyone can install it on his own server.
 
-A [demo](http://demo.fileshelter.suroot.com) instance is available, with the following limitations:
+A [demo](http://fileshelter.suroot.com) instance is available, with the following limitations:
 - Maximum duration is set to 3 days
-- Maximum download limit is set to 30
+- Maximum download limit is set to 10
 - Maximum file size is set to 1 MB
 
 ## Features
@@ -50,7 +50,7 @@ FileShelter uses a configuration file, installed in '/etc/fileshelter.conf'
 It is recommended to edit this file and change the relevant settings (working directory, maximum file size, maximum validity duration, etc.)
 
 A basic "Terms of Services" is provided, located in '/usr/share/fileshelter/approot/tos.xml'. You may modify it to fit your needs.
-Do not forget to change the organization name ("msg-tos-org") and the site's URL ("msg-tos-url").
+Do not forget to change the organization name ("msg-tos-org") and the URL of the ToS ("msg-tos-url").
 
 It is highly recommended to run fileshelter as a non root user. Therefore make sure the user has write permissions on the working directory.
 
