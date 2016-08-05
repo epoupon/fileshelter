@@ -16,5 +16,6 @@ fileshelter_SOURCES = \
 	$(srcdir)/utils/Logger.cpp		\
 	$(srcdir)/utils/UUID.cpp
 
-fileshelter_CXXFLAGS=-std=c++11 -Wall -I$(srcdir)/ui
+# DBOOST_NO_CXX11_SCOPED_ENUMS prevents a link error with outdated boost filesystem lib
+fileshelter_CXXFLAGS=-std=c++11 -Wall -I$(srcdir)/ui -DDBOOST_NO_CXX11_SCOPED_ENUMS
 

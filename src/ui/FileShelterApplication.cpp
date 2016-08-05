@@ -83,7 +83,12 @@ static Wt::WWebWidget* createHome()
 	Wt::WTemplate *home = new Wt::WTemplate(Wt::WString::tr("template-home"));
 	home->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
+#if WT_VERSION >= 0X03030400
 	Wt::WPushButton *createBtn = new Wt::WPushButton("<i class=\"fa fa-upload\"></i> " + Wt::WString::tr("msg-share-create"), Wt::XHTMLText);
+#else
+	Wt::WPushButton *createBtn = new Wt::WPushButton(Wt::WString::tr("msg-share-create"));
+#endif
+
 	createBtn->addStyleClass("btn-primary");
 	createBtn->setLink( Wt::WLink(Wt::WLink::InternalPath, "/share-create") );
 

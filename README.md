@@ -47,7 +47,7 @@ This last command requires root privileges.
 
 ## Configuration
 FileShelter uses a configuration file, installed in '/etc/fileshelter.conf'
-It is recommended to edit this file and change the relevant settings (working directory, maximum file size, maximum validity duration, etc.)
+It is recommended to edit this file and change the relevant settings (working directory, maximum file size, maximum validity duration, listen port, etc.)
 
 A basic "Terms of Services" is provided, located in '/usr/share/fileshelter/approot/tos.xml'. You may modify it to fit your needs.
 Do not forget to change the organization name ("msg-tos-org") and the URL of the ToS ("msg-tos-url").
@@ -64,6 +64,8 @@ Alternatively, you may want to specify another configuration file:
 ```sh
 $ fileshelter /another/config/file
 ```
+
+To connect to FileShelter, just open your favorite browser and go to http://localhost:5091
 
 ## Credits
 - Wt, awesome framework: http://www.webtoolkit.eu/
