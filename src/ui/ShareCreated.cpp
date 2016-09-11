@@ -51,8 +51,6 @@ ShareCreated::refresh(void)
 
 	std::string editUUID = wApp->internalPathNextPart("/share-created/");
 
-	FS_LOG(UI, DEBUG) << "editUUID = '" << editUUID << "'";
-
 	Wt::Dbo::Transaction transaction(DboSession());
 
 	Database::Share::pointer share = Database::Share::getByEditUUID(DboSession(), editUUID);

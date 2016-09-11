@@ -118,6 +118,8 @@ handlePathChange(Wt::WStackedWidget* stack)
 		{ "/tos",		IdxToS },
 	};
 
+	FS_LOG(UI, DEBUG) << "Internal path changed to '" << wApp->internalPath() << "'";
+
 	for (auto index : indexes)
 	{
 		if (wApp->internalPathMatches(index.first))
@@ -152,7 +154,7 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 	// Resouce bundles
 	messageResourceBundle().use(appRoot() + "templates");
 
-	FS_LOG(UI, INFO) << "Locale = " << env.locale().name();
+	FS_LOG(UI, INFO) << "Client address = " << env.clientAddress() << ", UserAgent = '" << env.userAgent() << "', Locale = " << env.locale().name() << ", path = '" << env.internalPath() << "'";
 
 	messageResourceBundle().use(appRoot() + "messages");
 	messageResourceBundle().use(appRoot() + "tos");

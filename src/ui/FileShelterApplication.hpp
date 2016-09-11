@@ -41,9 +41,6 @@ class FileShelterApplication : public Wt::WApplication
 		Database::Handler	_db;
 };
 
-// Helpers to get session data
-#define LmsApp	FileShelterApplication::instance()
-
 Database::Handler& DbHandler();
 Wt::Dbo::Session& DboSession();
 

@@ -17,6 +17,7 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <Wt/WEnvironment>
 #include <Wt/WTemplate>
 #include <Wt/WPushButton>
 #include <Wt/WMessageBox>
@@ -51,8 +52,6 @@ ShareEdit::refresh(void)
 
 	std::string editUUID = wApp->internalPathNextPart("/share-edit/");
 
-	FS_LOG(UI, DEBUG) << "editUUID = '" << editUUID << "'";
-
 	Wt::Dbo::Transaction transaction(DboSession());
 
 	Database::Share::pointer share = Database::Share::getByEditUUID(DboSession(), editUUID);
@@ -62,6 +61,8 @@ ShareEdit::refresh(void)
 		displayNotFound();
 		return;
 	}
+
+	FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Editing share from " << wApp->environment().clientAddress();
 
 	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-edit"), this);
 	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
@@ -102,7 +103,11 @@ ShareEdit::refresh(void)
 				Database::Share::pointer share = Database::Share::getByEditUUID(DboSession(), editUUID);
 
 				if (share)
+				{
+					FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Deleting share from " << wApp->environment().clientAddress();
+					share.modify()->destroy();
 					share.remove();
+				}
 
 				displayRemoved();
 			}

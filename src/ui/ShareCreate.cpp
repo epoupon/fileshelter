@@ -17,6 +17,7 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <Wt/WEnvironment>
 #include <Wt/WFormModel>
 #include <Wt/WSignal>
 #include <Wt/WTemplateFormView>
@@ -81,13 +82,17 @@ class ShareCreateFormModel : public Wt::WFormModel
 
 			auto dateValidator = new Wt::WDateValidator();
 			dateValidator->setMandatory(true);
-			dateValidator->setBottom(Wt::WDate::currentServerDate().addDays(1));
+
+			// Make sure to use a UTC date
+			auto currentDate = Wt::WDate(boost::gregorian::day_clock::universal_day());
+
+			dateValidator->setBottom(currentDate.addDays(1));
 			if (maxDurationDays > 0)
-				dateValidator->setTop(Wt::WDate::currentServerDate().addDays(maxDurationDays));
+				dateValidator->setTop(currentDate.addDays(maxDurationDays));
 			setValidator(ExpiryDateField, dateValidator);
 
 			auto maxValidityDays = Config::instance().getULong("max-validity-days", 30);
-			auto suggestedExpiryDate = Wt::WDate::currentServerDate();
+			auto suggestedExpiryDate = currentDate;
 
 			if (maxValidityDays != 0 && maxValidityDays < 7)
 				suggestedExpiryDate = suggestedExpiryDate.addDays(maxValidityDays);
@@ -201,7 +206,7 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 
 		upload->fileTooLarge().connect(std::bind([=] ()
 		{
-			FS_LOG(UI, DEBUG) << "File too large!";
+			FS_LOG(UI, WARNING) << "File too large!";
 			failed().emit(Wt::WString::tr("msg-share-create-too-large"));
 		}));
 
@@ -221,35 +226,20 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 
 			Wt::Dbo::Transaction transaction(DboSession());
 
-			Database::Share::pointer share = Database::Share::create(DboSession());
-
-			auto storePath = Config::instance().getPath("working-dir") / "files" / share->getDownloadUUID();
-
-			boost::system::error_code ec;
-			boost::filesystem::rename(curPath, storePath, ec);
-			if (ec)
+			Database::Share::pointer share = Database::Share::create(DboSession(), curPath);
+			if (!share)
 			{
-				FS_LOG(UI, INFO) << "Move file failed from " << curPath << " to " << storePath << ": " << ec.message();
-
-				// fallback on copy
-				boost::filesystem::copy_file(curPath, storePath, ec);
-				if (ec)
-				{
-					FS_LOG(UI, ERROR) << "Copy file failed from " << curPath << " to " << storePath << ": " << ec.message();
-					failed().emit(Wt::WString::tr("msg-internal-error"));
-					share.remove();
-					return;
-				}
+				failed().emit(Wt::WString::tr("msg-internal-error"));
+				return;
 			}
-			else
-				upload->stealSpooledFile();
 
-
+			upload->stealSpooledFile();
 			share.modify()->setDesc(model->valueText(ShareCreateFormModel::DescriptionField).toUTF8());
-			share.modify()->setPath(storePath);
 			share.modify()->setFileName(upload->clientFileName().toUTF8());
-			share.modify()->setFileSize(boost::filesystem::file_size(storePath));
 			share.modify()->setMaxHits(Wt::asNumber(model->value(ShareCreateFormModel::HitsValidityField)));
+
+			share.modify()->setCreationTime(boost::posix_time::second_clock::universal_time());
+			share.modify()->setClientAddr(wApp->environment().clientAddress());
 
 			Wt::WDate date = expiryDate->date();
 			share.modify()->setExpiryDate(boost::gregorian::date(date.year(), date.month(), date.day()));
@@ -257,6 +247,8 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 				share.modify()->setPassword(model->valueText(ShareCreateFormModel::PasswordField));
 
 			transaction.commit();
+
+			FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Share created. Client = " << share->getClientAddr() << ", size = " << share->getFileSize() << ", name = '" << share->getFileName() << "', desc = '" << share->getDesc() << "', expiry on " << share->getExpiryDate() << ", download limit = " << share->getMaxHits() << ", password protected = " << share->hasPassword();
 
 			wApp->setInternalPath("/share-created/" + share->getEditUUID(), true);
 		}));

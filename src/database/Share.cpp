@@ -37,11 +37,33 @@ _editUUID(generateUUID())
 }
 
 Share::pointer
-Share::create(Wt::Dbo::Session& session)
+Share::create(Wt::Dbo::Session& session, boost::filesystem::path path)
 {
-	return session.add(new Share());
+	auto share = session.add(new Share());
+	auto storePath = share->getPath();
+
+	boost::system::error_code ec;
+	boost::filesystem::rename(path, storePath, ec);
+	if (ec)
+	{
+		FS_LOG(DB, ERROR) << "Move file failed from " << path << " to " << storePath << ": " << ec.message();
+		share.remove();
+		return Share::pointer();
+	}
+
+	share.modify()->setFileSize(boost::filesystem::file_size(storePath));
+
+	return share;
 }
 
+void
+Share::destroy()
+{
+	boost::system::error_code ec;
+	boost::filesystem::remove(getPath(), ec);
+	if (ec)
+		FS_LOG(DB, ERROR) << "Cannot remove file " << getPath() << ": " << ec.message();
+}
 
 Share::pointer
 Share::getByEditUUID(Wt::Dbo::Session& session, std::string UUID)
@@ -100,6 +122,12 @@ Share::verifyPassword(Wt::WString password) const
 	Wt::Auth::PasswordHash hash(_hashFunc, _salt, _password);
 
 	return verifier.verify(password, hash);
+}
+
+boost::filesystem::path
+Share::getPath(void) const
+{
+	return Config::instance().getPath("working-dir") / "files" / _downloadUUID;
 }
 
 

@@ -40,8 +40,11 @@ Handler::Handler(Wt::Dbo::SqlConnectionPool& connectionPool)
 
 	        _session.createTables();
 	}
-	catch(std::exception& e) {
-		FS_LOG(DB, ERROR) << "Cannot create tables: " << e.what();
+	catch(std::exception& e)
+	{
+		// HACK: get rid of the 'already exists' table creation
+		if (strstr(e.what(), "already exists") == NULL)
+			FS_LOG(DB, ERROR) << "Cannot create tables: " << e.what();
 	}
 
 	{

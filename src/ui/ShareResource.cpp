@@ -18,6 +18,8 @@
  */
 
 #include <fstream>
+
+#include <Wt/WEnvironment>
 #include <Wt/Http/Response>
 
 #include "database/Share.hpp"
@@ -47,20 +49,20 @@ ShareResource::handleRequest(const Wt::Http::Request& request,
 {
 	if (!request.continuation())
 	{
-		FS_LOG(UI, INFO) << "[" << _downloadUUID << "] - Not a continuation...";
-
 		// Sessions are not thread safe in resources
 		Wt::WApplication::UpdateLock lock(wApp);
+
+		FS_LOG(UI, INFO) << "[" << _downloadUUID << "] New download from " << wApp->environment().clientAddress();
 
 		Wt::Dbo::Transaction transaction(DboSession());
 
 		auto share = Database::Share::getByDownloadUUID(DboSession(), _downloadUUID);
 
-		FS_LOG(UI, INFO) << "Hits = " << share->getHits() << " / " << share->getMaxHits();
+		FS_LOG(UI, INFO) << "[" << _downloadUUID << "] Hits = " << share->getHits() << " / " << share->getMaxHits();
 
 		if (share->hasExpired())
 		{
-			FS_LOG(UI, WARNING) << "Share expired!";
+			FS_LOG(UI, ERROR) <<  "[" << _downloadUUID << "] Share expired!";
 			response.setStatus(404);
 			return;
 		}
@@ -68,8 +70,6 @@ ShareResource::handleRequest(const Wt::Http::Request& request,
 		suggestFileName(share->getFileName());
 		_path = share->getPath();
 		share.modify()->incHits();
-
-		FS_LOG(UI, INFO) << "Hits now set to " << share->getHits() << " / " << share->getMaxHits();
 	}
 	else
 	{

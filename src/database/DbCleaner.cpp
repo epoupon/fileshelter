@@ -84,12 +84,9 @@ Cleaner::process(boost::system::error_code err)
 		// really remove the share at least a day after it has expired
 		if (share->hasExpired() && share->getExpiryDate() < currentDate)
 		{
-			FS_LOG(DB, INFO) << "Deleting expired share " << share->getDownloadUUID();
+			FS_LOG(DB, INFO) << "[" << share->getDownloadUUID() << "] Deleting expired share";
 
-			boost::filesystem::remove(share->getPath(), err);
-			if (err)
-				FS_LOG(DB, ERROR) << "Cannot remove file " << share->getPath() << ": " << err.message();
-
+			share.modify()->destroy();
 			share.remove();
 		}
 	}

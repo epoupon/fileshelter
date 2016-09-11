@@ -35,7 +35,11 @@ class Share
 		Share();
 
 		// Helpers
-		static pointer	create(Wt::Dbo::Session& session);
+		// Create a new share, will move the underlying file in the working directory
+		static pointer	create(Wt::Dbo::Session& session, boost::filesystem::path file);
+
+		// Remove the underlying file, must call remove on dbo object after that
+		void	destroy();
 
 		static pointer	getByEditUUID(Wt::Dbo::Session& session, std::string UUID);
 		static pointer	getByDownloadUUID(Wt::Dbo::Session& session, std::string UUID);
@@ -44,7 +48,7 @@ class Share
 		static std::vector<pointer> getAll(Wt::Dbo::Session& session);
 
 		// Getters
-		boost::filesystem::path		getPath(void) const { return _path; }
+		boost::filesystem::path		getPath(void) const;
 		std::string			getFileName(void) const { return _filename; }
 		std::size_t			getFileSize(void) const { return _filesize; }
 		bool				hasPassword(void) const { return !_password.empty(); }
@@ -57,18 +61,19 @@ class Share
 		std::size_t			getHits(void) const { return _hits; }
 		std::string			getDownloadUUID(void) const { return _downloadUUID; }
 		std::string			getEditUUID(void) const { return _editUUID; }
+		std::string			getClientAddr(void) const { return _clientAddress; }
 
 		// Setters
-		void setPath(boost::filesystem::path path) { _path = path.string(); }
 		void setFileName(std::string name) { _filename = name; }
 		void setFileSize(std::size_t size) { _filesize = size; }
 		void setPassword(Wt::WString password);
 		void setDesc(std::string desc) { _desc = desc; }
-		void setCreationTime(boost::posix_time::ptime time);
+		void setCreationTime(boost::posix_time::ptime time) { _creationTime = time; }
 		void setValidityDuration(boost::posix_time::ptime time);
 		void setMaxHits(std::size_t maxHits)	{ _maxHits = maxHits; }
 		void incHits()				{ _hits++; }
 		void setExpiryDate(boost::gregorian::date date) { _expiryTime = boost::posix_time::ptime(date); }
+		void setClientAddr(std::string addr) { _clientAddress = addr; }
 
 
 		template<class Action>
@@ -77,7 +82,7 @@ class Share
 				Wt::Dbo::field(a, _filename,		"filename");
 				Wt::Dbo::field(a, _filesize,		"filesize");
 				Wt::Dbo::field(a, _checksum,		"checksum");
-				Wt::Dbo::field(a, _path,		"path");
+				Wt::Dbo::field(a, _clientAddress,	"client_addr");
 				Wt::Dbo::field(a, _password,		"password");
 				Wt::Dbo::field(a, _salt,		"salt");
 				Wt::Dbo::field(a, _hashFunc,		"hash_func");
@@ -95,7 +100,7 @@ class Share
 		std::string				_filename;
 		long long				_filesize;
 		std::string				_checksum;
-		std::string				_path;
+		std::string				_clientAddress;	// Client IP address that uploaded the file
 		std::string				_password;	// optional
 		std::string				_salt;
 		std::string				_hashFunc;

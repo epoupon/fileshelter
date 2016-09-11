@@ -49,8 +49,6 @@ class SharePasswordValidator : public Wt::WValidator
 
 			Database::Share::pointer share = Database::Share::getByDownloadUUID(DboSession(), _downloadUUID);
 
-			FS_LOG(UI, DEBUG) << "share = " << share;
-
 			if (share && share->verifyPassword(input))
 				return Result(Valid);
 
