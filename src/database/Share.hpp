@@ -21,6 +21,7 @@
 
 #include <vector>
 #include <boost/filesystem/path.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 #include <Wt/Dbo/Dbo>
 
@@ -33,6 +34,10 @@ class Share
 		typedef Wt::Dbo::ptr<Share> pointer;
 
 		Share();
+
+		static std::size_t getMaxFileSize();
+		static boost::posix_time::time_duration getMaxValidatityDuration();
+		static std::size_t getMaxValidatityHits();
 
 		// Helpers
 		// Create a new share, will move the underlying file in the working directory
@@ -55,7 +60,7 @@ class Share
 		bool				verifyPassword(Wt::WString password) const;
 		std::string			getDesc(void) const { return _desc; }
 		boost::posix_time::ptime	getCreationTime(void) const { return _creationTime; }
-		boost::gregorian::date		getExpiryDate(void) const { return _expiryTime.date(); }
+		boost::posix_time::ptime	getExpiryTime(void) const { return _expiryTime; }
 		bool				hasExpired(void) const;
 		std::size_t			getMaxHits(void) const { return _maxHits; }
 		std::size_t			getHits(void) const { return _hits; }
@@ -72,7 +77,7 @@ class Share
 		void setValidityDuration(boost::posix_time::ptime time);
 		void setMaxHits(std::size_t maxHits)	{ _maxHits = maxHits; }
 		void incHits()				{ _hits++; }
-		void setExpiryDate(boost::gregorian::date date) { _expiryTime = boost::posix_time::ptime(date); }
+		void setExpiryTime(boost::posix_time::ptime expiryTime) { _expiryTime = expiryTime; }
 		void setClientAddr(std::string addr) { _clientAddress = addr; }
 
 

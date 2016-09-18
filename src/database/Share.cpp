@@ -90,8 +90,8 @@ Share::hasExpired(void) const
 	if (_maxHits > 0 && _hits >= _maxHits)
 		return true;
 
-	auto currentDate = boost::gregorian::day_clock::universal_day();
-	if (currentDate >= _expiryTime.date())
+	auto now = boost::posix_time::second_clock::universal_time();
+	if (now >= _expiryTime)
 		return true;
 
 	return false;
@@ -130,7 +130,29 @@ Share::getPath(void) const
 	return Config::instance().getPath("working-dir") / "files" / _downloadUUID;
 }
 
+std::size_t
+Share::getMaxFileSize(void)
+{
+	return Config::instance().getULong("max-file-size", 100);
+}
 
+boost::posix_time::time_duration
+Share::getMaxValidatityDuration(void)
+{
+	static const auto durationDay =  boost::posix_time::hours(24);
+	auto maxDuration = boost::posix_time::hours(Config::instance().getULong("max-validity-days", 30) * 24);
+
+	if (maxDuration < durationDay)
+		maxDuration = durationDay;
+
+	return maxDuration;
+}
+
+std::size_t
+Share::getMaxValidatityHits(void)
+{
+	return Config::instance().getULong("max-validity-hits", 30);
+}
 
 } // namespace Database
 

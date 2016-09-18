@@ -27,8 +27,11 @@
 #include <Wt/WProgressBar>
 #include <Wt/WDateEdit>
 #include <Wt/WSpinBox>
+#include <Wt/WComboBox>
 #include <Wt/WIntValidator>
 #include <Wt/WDateValidator>
+#include <Wt/WDateValidator>
+#include <Wt/WStringListModel>
 #include <Wt/WAbstractItemModel>
 
 #include "utils/Config.hpp"
@@ -41,6 +44,7 @@
 
 namespace UserInterface {
 
+using namespace Database;
 
 class ShareCreateFormModel : public Wt::WFormModel
 {
@@ -49,7 +53,8 @@ class ShareCreateFormModel : public Wt::WFormModel
 		// Associate each field with a unique string literal.
 		static const Field DescriptionField;
 		static const Field FileField;
-		static const Field ExpiryDateField;
+		static const Field DurationValidityField;
+		static const Field DurationUnitValidityField;
 		static const Field HitsValidityField;
 		static const Field PasswordField;
 		static const Field PasswordConfirmField;
@@ -58,21 +63,36 @@ class ShareCreateFormModel : public Wt::WFormModel
 			: Wt::WFormModel(parent)
 		{
 			addField(DescriptionField, Wt::WString::tr("msg-optional"));
-			addField(FileField, Wt::WString::tr("msg-max-file-size").arg( Config::instance().getULong("max-file-size", 100) ));
-			addField(ExpiryDateField);
+			addField(FileField, Wt::WString::tr("msg-max-file-size").arg( Share::getMaxFileSize()));
+			addField(DurationValidityField);
+			addField(DurationUnitValidityField);
 			addField(HitsValidityField);
 			addField(PasswordField, Wt::WString::tr("msg-optional"));
 			addField(PasswordConfirmField);
 
-			auto maxHits = Config::instance().getULong("max-validity-hits", 0);
-			auto maxDurationDays = Config::instance().getULong("max-validity-days", 0);
+			initializeModels();
 
+			// Duration Validity Unit
+			setValidator(DurationUnitValidityField, new Wt::WValidator(true));  // mandatory
+
+			// Duration Validity
+			auto durationValidator = new Wt::WIntValidator();
+			durationValidator->setMandatory(true);
+			durationValidator->setBottom(1);
+			setValidator(DurationValidityField, durationValidator);
+
+			setValue(DurationValidityField, 1);
+			setValue(DurationUnitValidityField, Wt::WString::tr("msg-days"));
+			updateDurationValidator();
+
+			// Hits validity
+			auto maxValidityHits = Share::getMaxValidatityHits();
 			auto hitsValidator = new Wt::WIntValidator();
 			hitsValidator->setMandatory(true);
-			if (maxHits > 0)
+			if (maxValidityHits > 0)
 			{
 				hitsValidator->setBottom(1);
-				hitsValidator->setTop(maxHits);
+				hitsValidator->setTop(maxValidityHits);
 			}
 			else
 			{
@@ -80,30 +100,7 @@ class ShareCreateFormModel : public Wt::WFormModel
 			}
 			setValidator(HitsValidityField, hitsValidator);
 
-			auto dateValidator = new Wt::WDateValidator();
-			dateValidator->setMandatory(true);
-
-			// Make sure to use a UTC date
-			auto currentDate = Wt::WDate(boost::gregorian::day_clock::universal_day());
-
-			dateValidator->setBottom(currentDate.addDays(1));
-			if (maxDurationDays > 0)
-				dateValidator->setTop(currentDate.addDays(maxDurationDays));
-			setValidator(ExpiryDateField, dateValidator);
-
-			auto maxValidityDays = Config::instance().getULong("max-validity-days", 30);
-			auto suggestedExpiryDate = currentDate;
-
-			if (maxValidityDays != 0 && maxValidityDays < 7)
-				suggestedExpiryDate = suggestedExpiryDate.addDays(maxValidityDays);
-			else
-				suggestedExpiryDate = suggestedExpiryDate.addDays(7);
-
-			setValue(ExpiryDateField, suggestedExpiryDate);
-
-			auto maxValidityHits = Config::instance().getULong("max-validity-hits", 10);
 			int suggestedValidityHits;
-
 			if (maxValidityHits != 0 && maxValidityHits < 10)
 				suggestedValidityHits = maxValidityHits;
 			else
@@ -112,14 +109,48 @@ class ShareCreateFormModel : public Wt::WFormModel
 			setValue(HitsValidityField, suggestedValidityHits);
 		}
 
+		void updateDurationValidator(void)
+		{
+			auto maxValidityDuration = Share::getMaxValidatityDuration();
+			auto durationValidator = dynamic_cast<Wt::WIntValidator*>(validator(DurationValidityField));
+
+			int maxValue = 1;
+			auto unit = valueText(DurationUnitValidityField);
+			if (unit == Wt::WString::tr("msg-hours"))
+				maxValue = maxValidityDuration.hours();
+			else if (unit == Wt::WString::tr("msg-days"))
+				maxValue = maxValidityDuration.hours() / 24;
+			else if (unit == Wt::WString::tr("msg-weeks"))
+				maxValue = maxValidityDuration.hours() / 24 / 7;
+			else if (unit == Wt::WString::tr("msg-months"))
+				maxValue = maxValidityDuration.hours() / 24 / 31;
+			else if (unit == Wt::WString::tr("msg-years"))
+				maxValue = maxValidityDuration.hours() / 24 / 365;
+
+			durationValidator->setTop(maxValue);
+
+			// If the current value is too high, change it to the max
+			if (Wt::asNumber(value(DurationValidityField)) > maxValue)
+				setValue(DurationValidityField, maxValue);
+		}
+
 		bool validateField(Field field)
 		{
 			Wt::WString error; // empty means validated
 
+				std::cerr << "Validating " << field << std::endl;
 			if (field == PasswordConfirmField)
 			{
 				if (valueText(PasswordField) != valueText(PasswordConfirmField))
 					error = Wt::WString::tr("msg-passwords-dont-match");
+			}
+			else if (field == DurationUnitValidityField)
+			{
+				// Since they are grouped together,
+				// make it share the same state as DurationValidityField
+				validateField(DurationValidityField);
+				setValidation(field, validation(DurationValidityField));
+				return validation(field).state() == Wt::WValidator::Valid;
 			}
 			else
 			{
@@ -130,11 +161,35 @@ class ShareCreateFormModel : public Wt::WFormModel
 			return validation(field).state() == Wt::WValidator::Valid;
 		}
 
+		Wt::WAbstractItemModel *durationValidityModel() { return _durationValidityModel; }
+
+	private:
+
+		void initializeModels(void)
+		{
+			auto maxDuration = Share::getMaxValidatityDuration();
+
+			_durationValidityModel = new Wt::WStringListModel(this);
+
+			_durationValidityModel->addString( Wt::WString::tr("msg-hours") );
+			_durationValidityModel->addString( Wt::WString::tr("msg-days") );
+
+			if (maxDuration >= boost::posix_time::hours(7*24))
+				_durationValidityModel->addString( Wt::WString::tr("msg-weeks") );
+			if (maxDuration >= boost::posix_time::hours(31*24))
+				_durationValidityModel->addString( Wt::WString::tr("msg-months") );
+			if (maxDuration >= boost::posix_time::hours(365*24))
+				_durationValidityModel->addString( Wt::WString::tr("msg-years") );
+
+		}
+
+		Wt::WStringListModel*	_durationValidityModel;
 };
 
 const Wt::WFormModel::Field ShareCreateFormModel::DescriptionField = "desc";
 const Wt::WFormModel::Field ShareCreateFormModel::FileField = "file";
-const Wt::WFormModel::Field ShareCreateFormModel::ExpiryDateField = "expiry-date";
+const Wt::WFormModel::Field ShareCreateFormModel::DurationValidityField = "duration-validity";
+const Wt::WFormModel::Field ShareCreateFormModel::DurationUnitValidityField = "duration-unit-validity";
 const Wt::WFormModel::Field ShareCreateFormModel::HitsValidityField = "hits-validity";
 const Wt::WFormModel::Field ShareCreateFormModel::PasswordField = "password";
 const Wt::WFormModel::Field ShareCreateFormModel::PasswordConfirmField = "password-confirm";
@@ -167,21 +222,42 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 		upload->setProgressBar(new Wt::WProgressBar());
 		setFormWidget(ShareCreateFormModel::FileField, upload);
 
-		// Time validity
-		Wt::WDateEdit *expiryDate = new Wt::WDateEdit();
-		setFormWidget(ShareCreateFormModel::ExpiryDateField, expiryDate);
+		// Duration validity
+		auto durationValidity = new Wt::WSpinBox();
+		setFormWidget(ShareCreateFormModel::DurationValidityField, durationValidity);
+
+		// Duration validity unit
+		auto durationUnitValidity = new Wt::WComboBox();
+		setFormWidget(ShareCreateFormModel::DurationUnitValidityField, durationUnitValidity);
+		durationUnitValidity->setModel(model->durationValidityModel());
+
+		// each time the unit is changed, make sure to update the limits
+		durationUnitValidity->changed().connect(std::bind([=]
+		{
+			updateModel(model);
+			model->updateDurationValidator();
+
+			// Revalidate the fields if necessary
+			if (model->isValidated(ShareCreateFormModel::DurationValidityField))
+			{
+				model->validateField(ShareCreateFormModel::DurationValidityField);
+				model->validateField(ShareCreateFormModel::DurationUnitValidityField);
+			}
+
+			updateView(model);
+		}));
 
 		// Hits validity
-		Wt::WSpinBox *hitsValidity = new Wt::WSpinBox();
+		auto hitsValidity = new Wt::WSpinBox();
 		setFormWidget(ShareCreateFormModel::HitsValidityField, hitsValidity);
 
 		// Password
-		Wt::WLineEdit *password = new Wt::WLineEdit();
+		auto password = new Wt::WLineEdit();
 		password->setEchoMode(Wt::WLineEdit::Password);
 		setFormWidget(ShareCreateFormModel::PasswordField, password);
 
 		// Password confirm
-		Wt::WLineEdit *passwordConfirm = new Wt::WLineEdit();
+		auto passwordConfirm = new Wt::WLineEdit();
 		passwordConfirm->setEchoMode(Wt::WLineEdit::Password);
 		setFormWidget(ShareCreateFormModel::PasswordConfirmField, passwordConfirm);
 
@@ -241,14 +317,31 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 			share.modify()->setCreationTime(boost::posix_time::second_clock::universal_time());
 			share.modify()->setClientAddr(wApp->environment().clientAddress());
 
-			Wt::WDate date = expiryDate->date();
-			share.modify()->setExpiryDate(boost::gregorian::date(date.year(), date.month(), date.day()));
+			// calculate the expiry date from the duration
+			auto now = boost::posix_time::second_clock::universal_time();
+
+			Wt::WDateTime expiryDateTime(now);
+			auto duration = Wt::asNumber(model->value(ShareCreateFormModel::DurationValidityField));
+			auto unit = model->valueText(ShareCreateFormModel::DurationUnitValidityField);
+			if (unit == Wt::WString::tr("msg-hours"))
+				expiryDateTime = expiryDateTime.addSecs(3600 * duration);
+			else if (unit == Wt::WString::tr("msg-days"))
+				expiryDateTime = expiryDateTime.addDays(duration);
+			else if (unit == Wt::WString::tr("msg-weeks"))
+				expiryDateTime = expiryDateTime.addDays(7 * duration);
+			else if (unit == Wt::WString::tr("msg-months"))
+				expiryDateTime = expiryDateTime.addMonths(duration);
+			else if (unit == Wt::WString::tr("msg-years"))
+				expiryDateTime = expiryDateTime.addYears(duration);
+
+			share.modify()->setExpiryTime(expiryDateTime.toPosixTime());
+
 			if (!model->valueText(ShareCreateFormModel::PasswordField).empty())
 				share.modify()->setPassword(model->valueText(ShareCreateFormModel::PasswordField));
 
 			transaction.commit();
 
-			FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Share created. Client = " << share->getClientAddr() << ", size = " << share->getFileSize() << ", name = '" << share->getFileName() << "', desc = '" << share->getDesc() << "', expiry on " << share->getExpiryDate() << ", download limit = " << share->getMaxHits() << ", password protected = " << share->hasPassword();
+			FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Share created. Client = " << share->getClientAddr() << ", size = " << share->getFileSize() << ", name = '" << share->getFileName() << "', desc = '" << share->getDesc() << "', expiry " << share->getExpiryTime() << ", download limit = " << share->getMaxHits() << ", password protected = " << share->hasPassword();
 
 			wApp->setInternalPath("/share-created/" + share->getEditUUID(), true);
 		}));

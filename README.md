@@ -10,9 +10,9 @@ A [demo](http://fileshelter.suroot.com) instance is available, with the followin
 - Maximum file size is set to 1 MB
 
 ## Features
-- Expiry date
-- Download limit
-- Password protection
+- Period of validity (from one hour to years)
+- Optional download limit
+- Optional password protection
 - Practically unique links, using [UUID](https://fr.wikipedia.org/wiki/Universal_Unique_Identifier)
 - Private link, used to remove the file or to check the download counter
 - Basic terms of service

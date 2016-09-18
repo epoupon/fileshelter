@@ -42,16 +42,17 @@ Cleaner::Cleaner(Wt::Dbo::SqlConnectionPool& connectionPool)
 void
 Cleaner::start(void)
 {
-	schedule();
+	// Schedule an immediate cleanup
+	schedule(boost::posix_time::seconds(0));
+
 	_ioService.start();
 }
 
 void
-Cleaner::schedule(void)
+Cleaner::schedule(boost::posix_time::time_duration duration)
 {
-	boost::gregorian::date nextScanDate = getNextDay(boost::gregorian::day_clock::universal_day());
-
-	auto nextScanTime = boost::posix_time::ptime( nextScanDate, boost::posix_time::seconds(0));
+	auto now = boost::posix_time::second_clock::universal_time();
+	auto nextScanTime = now + duration;
 
 	_scheduleTimer.expires_at(nextScanTime);
 	_scheduleTimer.async_wait( boost::bind( &Cleaner::process, this, boost::asio::placeholders::error));
@@ -73,16 +74,19 @@ Cleaner::process(boost::system::error_code err)
 	if (err)
 		return;
 
-	boost::gregorian::date currentDate = boost::gregorian::day_clock::universal_day();
+	auto now = boost::posix_time::second_clock::universal_time();
+
 	FS_LOG(DB, INFO) << "Cleaning expired shares...";
 	Wt::Dbo::Transaction transaction(_db.getSession());
 
 	auto shares = Database::Share::getAll(_db.getSession());
+	FS_LOG(DB, INFO) << "Current number of shares: " << shares.size();
 	for (auto share : shares)
 	{
 		// In order not to delete a share that is being downloaded,
 		// really remove the share at least a day after it has expired
-		if (share->hasExpired() && share->getExpiryDate() < currentDate)
+		if (share->hasExpired()
+			&& now > share->getExpiryTime() + boost::posix_time::hours(24))
 		{
 			FS_LOG(DB, INFO) << "[" << share->getDownloadUUID() << "] Deleting expired share";
 
@@ -93,7 +97,7 @@ Cleaner::process(boost::system::error_code err)
 
 	FS_LOG(DB, INFO) << "Cleaning expired shares: complete!";
 
-	schedule();
+	schedule(boost::posix_time::hours(6));
 }
 
 

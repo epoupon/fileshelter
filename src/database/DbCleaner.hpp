@@ -37,7 +37,7 @@ class Cleaner
 
 	private:
 
-		void schedule(void);
+		void schedule(boost::posix_time::time_duration duration);
 		void process(boost::system::error_code ec);
 
 		Wt::WIOService _ioService;
