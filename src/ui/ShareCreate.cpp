@@ -138,7 +138,6 @@ class ShareCreateFormModel : public Wt::WFormModel
 		{
 			Wt::WString error; // empty means validated
 
-				std::cerr << "Validating " << field << std::endl;
 			if (field == PasswordConfirmField)
 			{
 				if (valueText(PasswordField) != valueText(PasswordConfirmField))
