@@ -130,7 +130,7 @@ handlePathChange(Wt::WStackedWidget* stack)
 	}
 
 	// Redirect bad path to the home
-	wApp->setInternalPath("/home", true);
+	wApp->setInternalPath("/home", false);
 }
 
 /*
