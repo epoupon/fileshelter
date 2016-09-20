@@ -25,6 +25,7 @@
 #include <Wt/WTemplate>
 #include <Wt/WPushButton>
 
+#include "utils/Config.hpp"
 #include "utils/Logger.hpp"
 
 #include "ShareCreate.hpp"
@@ -158,6 +159,7 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 
 	messageResourceBundle().use(appRoot() + "messages");
 	messageResourceBundle().use(appRoot() + "tos");
+	messageResourceBundle().use((Config::instance().getPath("working-dir") / "tos_user").string());
 
 	setTitle("FileShelter");
 

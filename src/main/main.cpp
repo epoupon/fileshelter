@@ -36,6 +36,7 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 
 	boost::filesystem::path wtConfigPath = Config::instance().getPath("working-dir") / "wt_config.xml";
 	boost::filesystem::path wtLogFilePath = Config::instance().getPath("working-dir") / "fileshelter.log";
+	boost::filesystem::path tosUserPath = Config::instance().getPath("working-dir") / "tos_user.xml";
 
 	args.push_back(execPath);
 	args.push_back("--config=" + wtConfigPath.string());
@@ -57,16 +58,49 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 	}
 
 	// Generate the wt_config.xml file
-	boost::property_tree::ptree pt;
+	{
+		boost::property_tree::ptree pt;
 
-	pt.put("server.application-settings.<xmlattr>.location", "*");
-	pt.put("server.application-settings.log-file", wtLogFilePath.string());
-	pt.put("server.application-settings.max-request-size", Config::instance().getULong("max-file-size", 100) * 1024 /* kB */);
-	pt.put("server.application-settings.behind-reverse-proxy", Config::instance().getBool("behind-reverse-proxy", false));
-	pt.put("server.application-settings.progressive-bootstrap", true);
+		pt.put("server.application-settings.<xmlattr>.location", "*");
+		pt.put("server.application-settings.log-file", wtLogFilePath.string());
+		pt.put("server.application-settings.max-request-size", Config::instance().getULong("max-file-size", 100) * 1024 /* kB */);
+		pt.put("server.application-settings.behind-reverse-proxy", Config::instance().getBool("behind-reverse-proxy", false));
+		pt.put("server.application-settings.progressive-bootstrap", true);
 
-	std::ofstream oss(wtConfigPath.string().c_str(), std::ios::out);
-	boost::property_tree::xml_parser::write_xml(oss, pt);
+		std::ofstream oss(wtConfigPath.string().c_str(), std::ios::out);
+		boost::property_tree::xml_parser::write_xml(oss, pt);
+	}
+
+	// Generate the tos_user.xml file
+	{
+		boost::property_tree::ptree pt;
+
+		pt.put("messages.<xmlattr>.xmlns:if", "Wt.WTemplate.conditions");
+
+		{
+			boost::property_tree::ptree node;
+			node.put("<xmlattr>.id", "msg-tos-org");
+			node.put("", Config::instance().getString("tos-org", "**[ORG]**"));
+			pt.add_child("messages.message", node);
+		}
+
+		{
+			boost::property_tree::ptree node;
+			node.put("<xmlattr>.id", "msg-tos-url");
+			node.put("", Config::instance().getString("tos-url", "**[DEPLOY URL]**/tos"));
+			pt.add_child("messages.message", node);
+		}
+
+		{
+			boost::property_tree::ptree node;
+			node.add("<xmlattr>.id", "msg-tos-support-email");
+			node.put("", Config::instance().getString("tos-support-email", "**[SUPPORT EMAIL ADDRESS]**"));
+			pt.add_child("messages.message", node);
+		}
+
+		std::ofstream oss(tosUserPath.string().c_str(), std::ios::out);
+		boost::property_tree::xml_parser::write_xml(oss, pt);
+	}
 
 	return args;
 }
