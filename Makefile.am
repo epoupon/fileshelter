@@ -8,16 +8,16 @@ fileshelter_approotdir=$(pkgdatadir)/approot
 
 fileshelter_cssdir=$(fileshelter_docrootdir)/css
 
-fileshelter_css_DATA = \
+dist_fileshelter_css_DATA = \
 		 docroot/css/fileshelter.css
 
-fileshelter_approot_DATA = \
+dist_fileshelter_approot_DATA = \
 		approot/templates.xml	\
 		approot/messages.xml	\
 		approot/messages_fr.xml \
 		approot/tos.xml
 
-sysconf_DATA = \
+dist_sysconf_DATA = \
 	        $(top_srcdir)/conf/fileshelter.conf
 
 install-data-hook:
