@@ -20,12 +20,16 @@ A [demo](http://fileshelter.suroot.com) instance is available, with the followin
 Once the expiry date or the download limit is reached, the download is no longer available and the file is deleted.
 
 ## Installation
-### Debian dependencies
+### From packages
+Check the [release](https://github.com/epoupon/fileshelter/releases) page to get the latest package for your distribution.
+
+### From Source
+#### Debian dependencies
 ```sh
 $ apt-get install build-essential autoconf automake libboost-dev libwtdbosqlite-dev libwthttp-dev libwtdbo-dev libwt-dev libconfig++-dev
 ```
 
-### Build
+#### Build
 ```sh
 $ git clone https://github.com/epoupon/fileshelter.git fileshelter
 $ cd fileshelter
