@@ -17,6 +17,11 @@ AC_CHECK_LIB([boost_system],
 		,
 		[AC_MSG_ERROR([libboost_system not found!])])
 
+AC_CHECK_LIB(	[boost_signals],
+		[main],
+		,
+		[AC_MSG_ERROR([libboost_signals not found!])])
+
 AC_CHECK_LIB(	[boost_filesystem],
 		[main],
 		,

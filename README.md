@@ -24,9 +24,23 @@ Once the expiry date or the download limit is reached, the download is no longer
 Check the [release](https://github.com/epoupon/fileshelter/releases) page to get the latest package for your distribution.
 
 ### From Source
-#### Debian dependencies
+#### Debian/Ubuntu dependencies
 ```sh
 $ apt-get install build-essential autoconf automake libboost-dev libwtdbosqlite-dev libwthttp-dev libwtdbo-dev libwt-dev libconfig++-dev
+```
+#### CentOS 7 dependencies
+You need to install [wt](https://www.webtoolkit.eu/wt/doc/reference/html/InstallationUnix.html) from source:
+```sh
+$ yum groupinstall 'Development Tools'
+$ yum install boost-devel
+$ git clone https://github.com/emweb/wt.git wt
+$ cd wt; mkdir build
+$ cmake ../ -DWT_CPP__11_MODE=-std=c++1 -DCMAKE_INSTALL_PREFIX=/usr
+$ make install
+```
+Once this is done, you can install fileshelter's extra dependencies:
+```sh
+yum install libconfig-devel
 ```
 
 #### Build
