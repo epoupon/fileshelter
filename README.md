@@ -35,7 +35,7 @@ $ yum groupinstall 'Development Tools'
 $ yum install boost-devel
 $ git clone https://github.com/emweb/wt.git wt
 $ cd wt; mkdir build
-$ cmake ../ -DWT_CPP__11_MODE=-std=c++1 -DCMAKE_INSTALL_PREFIX=/usr
+$ cmake ../ -DWT_CPP_11_MODE=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr
 $ make install
 ```
 Once this is done, you can install fileshelter's extra dependencies:
