@@ -161,7 +161,7 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 	messageResourceBundle().use(appRoot() + "tos");
 	messageResourceBundle().use((Config::instance().getPath("working-dir") / "tos_user").string());
 
-	setTitle("FileShelter");
+	setTitle(Wt::WString::tr("msg-app-name"));
 
 	enableInternalPaths();
 
