@@ -36,7 +36,7 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 
 	boost::filesystem::path wtConfigPath = Config::instance().getPath("working-dir") / "wt_config.xml";
 	boost::filesystem::path wtLogFilePath = Config::instance().getPath("working-dir") / "fileshelter.log";
-	boost::filesystem::path tosUserPath = Config::instance().getPath("working-dir") / "tos_user.xml";
+	boost::filesystem::path userMsgPath = Config::instance().getPath("working-dir") / "user_messages.xml";
 
 	args.push_back(execPath);
 	args.push_back("--config=" + wtConfigPath.string());
@@ -71,7 +71,7 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 		boost::property_tree::xml_parser::write_xml(oss, pt);
 	}
 
-	// Generate the tos_user.xml file
+	// Generate the user_messages.xml file
 	{
 		boost::property_tree::ptree pt;
 
@@ -98,7 +98,14 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 			pt.add_child("messages.message", node);
 		}
 
-		std::ofstream oss(tosUserPath.string().c_str(), std::ios::out);
+		{
+			boost::property_tree::ptree node;
+			node.add("<xmlattr>.id", "msg-app-name");
+			node.put("", Config::instance().getString("app-name", "FileShelter"));
+			pt.add_child("messages.message", node);
+		}
+
+		std::ofstream oss(userMsgPath.string().c_str(), std::ios::out);
 		boost::property_tree::xml_parser::write_xml(oss, pt);
 	}
 

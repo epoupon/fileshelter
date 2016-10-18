@@ -83,6 +83,7 @@ static Wt::WWebWidget* createHome()
 {
 	Wt::WTemplate *home = new Wt::WTemplate(Wt::WString::tr("template-home"));
 	home->addFunction("tr", &Wt::WTemplate::Functions::tr);
+	home->addFunction("block", &Wt::WTemplate::Functions::block);
 
 #if WT_VERSION >= 0X03030400
 	Wt::WPushButton *createBtn = new Wt::WPushButton("<i class=\"fa fa-upload\"></i> " + Wt::WString::tr("msg-share-create"), Wt::XHTMLText);
@@ -159,7 +160,7 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 
 	messageResourceBundle().use(appRoot() + "messages");
 	messageResourceBundle().use(appRoot() + "tos");
-	messageResourceBundle().use((Config::instance().getPath("working-dir") / "tos_user").string());
+	messageResourceBundle().use((Config::instance().getPath("working-dir") / "user_messages").string());
 
 	setTitle(Wt::WString::tr("msg-app-name"));
 

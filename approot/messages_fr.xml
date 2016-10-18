@@ -3,7 +3,7 @@
 <!--FORMS message blocks-->
 
 <message id="msg-home-desc">
-	<p>FileShelter vous permet de partager facilement des fichiers par Internet.</p>
+	<p>${tr:msg-app-name} vous permet de partager facilement des fichiers par Internet.</p>
 	<p>Uploadez un fichier et obtenez en retour un lien permettant de le télécharger !</p>
 </message>
 

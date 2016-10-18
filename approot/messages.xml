@@ -4,14 +4,13 @@
 <!--FORMS message blocks-->
 
 <message id="msg-home-desc">
-	<p>FileShelter allows you to easily share files over the Internet.</p>
+	<p>${tr:msg-app-name} allows you to easily share files over the Internet.</p>
 	<p>Just upload a file and get an URL back!</p>
 </message>
 
 <message id="msg-tos">Terms of Service</message>
 
 <message id="msg-home">Home</message>
-<message id="msg-app-name">FileShelter</message>
 <message id="msg-share-create">New share</message>
 <message id="msg-share-edit">Edit</message>
 <message id="msg-share-download">Download</message>
