@@ -68,13 +68,23 @@ Share::destroy()
 Share::pointer
 Share::getByEditUUID(Wt::Dbo::Session& session, std::string UUID)
 {
-	return session.find<Share>().where("edit_UUID = ?").bind(UUID);
+	pointer res = session.find<Share>().where("edit_UUID = ?").bind(UUID);
+
+	if (!res || !boost::filesystem::exists(res->getPath()))
+		return pointer();
+
+	return res;
 }
 
 Share::pointer
 Share::getByDownloadUUID(Wt::Dbo::Session& session, std::string UUID)
 {
-	return session.find<Share>().where("download_UUID = ?").bind(UUID);
+	pointer res = session.find<Share>().where("download_UUID = ?").bind(UUID);
+
+	if (!res || !boost::filesystem::exists(res->getPath()))
+		return pointer();
+
+	return res;
 }
 
 std::vector<Share::pointer>
