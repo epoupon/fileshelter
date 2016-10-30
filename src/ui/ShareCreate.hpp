@@ -25,6 +25,8 @@
 
 namespace UserInterface {
 
+class ShareParameters;
+
 class ShareCreate : public Wt::WContainerWidget
 {
 	public:
@@ -32,6 +34,10 @@ class ShareCreate : public Wt::WContainerWidget
 
 	private:
 		void refresh(void);
+		void displayError(Wt::WString error);
+
+		std::shared_ptr<ShareParameters> _parameters;
+
 };
 
 
