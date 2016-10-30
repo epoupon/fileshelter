@@ -25,7 +25,6 @@
 #include <Wt/WLineEdit>
 #include <Wt/WFileUpload>
 #include <Wt/WProgressBar>
-#include <Wt/WDateEdit>
 #include <Wt/WSpinBox>
 #include <Wt/WComboBox>
 #include <Wt/WIntValidator>
@@ -46,6 +45,48 @@ namespace UserInterface {
 
 using namespace Database;
 
+struct Duration
+{
+	enum class Unit
+	{
+		Hours,
+		Days,
+		Weeks,
+		Months,
+		Years,
+	};
+
+	std::size_t value;
+	Unit unit;
+};
+
+Wt::WDateTime operator+(const Wt::WDateTime& dateTime, const Duration& duration)
+{
+	switch (duration.unit)
+	{
+		case Duration::Unit::Hours:
+			return dateTime.addSecs(3600 * duration.value);
+		case Duration::Unit::Days:
+			return dateTime.addDays(duration.value);
+		case Duration::Unit::Weeks:
+			return dateTime.addDays(7 * duration.value);
+		case Duration::Unit::Months:
+			return dateTime.addMonths(duration.value);
+		case Duration::Unit::Years:
+			return dateTime.addYears(duration.value);
+	}
+	return dateTime;
+}
+
+class ShareParameters
+{
+	public:
+		Wt::WString	description;
+		Duration	maxDuration;
+		std::size_t	maxHits;
+		Wt::WString	password;
+};
+
 class ShareCreateFormModel : public Wt::WFormModel
 {
 	public:
@@ -63,7 +104,6 @@ class ShareCreateFormModel : public Wt::WFormModel
 			: Wt::WFormModel(parent)
 		{
 			addField(DescriptionField, Wt::WString::tr("msg-optional"));
-			addField(FileField, Wt::WString::tr("msg-max-file-size").arg( Share::getMaxFileSize()));
 			addField(DurationValidityField);
 			addField(DurationUnitValidityField);
 			addField(HitsValidityField);
@@ -195,31 +235,22 @@ const Wt::WFormModel::Field ShareCreateFormModel::PasswordConfirmField = "passwo
 
 class ShareCreateFormView : public Wt::WTemplateFormView
 {
-	private:
-		Wt::Signal<Wt::WString> _sigFailed;
-
 	public:
 
-	Wt::Signal<Wt::WString>& failed() { return _sigFailed;}
+	Wt::Signal<ShareParameters>& validated() { return _sigValidated;}
 
 	ShareCreateFormView(Wt::WContainerWidget *parent = 0)
 	: Wt::WTemplateFormView(parent)
 	{
 		auto model = new ShareCreateFormModel(this);
 
-		setTemplateText(tr("template-share-create"));
+		setTemplateText(tr("template-form-share-create"));
 		addFunction("id", &WTemplate::Functions::id);
 		addFunction("block", &WTemplate::Functions::id);
 
 		// Desc
 		Wt::WLineEdit *desc = new Wt::WLineEdit();
 		setFormWidget(ShareCreateFormModel::DescriptionField, desc);
-
-		// File
-		Wt::WFileUpload *upload = new Wt::WFileUpload();
-		upload->setFileTextSize(80);
-		upload->setProgressBar(new Wt::WProgressBar());
-		setFormWidget(ShareCreateFormModel::FileField, upload);
 
 		// Duration validity
 		auto durationValidity = new Wt::WSpinBox();
@@ -270,89 +301,45 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 
 			if (model->validate())
 			{
-				FS_LOG(UI, DEBUG) << "validation OK";
+				FS_LOG(UI, DEBUG) << "Validation OK";
+				ShareParameters params;
 
-				upload->upload();
-				uploadBtn->disable();
+				params.description = model->valueText(ShareCreateFormModel::DescriptionField);
+				params.maxDuration.value = Wt::asNumber(model->value(ShareCreateFormModel::DurationValidityField));
+
+				auto unit = model->valueText(ShareCreateFormModel::DurationUnitValidityField);
+				if (unit == Wt::WString::tr("msg-hours"))
+					params.maxDuration.unit = Duration::Unit::Hours;
+				else if (unit == Wt::WString::tr("msg-days"))
+					params.maxDuration.unit = Duration::Unit::Days;
+				else if (unit == Wt::WString::tr("msg-weeks"))
+					params.maxDuration.unit = Duration::Unit::Weeks;
+				else if (unit == Wt::WString::tr("msg-months"))
+					params.maxDuration.unit = Duration::Unit::Months;
+				else if (unit == Wt::WString::tr("msg-years"))
+					params.maxDuration.unit = Duration::Unit::Years;
+
+				params.maxHits = Wt::asNumber(model->value(ShareCreateFormModel::HitsValidityField));
+				params.password = model->valueText(ShareCreateFormModel::PasswordField);
+
+				_sigValidated.emit(params);
 			}
 
 			updateView(model);
-		}));
-
-		upload->fileTooLarge().connect(std::bind([=] ()
-		{
-			FS_LOG(UI, WARNING) << "File too large!";
-			failed().emit(Wt::WString::tr("msg-share-create-too-large"));
-		}));
-
-		upload->uploaded().connect(std::bind([=] ()
-		{
-			FS_LOG(UI, DEBUG) << "Uploaded!";
-
-			// Filename is the DownloadUID
-			auto curPath = boost::filesystem::path(upload->spoolFileName());
-			// Special case: the user did not choose a file
-			if (!boost::filesystem::exists(curPath))
-			{
-				FS_LOG(UI, ERROR) << "User did not select a file";
-				failed().emit(Wt::WString::tr("msg-no-file-selected"));
-				return;
-			}
-
-			Wt::Dbo::Transaction transaction(DboSession());
-
-			Database::Share::pointer share = Database::Share::create(DboSession(), curPath);
-			if (!share)
-			{
-				failed().emit(Wt::WString::tr("msg-internal-error"));
-				return;
-			}
-
-			upload->stealSpooledFile();
-			share.modify()->setDesc(model->valueText(ShareCreateFormModel::DescriptionField).toUTF8());
-			share.modify()->setFileName(upload->clientFileName().toUTF8());
-			share.modify()->setMaxHits(Wt::asNumber(model->value(ShareCreateFormModel::HitsValidityField)));
-
-			share.modify()->setCreationTime(boost::posix_time::second_clock::universal_time());
-			share.modify()->setClientAddr(wApp->environment().clientAddress());
-
-			// calculate the expiry date from the duration
-			auto now = boost::posix_time::second_clock::universal_time();
-
-			Wt::WDateTime expiryDateTime(now);
-			auto duration = Wt::asNumber(model->value(ShareCreateFormModel::DurationValidityField));
-			auto unit = model->valueText(ShareCreateFormModel::DurationUnitValidityField);
-			if (unit == Wt::WString::tr("msg-hours"))
-				expiryDateTime = expiryDateTime.addSecs(3600 * duration);
-			else if (unit == Wt::WString::tr("msg-days"))
-				expiryDateTime = expiryDateTime.addDays(duration);
-			else if (unit == Wt::WString::tr("msg-weeks"))
-				expiryDateTime = expiryDateTime.addDays(7 * duration);
-			else if (unit == Wt::WString::tr("msg-months"))
-				expiryDateTime = expiryDateTime.addMonths(duration);
-			else if (unit == Wt::WString::tr("msg-years"))
-				expiryDateTime = expiryDateTime.addYears(duration);
-
-			share.modify()->setExpiryTime(expiryDateTime.toPosixTime());
-
-			if (!model->valueText(ShareCreateFormModel::PasswordField).empty())
-				share.modify()->setPassword(model->valueText(ShareCreateFormModel::PasswordField));
-
-			transaction.commit();
-
-			FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Share created. Client = " << share->getClientAddr() << ", size = " << share->getFileSize() << ", name = '" << share->getFileName() << "', desc = '" << share->getDesc() << "', expiry " << share->getExpiryTime() << ", download limit = " << share->getMaxHits() << ", password protected = " << share->hasPassword();
-
-			wApp->setInternalPath("/share-created/" + share->getEditUUID(), true);
 		}));
 
 		updateView(model);
 
 	}
 
+	private:
+		Wt::Signal<ShareParameters> _sigValidated;
+
 };
 
 ShareCreate::ShareCreate(Wt::WContainerWidget* parent)
-: Wt::WContainerWidget(parent)
+: Wt::WContainerWidget(parent),
+ _parameters(std::make_shared<ShareParameters>())
 {
 	refresh();
 
@@ -363,6 +350,17 @@ ShareCreate::ShareCreate(Wt::WContainerWidget* parent)
 }
 
 void
+ShareCreate::displayError(Wt::WString error)
+{
+	clear();
+
+	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-not-created"), this);
+
+	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
+	t->bindString("error", error);
+}
+
+void
 ShareCreate::refresh(void)
 {
 	if (!wApp->internalPathMatches("/share-create"))
@@ -370,16 +368,81 @@ ShareCreate::refresh(void)
 
 	clear();
 
-	ShareCreateFormView* form = new ShareCreateFormView(this);
+	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-create"), this);
+	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
-	form->failed().connect(std::bind([=] (Wt::WString error)
+	t->bindWidget("msg-max-size", new Wt::WText(Wt::WString::tr("msg-max-file-size").arg( Share::getMaxFileSize() )));
+
+	Wt::WFileUpload *upload = new Wt::WFileUpload();
+	upload->setFileTextSize(80);
+	upload->setProgressBar(new Wt::WProgressBar());
+	t->bindWidget("file", upload);
+
+	ShareCreateFormView* form = new ShareCreateFormView();
+	t->bindWidget("form", form);
+
+	upload->fileTooLarge().connect(std::bind([=] ()
 	{
-		FS_LOG(UI, DEBUG) << "Handling error: " << error;
-		clear();
-		Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-not-created"), this);
-		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
-		t->bindString("error", error);
+		FS_LOG(UI, WARNING) << "File too large!";
+		displayError(Wt::WString::tr("msg-share-create-too-large"));
+	}));
+
+	form->validated().connect(std::bind([=] (ShareParameters params)
+	{
+		FS_LOG(UI, DEBUG) << "Starting upload...";
+
+		// Start the upload
+		form->hide();
+		upload->upload();
+		*_parameters = params;
 	}, std::placeholders::_1));
+
+	upload->uploaded().connect(std::bind([=] ()
+	{
+		FS_LOG(UI, DEBUG) << "File successfully uploaded!";
+
+		auto curPath = boost::filesystem::path(upload->spoolFileName());
+
+		// Special case: the user did not choose a file
+		if (!boost::filesystem::exists(curPath))
+		{
+			FS_LOG(UI, ERROR) << "User did not select a file";
+			displayError(Wt::WString::tr("msg-no-file-selected"));
+			return;
+		}
+
+		Wt::Dbo::Transaction transaction(DboSession());
+
+		Database::Share::pointer share = Database::Share::create(DboSession(), curPath);
+		if (!share)
+		{
+			displayError(Wt::WString::tr("msg-internal-error"));
+			return;
+		}
+
+		upload->stealSpooledFile();
+		share.modify()->setDesc(_parameters->description.toUTF8());
+		share.modify()->setFileName(upload->clientFileName().toUTF8());
+		share.modify()->setMaxHits(_parameters->maxHits);
+		share.modify()->setCreationTime(boost::posix_time::second_clock::universal_time());
+		share.modify()->setClientAddr(wApp->environment().clientAddress());
+
+		// calculate the expiry date from the duration
+		auto now = boost::posix_time::second_clock::universal_time();
+		Wt::WDateTime expiryDateTime(now);
+
+		share.modify()->setExpiryTime((expiryDateTime + _parameters->maxDuration).toPosixTime());
+
+		if (!_parameters->password.empty())
+			share.modify()->setPassword(_parameters->password.toUTF8());
+
+		transaction.commit();
+
+		FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Share created. Client = " << share->getClientAddr() << ", size = " << share->getFileSize() << ", name = '" << share->getFileName() << "', desc = '" << share->getDesc() << "', expiry " << share->getExpiryTime() << ", download limit = " << share->getMaxHits() << ", password protected = " << share->hasPassword();
+
+		wApp->setInternalPath("/share-created/" + share->getEditUUID(), true);
+	}));
+
 }
 
 } // namespace UserInterface
