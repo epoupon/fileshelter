@@ -238,6 +238,14 @@
 			</div>
 		</div>
 		<div class="form-group">
+			<label class="control-label col-sm-2">
+				${tr:msg-download-link}
+			</label>
+			<div class="col-sm-5 well well-sm">
+				${download-link}
+			</div>
+		</div>
+		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-5">
 				${delete-btn}
 			</div>

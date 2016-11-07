@@ -18,7 +18,6 @@
  */
 
 #include <Wt/WTemplate>
-#include <Wt/WAnchor>
 #include <Wt/WEnvironment>
 
 #include "utils/Logger.hpp"
@@ -27,6 +26,7 @@
 #include "FileShelterApplication.hpp"
 
 #include "ShareCreated.hpp"
+#include "ShareCommon.hpp"
 
 
 namespace UserInterface {
@@ -65,11 +65,8 @@ ShareCreated::refresh(void)
 	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-created"), this);
 	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
-	std::string downloadPath = "/share-download/" + share->getDownloadUUID();
-	std::string editPath = "/share-edit/" + share->getEditUUID();
-
-	t->bindWidget("download-link", new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, downloadPath), wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + downloadPath));
-	t->bindWidget("edit-link", new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, editPath), wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + editPath));
+	t->bindWidget("download-link", createShareDownloadAnchor(share));
+	t->bindWidget("edit-link", createShareEditAnchor(share));
 }
 
 } // namespace UserInterface

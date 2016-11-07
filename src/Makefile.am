@@ -10,6 +10,8 @@ fileshelter_SOURCES = \
 	$(srcdir)/database/Share.hpp		\
 	$(srcdir)/ui/FileShelterApplication.cpp	\
 	$(srcdir)/ui/FileShelterApplication.hpp	\
+	$(srcdir)/ui/ShareCommon.cpp		\
+	$(srcdir)/ui/ShareCommon.hpp		\
 	$(srcdir)/ui/ShareCreate.cpp		\
 	$(srcdir)/ui/ShareCreate.hpp		\
 	$(srcdir)/ui/ShareCreated.cpp		\

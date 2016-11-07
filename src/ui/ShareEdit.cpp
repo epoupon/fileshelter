@@ -28,6 +28,7 @@
 #include "FileShelterApplication.hpp"
 
 #include "ShareEdit.hpp"
+#include "ShareCommon.hpp"
 
 
 namespace UserInterface {
@@ -77,6 +78,7 @@ ShareEdit::refresh(void)
 	t->bindString("expiry-date-time", boost::posix_time::to_simple_string(share->getExpiryTime()) + " UTC");
 	t->bindString("hits", std::to_string(share->getHits()));
 	t->bindString("max-hits", std::to_string(share->getMaxHits()));
+	t->bindWidget("download-link", createShareDownloadAnchor(share));
 
 	auto *deleteBtn = new Wt::WPushButton(tr("msg-delete"));
 	deleteBtn->addStyleClass("btn btn-danger");
