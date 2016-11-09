@@ -27,6 +27,7 @@
 #include "FileShelterApplication.hpp"
 #include "ShareResource.hpp"
 #include "SharePasswordFormView.hpp"
+#include "ShareCommon.hpp"
 
 #include "ShareDownload.hpp"
 
@@ -93,7 +94,7 @@ ShareDownload::displayDownload(void)
 		t->bindString("file-desc", share->getDesc());
 	}
 	t->bindString("file-name", share->getFileName());
-	t->bindString("file-size", std::to_string(share->getFileSize() / 1000));
+	t->bindString("file-size", sizeToString(share->getFileSize()));
 
 	auto *downloadBtn = new Wt::WPushButton(tr("msg-download"));
 

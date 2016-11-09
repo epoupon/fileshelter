@@ -16,8 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include <Wt/WApplication>
 #include <Wt/WEnvironment>
+#include <iomanip>
+#include <sstream>
 
 #include "ShareCommon.hpp"
 
@@ -32,5 +35,31 @@ Wt::WAnchor* createShareEditAnchor(Database::Share::pointer share)
 	std::string editPath = "/share-edit/" + share->getEditUUID();
 
 	return new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, editPath), wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + editPath);
+}
+
+template <typename T>
+std::string to_string_with_precision(const T a_value, const int n)
+{
+	std::ostringstream out;
+	out << std::setprecision(n) << std::fixed << a_value;
+	return out.str();
+}
+
+Wt::WString sizeToString(std::size_t size)
+{
+	if (size > 1024 * 1024 * 1024)
+	{
+		return Wt::WString::tr("msg-size-gb").arg(to_string_with_precision(size / 1024 / 1024 / 1024., 1));
+	}
+	if (size > 1024 * 1024)
+	{
+		return Wt::WString::tr("msg-size-mb").arg(to_string_with_precision(size / 1024 / 1024., 1));
+	}
+	else if (size > 1024)
+	{
+		return Wt::WString::tr("msg-size-kb").arg(to_string_with_precision(size / 1024., 1));
+	}
+	else
+		return Wt::WString::tr("msg-size-b").arg(size);
 }
 

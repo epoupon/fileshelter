@@ -39,6 +39,7 @@
 #include "database/Share.hpp"
 
 #include "FileShelterApplication.hpp"
+#include "ShareCommon.hpp"
 #include "ShareCreate.hpp"
 
 namespace UserInterface {
@@ -371,7 +372,7 @@ ShareCreate::refresh(void)
 	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-create"), this);
 	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
-	t->bindWidget("msg-max-size", new Wt::WText(Wt::WString::tr("msg-max-file-size").arg( Share::getMaxFileSize() )));
+	t->bindWidget("msg-max-size", new Wt::WText(Wt::WString::tr("msg-max-file-size").arg( sizeToString(Share::getMaxFileSize() * 1024*1024) )));
 
 	Wt::WFileUpload *upload = new Wt::WFileUpload();
 	upload->setFileTextSize(80);

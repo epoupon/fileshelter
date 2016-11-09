@@ -74,7 +74,7 @@ ShareEdit::refresh(void)
 		t->bindString("file-desc", share->getDesc());
 	}
 	t->bindString("file-name", share->getFileName());
-	t->bindString("file-size", std::to_string(share->getFileSize() / 1000));
+	t->bindString("file-size", sizeToString(share->getFileSize()));
 	t->bindString("expiry-date-time", boost::posix_time::to_simple_string(share->getExpiryTime()) + " UTC");
 	t->bindString("hits", std::to_string(share->getHits()));
 	t->bindString("max-hits", std::to_string(share->getMaxHits()));

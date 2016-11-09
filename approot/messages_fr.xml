@@ -34,7 +34,7 @@
 <message id="msg-internal-error">Erreur interne !</message>
 <message id="msg-share-protected-by-password">Ce partage est protégé par un mot de passe</message>
 <message id="msg-no-file-selected">Aucun fichier selectionné !</message>
-<message id="msg-max-file-size">La taille du fichier ne doit pas dépasser {1} Mo</message>
+<message id="msg-max-file-size">La taille du fichier ne doit pas dépasser {1}</message>
 
 <message id="msg-validity-period">Durée de validité</message>
 <message id="msg-hours">Heures</message>
