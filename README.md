@@ -26,21 +26,21 @@ Check the [release](https://github.com/epoupon/fileshelter/releases) page to get
 ### From Source
 #### Debian/Ubuntu dependencies
 ```sh
-$ apt-get install build-essential autoconf automake libboost-dev libwtdbosqlite-dev libwthttp-dev libwtdbo-dev libwt-dev libconfig++-dev
+# apt-get install build-essential autoconf automake libboost-dev libwtdbosqlite-dev libwthttp-dev libwtdbo-dev libwt-dev libconfig++-dev
 ```
 #### CentOS 7 dependencies
 You need to install [wt](https://www.webtoolkit.eu/wt/doc/reference/html/InstallationUnix.html) from source:
 ```sh
-$ yum groupinstall 'Development Tools'
-$ yum install boost-devel
+# yum groupinstall 'Development Tools'
+# yum install boost-devel
 $ git clone https://github.com/emweb/wt.git wt
 $ cd wt; mkdir build
 $ cmake ../ -DWT_CPP_11_MODE=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr
-$ make install
+# make install
 ```
 Once this is done, you can install fileshelter's extra dependencies:
 ```sh
-yum install libconfig-devel
+# yum install libconfig-devel
 ```
 
 #### Build
@@ -59,7 +59,7 @@ $ make
 ```
 
 ```sh
-$ make install
+# make install
 ```
 This last command requires root privileges.
 
@@ -84,6 +84,35 @@ $ fileshelter /another/config/file
 ```
 
 To connect to FileShelter, just open your favorite browser and go to http://localhost:5091
+
+## Reverse proxy settings
+You have to set the 'behind-reverse-proxy' option to 'true' in the configuration file.
+
+Here is an example to make FileShelter properly work on myserver.org using nginx.
+```
+server {
+    listen 80;
+
+    server_name myserver.org;
+
+    access_log            /var/log/nginx/myserver.access.log;
+
+    proxy_request_buffering off;
+    proxy_buffering off;
+    proxy_buffer_size 4k;
+
+    location / {
+
+      proxy_set_header        Host $host;
+      proxy_set_header        X-Real-IP $remote_addr;
+      proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header        X-Forwarded-Proto $scheme;
+
+      proxy_pass          http://localhost:5091;
+      proxy_read_timeout  120;
+    }
+}
+```
 
 ## Credits
 - Wt, awesome framework: http://www.webtoolkit.eu/
