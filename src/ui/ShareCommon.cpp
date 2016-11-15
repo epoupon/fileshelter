@@ -47,15 +47,15 @@ std::string to_string_with_precision(const T a_value, const int n)
 
 Wt::WString sizeToString(std::size_t size)
 {
-	if (size > 1024 * 1024 * 1024)
+	if (size >= 1024 * 1024 * 1024)
 	{
 		return Wt::WString::tr("msg-size-gb").arg(to_string_with_precision(size / 1024 / 1024 / 1024., 1));
 	}
-	if (size > 1024 * 1024)
+	if (size >= 1024 * 1024)
 	{
 		return Wt::WString::tr("msg-size-mb").arg(to_string_with_precision(size / 1024 / 1024., 1));
 	}
-	else if (size > 1024)
+	else if (size >= 1024)
 	{
 		return Wt::WString::tr("msg-size-kb").arg(to_string_with_precision(size / 1024., 1));
 	}
