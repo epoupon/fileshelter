@@ -22,6 +22,7 @@
 #include <Wt/WStackedWidget>
 #include <Wt/WNavigationBar>
 #include <Wt/WAnchor>
+#include <Wt/WMenu>
 #include <Wt/WTemplate>
 #include <Wt/WPushButton>
 
@@ -173,13 +174,18 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 	navbar->setResponsive(true);
 	navbar->setTitle("<i class=\"fa fa-external-link\"></i> " + Wt::WString::tr("msg-app-name"), Wt::WLink(Wt::WLink::InternalPath, "/home"));
 
-	auto homeAnchor = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/home"), "<i class=\"fa fa-home fa-lg\"></i> " + Wt::WString::tr("msg-home"));
-	homeAnchor->addStyleClass("fs-nav");
-	navbar->addWidget(homeAnchor);
-
-	auto createShareAnchor = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/share-create"), "<i class=\"fa fa-upload fa-lg\"></i> " + Wt::WString::tr("msg-share-create"));
-	createShareAnchor->addStyleClass("fs-nav");
-	navbar->addWidget(createShareAnchor);
+	auto menu = new Wt::WMenu();
+	{
+		auto menuItem = menu->insertItem(0, Wt::WString::tr("msg-home"));
+		menuItem->setLink(Wt::WLink(Wt::WLink::InternalPath, "/home"));
+		menuItem->setSelectable(false);
+	}
+	{
+		auto menuItem = menu->insertItem(1, Wt::WString::tr("msg-share-create"));
+		menuItem->setLink(Wt::WLink(Wt::WLink::InternalPath, "/share-create"));
+		menuItem->setSelectable(false);
+	}
+	navbar->addMenu(menu);
 
 	auto container = new Wt::WContainerWidget();
 	main->bindWidget("contents", container);
