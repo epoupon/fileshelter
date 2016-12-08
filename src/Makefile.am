@@ -29,7 +29,9 @@ fileshelter_SOURCES = \
 	$(srcdir)/utils/Logger.cpp		\
 	$(srcdir)/utils/Logger.hpp		\
 	$(srcdir)/utils/UUID.cpp		\
-	$(srcdir)/utils/UUID.hpp
+	$(srcdir)/utils/UUID.hpp		\
+	$(srcdir)/utils/Zip.cpp			\
+	$(srcdir)/utils/Zip.hpp
 
 
 # DBOOST_NO_CXX11_SCOPED_ENUMS prevents a link error with outdated boost filesystem lib

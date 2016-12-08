@@ -10,6 +10,7 @@ A [demo](http://fileshelter.suroot.com) instance is available, with the followin
 - Maximum file size is set to 1 MB
 
 ## Features
+- Multiple file upload (a zip is created server side)
 - Period of validity (from one hour to years)
 - Optional download limit
 - Optional password protection
@@ -26,7 +27,7 @@ Check the [release](https://github.com/epoupon/fileshelter/releases) page to get
 ### From Source
 #### Debian/Ubuntu dependencies
 ```sh
-apt-get install build-essential autoconf automake libboost-dev libwtdbosqlite-dev libwthttp-dev libwtdbo-dev libwt-dev libconfig++-dev
+apt-get install build-essential autoconf automake libboost-dev libwtdbosqlite-dev libwthttp-dev libwtdbo-dev libwt-dev libconfig++-dev libzip-dev
 ```
 #### CentOS 7 dependencies
 You need to install [wt](https://www.webtoolkit.eu/wt/doc/reference/html/InstallationUnix.html) from source:

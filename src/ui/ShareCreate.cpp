@@ -19,7 +19,6 @@
 
 #include <Wt/WEnvironment>
 #include <Wt/WFormModel>
-#include <Wt/WSignal>
 #include <Wt/WTemplateFormView>
 #include <Wt/WPushButton>
 #include <Wt/WLineEdit>
@@ -28,13 +27,14 @@
 #include <Wt/WSpinBox>
 #include <Wt/WComboBox>
 #include <Wt/WIntValidator>
-#include <Wt/WDateValidator>
-#include <Wt/WDateValidator>
 #include <Wt/WStringListModel>
 #include <Wt/WAbstractItemModel>
+#include <Wt/WDateTime>
 
 #include "utils/Config.hpp"
 #include "utils/Logger.hpp"
+#include "utils/UUID.hpp"
+#include "utils/Zip.hpp"
 
 #include "database/Share.hpp"
 
@@ -377,6 +377,7 @@ ShareCreate::refresh(void)
 	Wt::WFileUpload *upload = new Wt::WFileUpload();
 	upload->setFileTextSize(80);
 	upload->setProgressBar(new Wt::WProgressBar());
+	upload->setMultiple(true);
 	t->bindWidget("file", upload);
 
 	ShareCreateFormView* form = new ShareCreateFormView();
@@ -400,30 +401,69 @@ ShareCreate::refresh(void)
 
 	upload->uploaded().connect(std::bind([=] ()
 	{
-		FS_LOG(UI, DEBUG) << "File successfully uploaded!";
+		auto uploadedFiles = upload->uploadedFiles();
 
-		auto curPath = boost::filesystem::path(upload->spoolFileName());
+		FS_LOG(UI, DEBUG) << uploadedFiles.size() << " file" << (uploadedFiles.size() > 1 ? "s" : "") << " successfully uploaded!";
 
 		// Special case: the user did not choose a file
-		if (!boost::filesystem::exists(curPath))
+		if (uploadedFiles.empty())
 		{
 			FS_LOG(UI, ERROR) << "User did not select a file";
 			displayError(Wt::WString::tr("msg-no-file-selected"));
 			return;
 		}
 
+		boost::filesystem::path sharePath;
+		std::string fileName;
+
+		if (uploadedFiles.size() == 1)
+		{
+			sharePath = boost::filesystem::path(uploadedFiles.front().spoolFileName());
+			fileName = uploadedFiles.front().clientFileName();
+			uploadedFiles.front().stealSpoolFile();
+		}
+		else
+		{
+			// Generate a zip that contains all the files in it
+			// Name it using the description, fall back on the first file name otherwise
+
+			auto description = _parameters->description.toUTF8();
+			if (!description.empty())
+				fileName = description + ".zip";
+			else
+				fileName = uploadedFiles.front().clientFileName() + ".zip";
+
+			sharePath = Config::instance().getPath("working-dir") / "tmp" / generateUUID();
+			try
+			{
+				ZipFileWriter zip(sharePath);
+
+				std::vector<boost::filesystem::path> files;
+				for (auto uploadedFile : uploadedFiles)
+				{
+					zip.add(uploadedFile.clientFileName(),
+						boost::filesystem::path(uploadedFile.spoolFileName()));
+				}
+			}
+			catch(std::exception& e)
+			{
+				FS_LOG(UI, ERROR) << "Cannot create zip file: " << e.what();
+				displayError(Wt::WString::tr("msg-internal-error"));
+				return;
+			}
+		}
+
 		Wt::Dbo::Transaction transaction(DboSession());
 
-		Database::Share::pointer share = Database::Share::create(DboSession(), curPath);
+		Database::Share::pointer share = Database::Share::create(DboSession(), sharePath);
 		if (!share)
 		{
 			displayError(Wt::WString::tr("msg-internal-error"));
 			return;
 		}
 
-		upload->stealSpooledFile();
 		share.modify()->setDesc(_parameters->description.toUTF8());
-		share.modify()->setFileName(upload->clientFileName().toUTF8());
+		share.modify()->setFileName(fileName);
 		share.modify()->setMaxHits(_parameters->maxHits);
 		share.modify()->setCreationTime(boost::posix_time::second_clock::universal_time());
 		share.modify()->setClientAddr(wApp->environment().clientAddress());
@@ -442,6 +482,9 @@ ShareCreate::refresh(void)
 		FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Share created. Client = " << share->getClientAddr() << ", size = " << share->getFileSize() << ", name = '" << share->getFileName() << "', desc = '" << share->getDesc() << "', expiry " << share->getExpiryTime() << ", download limit = " << share->getMaxHits() << ", password protected = " << share->hasPassword();
 
 		wApp->setInternalPath("/share-created/" + share->getEditUUID(), true);
+
+		// Clear the widget in order to flush the temporary uploaded files
+		clear();
 	}));
 
 }

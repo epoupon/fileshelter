@@ -58,6 +58,11 @@ AC_CHECK_LIB(	[config++],
 		,
 		[AC_MSG_ERROR([libconfig not found!])])
 
+AC_CHECK_LIB(	[zip],
+		[zip_source_buffer],
+		,
+		[AC_MSG_ERROR([libzip not found!])])
+
 AC_CONFIG_FILES([Makefile
 		 src/Makefile])
 
