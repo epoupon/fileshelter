@@ -128,6 +128,7 @@ class ShareCreateFormModel : public Wt::WFormModel
 
 			// Hits validity
 			auto maxValidityHits = Share::getMaxValidatityHits();
+			auto defaultValidityHits = Share::getDefaultValidatityHits();
 			auto hitsValidator = new Wt::WIntValidator();
 			hitsValidator->setMandatory(true);
 			if (maxValidityHits > 0)
@@ -141,11 +142,9 @@ class ShareCreateFormModel : public Wt::WFormModel
 			}
 			setValidator(HitsValidityField, hitsValidator);
 
-			int suggestedValidityHits;
-			if (maxValidityHits != 0 && maxValidityHits < 10)
+			int suggestedValidityHits = defaultValidityHits;
+			if (maxValidityHits != 0 && maxValidityHits < defaultValidityHits)
 				suggestedValidityHits = maxValidityHits;
-			else
-				suggestedValidityHits = 10;
 
 			setValue(HitsValidityField, suggestedValidityHits);
 		}

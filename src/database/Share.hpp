@@ -38,6 +38,7 @@ class Share
 		static std::size_t getMaxFileSize();
 		static boost::posix_time::time_duration getMaxValidatityDuration();
 		static std::size_t getMaxValidatityHits();
+		static std::size_t getDefaultValidatityHits();
 
 		// Helpers
 		// Create a new share, will move the underlying file in the working directory

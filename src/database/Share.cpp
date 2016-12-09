@@ -161,7 +161,13 @@ Share::getMaxValidatityDuration(void)
 std::size_t
 Share::getMaxValidatityHits(void)
 {
-	return Config::instance().getULong("max-validity-hits", 30);
+	return Config::instance().getULong("max-validity-hits", 50);
+}
+
+std::size_t
+Share::getDefaultValidatityHits(void)
+{
+	return Config::instance().getULong("default-validity-hits", 30);
 }
 
 } // namespace Database
