@@ -28,15 +28,7 @@ ZipFileWriter::ZipFileWriter(boost::filesystem::path file)
 
 	_zip = zip_open(file.string().c_str(), ZIP_CREATE | ZIP_EXCL, &err_code);
 	if (_zip == NULL)
-	{
-		zip_error_t error;
-		zip_error_init_with_code(&error, err_code);
-
-		std::string strError = zip_error_strerror(&error);
-		zip_error_fini(&error);
-
-		throw std::runtime_error("Cannot create archive file '" + file.string() + "', error: " + strError);
-	}
+		throw std::runtime_error("Cannot create archive file '" + file.string() + "'");
 }
 
 ZipFileWriter::~ZipFileWriter()
@@ -48,7 +40,7 @@ void
 ZipFileWriter::add(std::string fileName, boost::filesystem::path file)
 {
 
-	zip_source_t *source = zip_source_file(_zip,
+	struct zip_source *source = zip_source_file(_zip,
 					file.string().c_str(),
 					0, 0);
 	if (source == NULL)
