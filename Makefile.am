@@ -21,10 +21,11 @@ dist_sysconf_DATA = \
 	        $(top_srcdir)/conf/fileshelter.conf
 
 install-data-hook:
+	cd $(DESTDIR)$(fileshelter_docrootdir); \
 	for wt_dir in "/usr/local/share/Wt/resources" "/usr/share/Wt/resources"; do \
 		if [ -d $$wt_dir ]; then \
-			if ! [ -e  $(fileshelter_docrootdir)/resources ] ; then \
-				$(LN_S) /usr/share/Wt/resources $(fileshelter_docrootdir)/resources; \
+			if ! [ -e  ./resources ] ; then \
+				$(LN_S) /usr/share/Wt/resources resources; \
 			fi; \
 			break; \
 		fi \
