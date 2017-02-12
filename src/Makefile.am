@@ -34,6 +34,6 @@ fileshelter_SOURCES = \
 	$(srcdir)/utils/Zip.hpp
 
 
-# DBOOST_NO_CXX11_SCOPED_ENUMS prevents a link error with outdated boost filesystem lib
-fileshelter_CXXFLAGS=-std=c++11 -Wall -I$(srcdir)/ui -DDBOOST_NO_CXX11_SCOPED_ENUMS
+# BOOST_NO_CXX11_SCOPED_ENUMS prevents a link error with outdated boost filesystem lib
+fileshelter_CXXFLAGS=-std=c++11 -Wall -I$(srcdir)/ui -DBOOST_NO_CXX11_SCOPED_ENUMS
 
