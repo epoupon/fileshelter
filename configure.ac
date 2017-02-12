@@ -1,5 +1,5 @@
 AC_PREREQ(2.59)
-AC_INIT(fileshelter, 2.0.0, test@test)
+AC_INIT(fileshelter, 2.0.1, test@test)
 AM_INIT_AUTOMAKE
 AC_CONFIG_HEADER(src/config/config.h)
 
@@ -7,6 +7,7 @@ AC_LANG_CPLUSPLUS
 
 # Checks for programs
 AC_PROG_CXX
+AC_PROG_LN_S
 
 AC_CHECK_HEADERS([Wt/WApplication],
                  [],

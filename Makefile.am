@@ -21,8 +21,15 @@ dist_sysconf_DATA = \
 	        $(top_srcdir)/conf/fileshelter.conf
 
 install-data-hook:
-	ln -s $(datadir)/Wt/resources $(fileshelter_docrootdir)/resources || echo "Skipped symlink creation"
+	for wt_dir in "/usr/local/share/Wt/resources" "/usr/share/Wt/resources"; do \
+		if [ -d $$wt_dir ]; then \
+			if ! [ -e  $(fileshelter_docrootdir)/resources ] ; then \
+				$(LN_S) /usr/share/Wt/resources $(fileshelter_docrootdir)/resources; \
+			fi; \
+			break; \
+		fi \
+	done
 
 uninstall-local:
-	cd $(fileshelter_docrootdir) && rm -f -r $(fileshelter_docrootdir)/resources
+	rm -f -r $(fileshelter_docrootdir)/resources
 
