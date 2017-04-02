@@ -102,8 +102,23 @@ static Wt::WWebWidget* createHome()
 
 static Wt::WWebWidget* createToS(void)
 {
-	Wt::WTemplate *tos = new Wt::WTemplate(Wt::WString::tr("template-tos"));
-	tos->addFunction("tr", &Wt::WTemplate::Functions::tr);
+	Wt::WTemplate *tos = new Wt::WTemplate();
+
+	// Override the ToS with a custom version is specified
+	auto path = Config::instance().getOptPath("tos-custom");
+	if (path)
+	{
+		std::ifstream ifs(path->string().c_str());
+		std::stringstream buffer;
+		buffer << ifs.rdbuf();
+
+		tos->setTemplateText(buffer.str());
+	}
+	else
+	{
+		tos->setTemplateText(Wt::WString::tr("template-tos"));
+		tos->addFunction("tr", &Wt::WTemplate::Functions::tr);
+	}
 
 	return tos;
 }
@@ -160,8 +175,9 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 	FS_LOG(UI, INFO) << "Client address = " << env.clientAddress() << ", UserAgent = '" << env.userAgent() << "', Locale = " << env.locale().name() << ", path = '" << env.internalPath() << "'";
 
 	messageResourceBundle().use(appRoot() + "messages");
-	messageResourceBundle().use(appRoot() + "tos");
 	messageResourceBundle().use((Config::instance().getPath("working-dir") / "user_messages").string());
+	if (!Config::instance().getOptPath("tos-custom"))
+		messageResourceBundle().use(appRoot() + "tos");
 
 	setTitle(Wt::WString::tr("msg-app-name"));
 

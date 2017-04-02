@@ -66,6 +66,19 @@ Config::getString(std::string setting, std::string def)
 	}
 }
 
+boost::optional<boost::filesystem::path>
+Config::getOptPath(std::string setting)
+{
+	try {
+		const char* res = _config->lookup(setting);
+		return boost::filesystem::path(std::string(res));
+	}
+	catch (std::exception &e)
+	{
+		return boost::none;
+	}
+}
+
 boost::filesystem::path
 Config::getPath(std::string setting, boost::filesystem::path path)
 {

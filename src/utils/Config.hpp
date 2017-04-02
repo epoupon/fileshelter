@@ -20,6 +20,8 @@
 #pragma once
 
 #include <boost/filesystem.hpp>
+#include <boost/optional.hpp>
+
 #include <libconfig.h++>
 
 // Used to get config values from configuration files
@@ -37,10 +39,13 @@ class Config
 
 		// Default values are returned in case of setting not found
 		std::string	getString(std::string setting, std::string def = "");
-		boost::filesystem::path getPath(std::string setting, boost::filesystem::path def = boost::filesystem::path());
+		boost::optional<boost::filesystem::path> getOptPath(std::string setting);
 		unsigned long	getULong(std::string setting, unsigned long def = 0);
 		long		getLong(std::string setting, long def = 0);
 		bool		getBool(std::string setting, bool def = false);
+
+		// Optional versions
+		boost::filesystem::path getPath(std::string setting, boost::filesystem::path def = boost::filesystem::path());
 
 	private:
 

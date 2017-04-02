@@ -16,7 +16,7 @@ A [demo](http://fileshelter.suroot.com) instance is available, with the followin
 - Optional password protection
 - Practically unique links, using [UUID](https://fr.wikipedia.org/wiki/Universal_Unique_Identifier)
 - Private link, used to remove the file or to check the download counter
-- Basic terms of service
+- Terms of service support
 
 Once the expiry date or the download limit is reached, the download is no longer available and the file is deleted.
 
@@ -68,8 +68,10 @@ This last command requires root privileges.
 FileShelter uses a configuration file, installed in '/etc/fileshelter.conf'
 It is recommended to edit this file and change the relevant settings (working directory, maximum file size, maximum validity duration, listen port, etc.)
 
-A basic "Terms of Services" is provided, located in '/usr/share/fileshelter/approot/tos.xml'. You may modify it to fit your needs.
-The configuration file contains the definition of the fields needed by this tos.
+A basic "Terms of Services" is provided, located in '/usr/share/fileshelter/approot/tos.html'.
+The configuration file contains the definition of the fields needed by the default tos.
+
+You may also specify an alternate tos file to fit your needs.
 
 It is highly recommended to run fileshelter as a non root user. Therefore make sure the user has write permissions on the working directory.
 
