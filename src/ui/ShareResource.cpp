@@ -57,12 +57,17 @@ ShareResource::handleRequest(const Wt::Http::Request& request,
 		Wt::Dbo::Transaction transaction(DboSession());
 
 		auto share = Database::Share::getByDownloadUUID(DboSession(), _downloadUUID);
+		if (!share)
+		{
+			FS_LOG(UI, WARNING) <<  "[" << _downloadUUID << "] Share does not exist!";
+			return;
+		}
 
 		FS_LOG(UI, INFO) << "[" << _downloadUUID << "] Hits = " << share->getHits() << " / " << share->getMaxHits();
 
 		if (share->hasExpired())
 		{
-			FS_LOG(UI, ERROR) <<  "[" << _downloadUUID << "] Share expired!";
+			FS_LOG(UI, WARNING) <<  "[" << _downloadUUID << "] Share expired!";
 			response.setStatus(404);
 			return;
 		}
@@ -86,8 +91,13 @@ ShareResource::handleRequest(const Wt::Http::Request& request,
 		FS_LOG(UI, ERROR) << "Cannot open " << _path;
 		return;
 	}
-	else
-		handleRequestPiecewise(request, response, is);
+
+	handleRequestPiecewise(request, response, is);
+
+	if (!request.continuation())
+	{
+		FS_LOG(UI, INFO) << "[" << _downloadUUID << "] Download complete from " << wApp->environment().clientAddress();
+	}
 }
 
 }
