@@ -474,7 +474,7 @@ ShareCreate::refresh(void)
 		share.modify()->setExpiryTime((expiryDateTime + _parameters->maxDuration).toPosixTime());
 
 		if (!_parameters->password.empty())
-			share.modify()->setPassword(_parameters->password.toUTF8());
+			share.modify()->setPassword(_parameters->password);
 
 		transaction.commit();
 

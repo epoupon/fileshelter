@@ -71,9 +71,9 @@ ShareEdit::refresh(void)
 	if (!share->getDesc().empty())
 	{
 		t->setCondition("if-desc", true);
-		t->bindString("file-desc", share->getDesc());
+		t->bindString("file-desc", Wt::WString::fromUTF8(share->getDesc()));
 	}
-	t->bindString("file-name", share->getFileName());
+	t->bindString("file-name", Wt::WString::fromUTF8(share->getFileName()));
 	t->bindString("file-size", sizeToString(share->getFileSize()));
 	t->bindString("expiry-date-time", boost::posix_time::to_simple_string(share->getExpiryTime()) + " UTC");
 	t->bindString("hits", std::to_string(share->getHits()));

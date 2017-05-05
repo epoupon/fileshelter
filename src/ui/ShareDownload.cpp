@@ -91,9 +91,9 @@ ShareDownload::displayDownload(void)
 	if (!share->getDesc().empty())
 	{
 		t->setCondition("if-desc", true);
-		t->bindString("file-desc", share->getDesc());
+		t->bindString("file-desc", Wt::WString::fromUTF8(share->getDesc()));
 	}
-	t->bindString("file-name", share->getFileName());
+	t->bindString("file-name", Wt::WString::fromUTF8(share->getFileName()));
 	t->bindString("file-size", sizeToString(share->getFileSize()));
 
 	auto *downloadBtn = new Wt::WPushButton(tr("msg-download"));
