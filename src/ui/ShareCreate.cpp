@@ -413,12 +413,12 @@ ShareCreate::refresh(void)
 		}
 
 		boost::filesystem::path sharePath;
-		std::string fileName;
+		Wt::WString fileName;
 
 		if (uploadedFiles.size() == 1)
 		{
 			sharePath = boost::filesystem::path(uploadedFiles.front().spoolFileName());
-			fileName = uploadedFiles.front().clientFileName();
+			fileName = Wt::WString::fromUTF8(uploadedFiles.front().clientFileName());
 			uploadedFiles.front().stealSpoolFile();
 		}
 		else
@@ -426,7 +426,7 @@ ShareCreate::refresh(void)
 			// Generate a zip that contains all the files in it
 			// Name it using the description, fall back on the first file name otherwise
 
-			auto description = _parameters->description.toUTF8();
+			Wt::WString description = _parameters->description;
 			if (!description.empty())
 				fileName = description + ".zip";
 			else
@@ -462,7 +462,7 @@ ShareCreate::refresh(void)
 		}
 
 		share.modify()->setDesc(_parameters->description.toUTF8());
-		share.modify()->setFileName(fileName);
+		share.modify()->setFileName(fileName.toUTF8());
 		share.modify()->setMaxHits(_parameters->maxHits);
 		share.modify()->setCreationTime(boost::posix_time::second_clock::universal_time());
 		share.modify()->setClientAddr(wApp->environment().clientAddress());

@@ -72,7 +72,7 @@ ShareResource::handleRequest(const Wt::Http::Request& request,
 			return;
 		}
 
-		suggestFileName(share->getFileName());
+		suggestFileName(Wt::WString::fromUTF8(share->getFileName()));
 		_path = share->getPath();
 		share.modify()->incHits();
 	}
