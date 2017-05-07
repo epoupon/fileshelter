@@ -38,6 +38,8 @@
 
 #include "database/Share.hpp"
 
+#include "ShareCreatePassword.hpp"
+
 #include "FileShelterApplication.hpp"
 #include "ShareCommon.hpp"
 #include "ShareCreate.hpp"
@@ -341,12 +343,12 @@ ShareCreate::ShareCreate(Wt::WContainerWidget* parent)
 : Wt::WContainerWidget(parent),
  _parameters(std::make_shared<ShareParameters>())
 {
-	refresh();
-
 	wApp->internalPathChanged().connect(std::bind([=]
 	{
 		refresh();
 	}));
+
+	refresh();
 }
 
 void
@@ -366,6 +368,29 @@ ShareCreate::refresh(void)
 	if (!wApp->internalPathMatches("/share-create"))
 		return;
 
+	clear();
+
+	if (!Config::instance().getString("upload-password", "").empty())
+		displayPassword();
+	else
+		displayCreate();
+}
+
+void
+ShareCreate::displayPassword()
+{
+	clear();
+
+	auto view = new ShareCreatePassword(this);
+	view->success().connect(std::bind([=]
+	{
+		displayCreate();
+	}));
+}
+
+void
+ShareCreate::displayCreate()
+{
 	clear();
 
 	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-create"), this);

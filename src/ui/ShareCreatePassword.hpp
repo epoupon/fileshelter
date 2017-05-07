@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Emeric Poupon
+ * Copyright (C) 2017 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -19,31 +19,23 @@
 
 #pragma once
 
-#include <Wt/WString>
-#include <Wt/WContainerWidget>
+#include <Wt/WSignal>
+#include <Wt/WTemplateFormView>
 
-
-namespace UserInterface {
-
-class ShareParameters;
-
-class ShareCreate : public Wt::WContainerWidget
+namespace UserInterface
 {
-	public:
-		ShareCreate(Wt::WContainerWidget *parent = 0);
 
+class ShareCreatePassword : public Wt::WTemplateFormView
+{
 	private:
-		void refresh(void);
+		Wt::Signal<void> _sigSuccess;
 
-		void displayCreate(void);
-		void displayPassword(void);
-		void displayError(Wt::WString error);
+	public:
+		Wt::Signal<void>& success() { return _sigSuccess;}
 
-		std::shared_ptr<ShareParameters> _parameters;
+		ShareCreatePassword(Wt::WContainerWidget *parent = 0);
 
 };
-
-
 
 } // namespace UserInterface
 

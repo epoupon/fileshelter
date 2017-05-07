@@ -103,6 +103,31 @@
 	</div>
 </message>
 
+<message id="template-share-create-password">
+	<h1><i class="fa fa-upload"></i> ${tr:msg-share-create}</h1>
+	<div class="alert alert-info">
+		${tr:msg-share-create-protected-by-password}
+	</div>
+	<div class="form-horizontal">
+		<div class="form-group">
+			<label class="control-label col-sm-2"  for="${id:password}">
+				${tr:msg-password}
+			</label>
+			<div class="col-sm-5">
+				${password}
+			</div>
+			<div class="help-block col-sm-5">
+				${password-info}
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-5">
+				${unlock-btn}
+			</div>
+		</div>
+	</div>
+</message>
+
 <message id="template-share-created">
 	<h1><i class="fa fa-check"></i> ${tr:msg-share-create-success}</h1>
 	<div class="form-horizontal">

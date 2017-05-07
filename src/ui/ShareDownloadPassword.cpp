@@ -25,14 +25,14 @@
 #include "database/Share.hpp"
 
 #include "FileShelterApplication.hpp"
-#include "SharePasswordFormView.hpp"
+#include "ShareDownloadPassword.hpp"
 
 namespace UserInterface {
 
-class SharePasswordValidator : public Wt::WValidator
+class ShareDownloadPasswordValidator : public Wt::WValidator
 {
 	public:
-		SharePasswordValidator(std::string downloadUUID, Wt::WObject *parent = 0)
+		ShareDownloadPasswordValidator(std::string downloadUUID, Wt::WObject *parent = 0)
 		: Wt::WValidator(parent),
 		 _downloadUUID(downloadUUID)
 		{
@@ -60,27 +60,27 @@ class SharePasswordValidator : public Wt::WValidator
 };
 
 
-class SharePasswordFormModel : public Wt::WFormModel
+class ShareDownloadPasswordFormModel : public Wt::WFormModel
 {
 	public:
 	static const Field PasswordField;
 
-	SharePasswordFormModel(std::string downloadUUID, Wt::WObject *parent)
+	ShareDownloadPasswordFormModel(std::string downloadUUID, Wt::WObject *parent)
 	: Wt::WFormModel(parent)
 	{
 		addField(PasswordField);
 
-		setValidator(PasswordField, new SharePasswordValidator(downloadUUID));
+		setValidator(PasswordField, new ShareDownloadPasswordValidator(downloadUUID));
 	}
 };
 
-const Wt::WFormModel::Field SharePasswordFormModel::PasswordField = "password";
+const Wt::WFormModel::Field ShareDownloadPasswordFormModel::PasswordField = "password";
 
-SharePasswordFormView::SharePasswordFormView(Wt::WContainerWidget *parent)
+ShareDownloadPassword::ShareDownloadPassword(Wt::WContainerWidget *parent)
 : Wt::WTemplateFormView(parent)
 {
 	std::string downloadUUID = wApp->internalPathNextPart("/share-download/");
-	auto model = new SharePasswordFormModel(downloadUUID, this);
+	auto model = new ShareDownloadPasswordFormModel(downloadUUID, this);
 
 	setTemplateText(tr("template-share-download-password"));
 	addFunction("id", &WTemplate::Functions::id);
@@ -89,7 +89,7 @@ SharePasswordFormView::SharePasswordFormView(Wt::WContainerWidget *parent)
 	// Password
 	Wt::WLineEdit *password = new Wt::WLineEdit();
 	password->setEchoMode(Wt::WLineEdit::Password);
-	setFormWidget(SharePasswordFormModel::PasswordField, password);
+	setFormWidget(ShareDownloadPasswordFormModel::PasswordField, password);
 
 	// Buttons
 	Wt::WPushButton *unlockBtn = new Wt::WPushButton(tr("msg-unlock"));
@@ -101,11 +101,16 @@ SharePasswordFormView::SharePasswordFormView(Wt::WContainerWidget *parent)
 
 		if (model->validate())
 		{
-			FS_LOG(UI, DEBUG) << "Password validation OK";
+			FS_LOG(UI, DEBUG) << "Download password validation OK";
 
 			success().emit();
 			return;
 		}
+
+		FS_LOG(UI, DEBUG) << "Download password validation failed";
+
+		// Mitigate brute force attemps
+		sleep(1);
 
 		updateView(model);
 	}));

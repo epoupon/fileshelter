@@ -14,14 +14,16 @@ fileshelter_SOURCES = \
 	$(srcdir)/ui/ShareCommon.hpp		\
 	$(srcdir)/ui/ShareCreate.cpp		\
 	$(srcdir)/ui/ShareCreate.hpp		\
+	$(srcdir)/ui/ShareCreatePassword.cpp	\
+	$(srcdir)/ui/ShareCreatePassword.hpp	\
 	$(srcdir)/ui/ShareCreated.cpp		\
 	$(srcdir)/ui/ShareCreated.hpp		\
 	$(srcdir)/ui/ShareDownload.cpp		\
 	$(srcdir)/ui/ShareDownload.hpp		\
 	$(srcdir)/ui/ShareEdit.cpp		\
 	$(srcdir)/ui/ShareEdit.hpp		\
-	$(srcdir)/ui/SharePasswordFormView.cpp	\
-	$(srcdir)/ui/SharePasswordFormView.hpp	\
+	$(srcdir)/ui/ShareDownloadPassword.cpp	\
+	$(srcdir)/ui/ShareDownloadPassword.hpp	\
 	$(srcdir)/ui/ShareResource.cpp		\
 	$(srcdir)/ui/ShareResource.hpp		\
 	$(srcdir)/utils/Config.cpp		\

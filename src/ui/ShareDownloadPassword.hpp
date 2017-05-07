@@ -25,7 +25,7 @@
 namespace UserInterface
 {
 
-class SharePasswordFormView : public Wt::WTemplateFormView
+class ShareDownloadPassword : public Wt::WTemplateFormView
 {
 	private:
 		Wt::Signal<void> _sigSuccess;
@@ -33,7 +33,7 @@ class SharePasswordFormView : public Wt::WTemplateFormView
 	public:
 		Wt::Signal<void>& success() { return _sigSuccess;}
 
-		SharePasswordFormView(Wt::WContainerWidget *parent = 0);
+		ShareDownloadPassword(Wt::WContainerWidget *parent = 0);
 
 };
 

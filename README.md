@@ -13,7 +13,7 @@ A [demo](http://fileshelter.suroot.com) instance is available, with the followin
 - Multiple file upload (a zip is created server side)
 - Period of validity (from one hour to years)
 - Optional download limit
-- Optional password protection
+- Optional password protection (download and upload)
 - Practically unique links, using [UUID](https://fr.wikipedia.org/wiki/Universal_Unique_Identifier)
 - Private link, used to remove the file or to check the download counter
 - Terms of service support
@@ -65,12 +65,10 @@ make install
 This last command requires root privileges.
 
 ## Configuration
-FileShelter uses a configuration file, installed in '/etc/fileshelter.conf'
+FileShelter uses a configuration file, installed in '/etc/fileshelter.conf'.
 It is recommended to edit this file and change the relevant settings (working directory, maximum file size, maximum validity duration, listen port, etc.)
 
-A basic "Terms of Services" is provided, located in '/usr/share/fileshelter/approot/tos.html'.
-The configuration file contains the definition of the fields needed by the default tos.
-
+A basic "Terms of Services" is provided. The configuration file contains the definition of the fields needed by the default tos.
 You may also specify an alternate tos file to fit your needs.
 
 It is highly recommended to run fileshelter as a non root user. Therefore make sure the user has write permissions on the working directory.

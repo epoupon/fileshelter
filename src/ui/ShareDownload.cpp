@@ -26,7 +26,7 @@
 
 #include "FileShelterApplication.hpp"
 #include "ShareResource.hpp"
-#include "SharePasswordFormView.hpp"
+#include "ShareDownloadPassword.hpp"
 #include "ShareCommon.hpp"
 
 #include "ShareDownload.hpp"
@@ -127,7 +127,7 @@ ShareDownload::displayPassword()
 {
 	clear();
 
-	auto view = new SharePasswordFormView(this);
+	auto view = new ShareDownloadPassword(this);
 	view->success().connect(std::bind([=]
 	{
 		displayDownload();
