@@ -259,7 +259,7 @@
 				${tr:msg-hits}
 			</label>
 			<div class="col-sm-5 well well-sm">
-				${hits} / ${max-hits}
+				${hits}
 			</div>
 		</div>
 		<div class="form-group">

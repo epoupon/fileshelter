@@ -76,8 +76,12 @@ ShareEdit::refresh(void)
 	t->bindString("file-name", Wt::WString::fromUTF8(share->getFileName()));
 	t->bindString("file-size", sizeToString(share->getFileSize()));
 	t->bindString("expiry-date-time", boost::posix_time::to_simple_string(share->getExpiryTime()) + " UTC");
-	t->bindString("hits", std::to_string(share->getHits()));
-	t->bindString("max-hits", std::to_string(share->getMaxHits()));
+
+	auto hits = std::to_string(share->getHits());
+	if (share->getMaxHits() > 0)
+		hits += " / " + std::to_string(share->getMaxHits());
+	t->bindString("hits", hits);
+
 	t->bindWidget("download-link", createShareDownloadAnchor(share));
 
 	auto *deleteBtn = new Wt::WPushButton(tr("msg-delete"));

@@ -90,6 +90,25 @@ class ShareParameters
 		Wt::WString	password;
 };
 
+static std::pair<std::size_t, std::size_t> computeHitsRange(void)
+{
+	std::size_t max, min;
+	auto maxValidityHits = Share::getMaxValidatityHits();
+
+	if (maxValidityHits > 0)
+	{
+		min = 1;
+		max = maxValidityHits;
+	}
+	else
+	{
+		min = 0;
+		max = std::numeric_limits<int>::max();
+	}
+
+	return std::make_pair(min, max);
+}
+
 class ShareCreateFormModel : public Wt::WFormModel
 {
 	public:
@@ -129,24 +148,15 @@ class ShareCreateFormModel : public Wt::WFormModel
 			updateDurationValidator();
 
 			// Hits validity
-			auto maxValidityHits = Share::getMaxValidatityHits();
-			auto defaultValidityHits = Share::getDefaultValidatityHits();
+			auto hitsRange = computeHitsRange();
 			auto hitsValidator = new Wt::WIntValidator();
 			hitsValidator->setMandatory(true);
-			if (maxValidityHits > 0)
-			{
-				hitsValidator->setBottom(1);
-				hitsValidator->setTop(maxValidityHits);
-			}
-			else
-			{
-				hitsValidator->setBottom(0);
-			}
+			hitsValidator->setRange(hitsRange.first, hitsRange.second);
 			setValidator(HitsValidityField, hitsValidator);
 
-			int suggestedValidityHits = defaultValidityHits;
-			if (maxValidityHits != 0 && maxValidityHits < defaultValidityHits)
-				suggestedValidityHits = maxValidityHits;
+			std::size_t suggestedValidityHits = Share::getDefaultValidatityHits();
+			if (suggestedValidityHits > hitsRange.second)
+				suggestedValidityHits = hitsRange.second;
 
 			setValue(HitsValidityField, suggestedValidityHits);
 		}
@@ -280,7 +290,9 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 		}));
 
 		// Hits validity
+		auto hitsRange = computeHitsRange();
 		auto hitsValidity = new Wt::WSpinBox();
+		hitsValidity->setRange(hitsRange.first, hitsRange.second);
 		setFormWidget(ShareCreateFormModel::HitsValidityField, hitsValidity);
 
 		// Password
