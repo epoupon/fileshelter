@@ -15,6 +15,7 @@ dist_fileshelter_approot_DATA = \
 		approot/templates.xml	\
 		approot/messages.xml	\
 		approot/messages_fr.xml \
+		approot/messages_ru.xml \
 		approot/tos.xml
 
 dist_sysconf_DATA = \
