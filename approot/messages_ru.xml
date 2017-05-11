@@ -1,4 +1,3 @@
-
 <?xml version="1.0" encoding="UTF-8" ?>
 <messages xmlns:if="Wt.WTemplate.conditions">
 <!--FORMS message blocks-->
@@ -56,9 +55,17 @@
 <message id="msg-share-create-failed">Ошибка создания ссылки!</message>
 <message id="msg-share-no-longer-available">Данный файл не существует!</message>
 
-<message id="msg-size-gb">{1} GB</message>
-<message id="msg-size-mb">{1} MB</message>
-<message id="msg-size-kb">{1} KB</message>
-<message id="msg-size-b">{1} B</message>
+<message id="Wt.WMessageBox.Yes">Да</message>
+<message id="Wt.WMessageBox.No">Нет</message>
+<message id="Wt.WValidator.Invalid">Это поле не может быть пустым</message>
+<message id="Wt.WDateValidator.DateTooEarly">Дата должна быть после {1}</message>
+<message id="Wt.WDateValidator.DateTooLate"> Дата должна быть до {1}</message>
+<message id="Wt.WDateValidator.WrongDateRange"> Дата должна быть между {1} и {2}</message>
+<message id="Wt.WDateValidator.WrongFormat">Формат '{1}'</message>
+
+<message id="Wt.WIntValidator.NotAnInteger">Должно быть целым числом</message>
+<message id="Wt.WIntValidator.TooSmall"> Число должно быть больше, чем {1}</message>
+<message id="Wt.WIntValidator.BadRange"> Число должно быть между {1} и {2}</message>
+<message id="Wt.WIntValidator.TooLarge"> Число должно быть меньше, чем {1}</message>
 
 </messages>
