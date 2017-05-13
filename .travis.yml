@@ -10,7 +10,7 @@ before_install:
 - sudo apt-get install build-essential autoconf automake cmake libboost-all-dev libconfig++-dev
 - wget https://nih.at/libzip/libzip-1.2.0.tar.gz
 - tar xvfp libzip-1.2.0.tar.gz
-- pushd libzip-1.2.0 && ./configure --prefix && make && sudo make install
+- pushd libzip-1.2.0 && ./configure --prefix=/usr && make && sudo make install
 - popd
 - git clone https://github.com/emweb/wt.git wt
 - pushd wt;
