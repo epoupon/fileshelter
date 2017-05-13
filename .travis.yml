@@ -9,8 +9,9 @@ os:
 before_install:
 - sudo apt-get install build-essential autoconf automake cmake libboost-all-dev libconfig++-dev libzip-dev
 - git clone https://github.com/emweb/wt.git wt
-- cd wt; git checkout 3.3.7; mkdir build; cd build
+- pushd wt; git checkout 3.3.7; mkdir build; cd build
 - cmake ../ -DWT_CPP_11_MODE=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr
 - sudo make install
+- popd
 script: autoreconf -vfi && ./configure && make
 
