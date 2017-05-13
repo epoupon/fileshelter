@@ -7,11 +7,17 @@ compiler:
 os:
 - linux
 before_install:
-- sudo apt-get install build-essential autoconf automake cmake libboost-all-dev libconfig++-dev libzip-dev
+- sudo apt-get install build-essential autoconf automake cmake libboost-all-dev libconfig++-dev
+- wget https://nih.at/libzip/libzip-1.2.0.tar.gz
+- tar xvfp libzip-1.2.0.tar.gz
+- pushd libzip-1.2.0 && ./configure --prefix && make && sudo make install
+- popd
 - git clone https://github.com/emweb/wt.git wt
-- pushd wt; git checkout 3.3.7; mkdir build; cd build
-- cmake ../ -DWT_CPP_11_MODE=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr
-- sudo make install
+- pushd wt;
+- git checkout 3.3.7
+- cmake -DWT_CPP_11_MODE=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr && sudo make install
 - popd
 script: autoreconf -vfi && ./configure && make
-
+env:
+  global:
+    - MAKEFLAGS="-j 2"
