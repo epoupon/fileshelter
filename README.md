@@ -1,4 +1,7 @@
 # FileShelter
+
+[![Build Status](https://travis-ci.org/epoupon/fileshelter.svg?branch=master)](https://travis-ci.org/epoupon/fileshelter)
+
 FileShelter is a self-hosted software that allows you to easily share files over the Internet.
 Just upload a file and get an URL back!
 
