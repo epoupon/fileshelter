@@ -1,0 +1,9 @@
+language: cpp
+sudo: required
+compiler:
+- clang
+- gcc
+os:
+- linux
+before_install:
+- sudo apt-get install build-essential autoconf automake libboost-dev libwtdbosqlite-dev libwthttp-dev libwtdbo-dev libwt-dev libconfig++-dev libzip-dev
