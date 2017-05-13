@@ -9,6 +9,8 @@ AC_LANG_CPLUSPLUS
 AC_PROG_CXX
 AC_PROG_LN_S
 
+PKG_CHECK_MODULES(libzip, libzip >= 1.0.1)
+
 AC_CHECK_HEADERS([Wt/WApplication],
                  [],
                  [AC_MSG_ERROR([Header not found or unusable !])])
@@ -58,11 +60,6 @@ AC_CHECK_LIB(	[config++],
 		[main],
 		,
 		[AC_MSG_ERROR([libconfig not found!])])
-
-AC_CHECK_LIB(	[zip],
-		[zip_source_buffer],
-		,
-		[AC_MSG_ERROR([libzip not found!])])
 
 AC_CONFIG_FILES([Makefile
 		 src/Makefile])
