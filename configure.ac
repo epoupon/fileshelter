@@ -11,7 +11,7 @@ AC_PROG_LN_S
 
 PKG_CHECK_MODULES(libzip, libzip >= 1.0.1)
 
-AC_CHECK_HEADERS([Wt/WApplication zip.h],
+AC_CHECK_HEADERS([Wt/WApplication],
                  [],
                  [AC_MSG_ERROR([Header not found or unusable !])])
 
