@@ -6,6 +6,11 @@ compiler:
 - gcc
 os:
 - linux
-script: autoreconf -vfi && ./configure && make
 before_install:
-- sudo apt-get install build-essential autoconf automake libboost-dev libwtdbosqlite-dev libwthttp-dev libwtdbo-dev libwt-dev libconfig++-dev libzip-dev
+- sudo apt-get install build-essential autoconf automake cmake libboost-dev libconfig++-dev libzip-dev
+- git clone https://github.com/emweb/wt.git wt
+- cd wt; git checkout 3.3.7; mkdir build; cd build
+- cmake ../ -DWT_CPP_11_MODE=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr
+- sudo make install
+script: autoreconf -vfi && ./configure && make
+
