@@ -9,7 +9,9 @@ AC_LANG_CPLUSPLUS
 AC_PROG_CXX
 AC_PROG_LN_S
 
-AC_CHECK_HEADERS([Wt/WApplication],
+PKG_CHECK_MODULES(libzip, libzip >= 1.0.1)
+
+AC_CHECK_HEADERS([Wt/WApplication zip.h],
                  [],
                  [AC_MSG_ERROR([Header not found or unusable !])])
 
