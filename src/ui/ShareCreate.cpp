@@ -143,8 +143,7 @@ class ShareCreateFormModel : public Wt::WFormModel
 			durationValidator->setBottom(1);
 			setValidator(DurationValidityField, durationValidator);
 
-			setValue(DurationValidityField, 1);
-			setValue(DurationUnitValidityField, Wt::WString::tr("msg-days"));
+			updateValidityDuration( Share::getDefaultValidatityDuration() );
 			updateDurationValidator();
 
 			// Hits validity
@@ -215,6 +214,44 @@ class ShareCreateFormModel : public Wt::WFormModel
 		Wt::WAbstractItemModel *durationValidityModel() { return _durationValidityModel; }
 
 	private:
+
+		void updateValidityDuration(boost::posix_time::time_duration duration)
+		{
+			auto maxValidityDuration = Share::getMaxValidatityDuration();
+			if (duration > maxValidityDuration)
+				duration = maxValidityDuration;
+
+			int value;
+			Wt::WString unit;
+			if (duration.hours() % 24)
+			{
+				value = duration.hours();
+				unit = Wt::WString::tr("msg-hours");
+			}
+			if ((duration.hours() / 24 % 365) == 0)
+			{
+				value = duration.hours() / 24 / 365;
+				unit = Wt::WString::tr("msg-years");
+			}
+			else if ((duration.hours() / 24 % 31) == 0)
+			{
+				value = duration.hours() / 24 / 31;
+				unit = Wt::WString::tr("msg-months");
+			}
+			else if ((duration.hours() / 24 % 7) == 0)
+			{
+				value = duration.hours() / 24 / 7;
+				unit = Wt::WString::tr("msg-weeks");
+			}
+			else
+			{
+				value = duration.hours() / 24;
+				unit = Wt::WString::tr("msg-days");
+			}
+
+			setValue(DurationValidityField, value);
+			setValue(DurationUnitValidityField, unit);
+		}
 
 		void initializeModels(void)
 		{
