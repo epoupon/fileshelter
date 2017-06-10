@@ -14,6 +14,7 @@ dist_fileshelter_css_DATA = \
 dist_fileshelter_approot_DATA = \
 		approot/templates.xml	\
 		approot/messages.xml	\
+		approot/messages_de.xml	\
 		approot/messages_fr.xml \
 		approot/messages_ru.xml \
 		approot/tos.xml

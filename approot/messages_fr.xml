@@ -52,7 +52,6 @@
 <message id="msg-download-link">Lien de téléchargement public</message>
 <message id="msg-edit-link">Lien d'édition privé</message>
 
-
 <message id="msg-share-create-too-large">Fichiers trop volumineux !</message>
 <message id="msg-share-create-failed">Impossible de créer le partage !</message>
 <message id="msg-share-no-longer-available">Ce partage n'est plus disponible !</message>
@@ -64,7 +63,6 @@
 <message id="Wt.WDateValidator.DateTooLate">La date doit être avant {1}</message>
 <message id="Wt.WDateValidator.WrongDateRange">La date doit être comprise entre {1} et {2}</message>
 <message id="Wt.WDateValidator.WrongFormat">Le format doit être '{1}'</message>
-
 <message id="Wt.WIntValidator.NotAnInteger">Doit être un nombre entier</message>
 <message id="Wt.WIntValidator.TooSmall">Le nombre doit être plus grand que {1}</message>
 <message id="Wt.WIntValidator.BadRange">Le nombre doit être compris entre {1} et {2}</message>

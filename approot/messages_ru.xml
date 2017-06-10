@@ -62,7 +62,6 @@
 <message id="Wt.WDateValidator.DateTooLate"> Дата должна быть до {1}</message>
 <message id="Wt.WDateValidator.WrongDateRange"> Дата должна быть между {1} и {2}</message>
 <message id="Wt.WDateValidator.WrongFormat">Формат '{1}'</message>
-
 <message id="Wt.WIntValidator.NotAnInteger">Должно быть целым числом</message>
 <message id="Wt.WIntValidator.TooSmall"> Число должно быть больше, чем {1}</message>
 <message id="Wt.WIntValidator.BadRange"> Число должно быть между {1} и {2}</message>
