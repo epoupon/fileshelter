@@ -29,7 +29,6 @@
 <message id="msg-hits">Downloads</message>
 <message id="msg-share-delete">Share löschen</message>
 <message id="msg-confirm-action">Sind Sie sicher ?</message>
-<message id="msg-passwords-dont-match">Passwörter stimmen nicht überein</message>
 <message id="msg-bad-password">Falsches Passwort</message>
 <message id="msg-internal-error">Interner Fehler !</message>
 <message id="msg-share-protected-by-password">Dieses Share ist durch ein Passwort geschützt</message>
@@ -47,7 +46,6 @@
 
 <message id="msg-max-hits">Max Downloads</message>
 <message id="msg-password">Passwort</message>
-<message id="msg-password-confirm">Passwort2</message>
 
 <message id="msg-download-link">Öffentlicher Download-Link</message>
 <message id="msg-edit-link">Privater editierbarer Link</message>

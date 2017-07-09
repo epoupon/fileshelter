@@ -120,7 +120,6 @@ class ShareCreateFormModel : public Wt::WFormModel
 		static const Field DurationUnitValidityField;
 		static const Field HitsValidityField;
 		static const Field PasswordField;
-		static const Field PasswordConfirmField;
 
 		ShareCreateFormModel(Wt::WObject *parent = 0)
 			: Wt::WFormModel(parent)
@@ -130,7 +129,6 @@ class ShareCreateFormModel : public Wt::WFormModel
 			addField(DurationUnitValidityField);
 			addField(HitsValidityField);
 			addField(PasswordField, Wt::WString::tr("msg-optional"));
-			addField(PasswordConfirmField);
 
 			initializeModels();
 
@@ -189,12 +187,7 @@ class ShareCreateFormModel : public Wt::WFormModel
 		{
 			Wt::WString error; // empty means validated
 
-			if (field == PasswordConfirmField)
-			{
-				if (valueText(PasswordField) != valueText(PasswordConfirmField))
-					error = Wt::WString::tr("msg-passwords-dont-match");
-			}
-			else if (field == DurationUnitValidityField)
+			if (field == DurationUnitValidityField)
 			{
 				// Since they are grouped together,
 				// make it share the same state as DurationValidityField
@@ -280,7 +273,6 @@ const Wt::WFormModel::Field ShareCreateFormModel::DurationValidityField = "durat
 const Wt::WFormModel::Field ShareCreateFormModel::DurationUnitValidityField = "duration-unit-validity";
 const Wt::WFormModel::Field ShareCreateFormModel::HitsValidityField = "hits-validity";
 const Wt::WFormModel::Field ShareCreateFormModel::PasswordField = "password";
-const Wt::WFormModel::Field ShareCreateFormModel::PasswordConfirmField = "password-confirm";
 
 class ShareCreateFormView : public Wt::WTemplateFormView
 {
@@ -336,11 +328,6 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 		auto password = new Wt::WLineEdit();
 		password->setEchoMode(Wt::WLineEdit::Password);
 		setFormWidget(ShareCreateFormModel::PasswordField, password);
-
-		// Password confirm
-		auto passwordConfirm = new Wt::WLineEdit();
-		passwordConfirm->setEchoMode(Wt::WLineEdit::Password);
-		setFormWidget(ShareCreateFormModel::PasswordConfirmField, passwordConfirm);
 
 		// Buttons
 		Wt::WPushButton *uploadBtn = new Wt::WPushButton(tr("msg-upload"));
