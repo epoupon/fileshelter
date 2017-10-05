@@ -30,7 +30,6 @@ namespace Database {
 
 Share::Share(void)
 : _hits(0),
-_maxHits(0),
 _downloadUUID(generateUUID()),
 _editUUID(generateUUID())
 {
@@ -97,9 +96,6 @@ Share::getAll(Wt::Dbo::Session& session)
 bool
 Share::hasExpired(void) const
 {
-	if (_maxHits > 0 && _hits >= _maxHits)
-		return true;
-
 	auto now = boost::posix_time::second_clock::universal_time();
 	if (now >= _expiryTime)
 		return true;
@@ -172,25 +168,6 @@ Share::getDefaultValidatityDuration(void)
 		defaultDuration = maxDuration;
 
 	return defaultDuration;
-}
-
-
-std::size_t
-Share::getMaxValidatityHits(void)
-{
-	return Config::instance().getULong("max-validity-hits", 100);
-}
-
-std::size_t
-Share::getDefaultValidatityHits(void)
-{
-	auto defaultHits = Config::instance().getULong("default-validity-hits", 30);
-	auto maxHits = getMaxValidatityHits();
-
-	if (maxHits != 0 && maxHits < defaultHits)
-		defaultHits = maxHits;
-
-	return defaultHits;
 }
 
 } // namespace Database

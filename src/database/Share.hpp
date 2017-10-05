@@ -38,8 +38,6 @@ class Share
 		static std::size_t getMaxFileSize();
 		static boost::posix_time::time_duration getMaxValidatityDuration();
 		static boost::posix_time::time_duration getDefaultValidatityDuration();
-		static std::size_t getMaxValidatityHits();
-		static std::size_t getDefaultValidatityHits();
 
 		// Helpers
 		// Create a new share, will move the underlying file in the working directory
@@ -64,7 +62,6 @@ class Share
 		boost::posix_time::ptime	getCreationTime(void) const { return _creationTime; }
 		boost::posix_time::ptime	getExpiryTime(void) const { return _expiryTime; }
 		bool				hasExpired(void) const;
-		std::size_t			getMaxHits(void) const { return _maxHits; }
 		std::size_t			getHits(void) const { return _hits; }
 		std::string			getDownloadUUID(void) const { return _downloadUUID; }
 		std::string			getEditUUID(void) const { return _editUUID; }
@@ -77,7 +74,6 @@ class Share
 		void setDesc(std::string desc) { _desc = desc; }
 		void setCreationTime(boost::posix_time::ptime time) { _creationTime = time; }
 		void setValidityDuration(boost::posix_time::ptime time);
-		void setMaxHits(std::size_t maxHits)	{ _maxHits = maxHits; }
 		void incHits()				{ _hits++; }
 		void setExpiryTime(boost::posix_time::ptime expiryTime) { _expiryTime = expiryTime; }
 		void setClientAddr(std::string addr) { _clientAddress = addr; }
@@ -96,7 +92,6 @@ class Share
 				Wt::Dbo::field(a, _desc,		"desc");
 				Wt::Dbo::field(a, _creationTime,	"creation_time");
 				Wt::Dbo::field(a, _expiryTime,		"expiry_time");
-				Wt::Dbo::field(a, _maxHits,		"max_hits");
 				Wt::Dbo::field(a, _hits,		"hits");
 				Wt::Dbo::field(a, _downloadUUID,	"download_UUID");
 				Wt::Dbo::field(a, _editUUID,		"edit_UUID");
@@ -117,7 +112,6 @@ class Share
 		boost::posix_time::ptime		_expiryTime;
 
 		int					_hits;
-		int					_maxHits;	//optional
 
 		std::string		_downloadUUID;
 		std::string		_editUUID;

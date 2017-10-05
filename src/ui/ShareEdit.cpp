@@ -77,10 +77,7 @@ ShareEdit::refresh(void)
 	t->bindString("file-size", sizeToString(share->getFileSize()));
 	t->bindString("expiry-date-time", boost::posix_time::to_simple_string(share->getExpiryTime()) + " UTC");
 
-	auto hits = std::to_string(share->getHits());
-	if (share->getMaxHits() > 0)
-		hits += " / " + std::to_string(share->getMaxHits());
-	t->bindString("hits", hits);
+	t->bindString("hits", std::to_string(share->getHits()));
 
 	t->bindWidget("download-link", createShareDownloadAnchor(share));
 

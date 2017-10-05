@@ -43,7 +43,6 @@
 <message id="msg-years">Лет</message>
 <message id="msg-expires">Истекает</message>
 
-<message id="msg-max-hits">Количество загрузок</message>
 <message id="msg-password">Пароль</message>
 
 <message id="msg-download-link">Публичная ссылка для загрузки</message>

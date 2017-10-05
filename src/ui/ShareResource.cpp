@@ -63,7 +63,7 @@ ShareResource::handleRequest(const Wt::Http::Request& request,
 			return;
 		}
 
-		FS_LOG(UI, INFO) << "[" << _downloadUUID << "] Hits = " << share->getHits() << " / " << share->getMaxHits();
+		FS_LOG(UI, INFO) << "[" << _downloadUUID << "] Hits = " << share->getHits();
 
 		if (share->hasExpired())
 		{
