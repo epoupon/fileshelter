@@ -44,6 +44,7 @@
 <message id="msg-years">Jahr(e)</message>
 <message id="msg-expires">Läuft ab</message>
 
+<message id="msg-max-hits">Max Downloads</message>
 <message id="msg-password">Passwort</message>
 
 <message id="msg-download-link">Öffentlicher Download-Link</message>

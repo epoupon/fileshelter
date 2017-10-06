@@ -86,8 +86,28 @@ class ShareParameters
 	public:
 		Wt::WString	description;
 		Duration	maxDuration;
+		std::size_t	maxHits;
 		Wt::WString	password;
 };
+
+static std::pair<std::size_t, std::size_t> computeHitsRange(void)
+{
+	std::size_t max, min;
+	auto maxValidityHits = Share::getMaxValidatityHits();
+
+	if (maxValidityHits > 0)
+	{
+		min = 1;
+		max = maxValidityHits;
+	}
+	else
+	{
+		min = 0;
+		max = std::numeric_limits<int>::max();
+	}
+
+	return std::make_pair(min, max);
+}
 
 class ShareCreateFormModel : public Wt::WFormModel
 {
@@ -123,6 +143,19 @@ class ShareCreateFormModel : public Wt::WFormModel
 
 			updateValidityDuration( Share::getDefaultValidatityDuration() );
 			updateDurationValidator();
+
+			// Hits validity
+			auto hitsRange = computeHitsRange();
+			auto hitsValidator = new Wt::WIntValidator();
+			hitsValidator->setMandatory(true);
+			hitsValidator->setRange(hitsRange.first, hitsRange.second);
+			setValidator(HitsValidityField, hitsValidator);
+
+			std::size_t suggestedValidityHits = Share::getDefaultValidatityHits();
+			if (suggestedValidityHits > hitsRange.second)
+				suggestedValidityHits = hitsRange.second;
+
+			setValue(HitsValidityField, suggestedValidityHits);
 		}
 
 		void updateDurationValidator(void)
@@ -285,6 +318,12 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 			updateView(model);
 		}));
 
+		// Hits validity
+		auto hitsRange = computeHitsRange();
+		auto hitsValidity = new Wt::WSpinBox();
+		hitsValidity->setRange(hitsRange.first, hitsRange.second);
+		setFormWidget(ShareCreateFormModel::HitsValidityField, hitsValidity);
+
 		// Password
 		auto password = new Wt::WLineEdit();
 		password->setEchoMode(Wt::WLineEdit::Password);
@@ -318,6 +357,7 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 				else if (unit == Wt::WString::tr("msg-years"))
 					params.maxDuration.unit = Duration::Unit::Years;
 
+				params.maxHits = Wt::asNumber(model->value(ShareCreateFormModel::HitsValidityField));
 				params.password = model->valueText(ShareCreateFormModel::PasswordField);
 
 				_sigValidated.emit(params);
@@ -484,6 +524,7 @@ ShareCreate::displayCreate()
 
 		share.modify()->setDesc(_parameters->description.toUTF8());
 		share.modify()->setFileName(fileName.toUTF8());
+		share.modify()->setMaxHits(_parameters->maxHits);
 		share.modify()->setCreationTime(boost::posix_time::second_clock::universal_time());
 		share.modify()->setClientAddr(wApp->environment().clientAddress());
 
@@ -498,7 +539,7 @@ ShareCreate::displayCreate()
 
 		transaction.commit();
 
-		FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Share created. Client = " << share->getClientAddr() << ", size = " << share->getFileSize() << ", name = '" << share->getFileName() << "', desc = '" << share->getDesc() << "', expiry " << share->getExpiryTime() << ", password protected = " << share->hasPassword();
+		FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Share created. Client = " << share->getClientAddr() << ", size = " << share->getFileSize() << ", name = '" << share->getFileName() << "', desc = '" << share->getDesc() << "', expiry " << share->getExpiryTime() << ", download limit = " << share->getMaxHits() << ", password protected = " << share->hasPassword();
 
 		wApp->setInternalPath("/share-created/" + share->getEditUUID(), true);
 
