@@ -7,7 +7,7 @@ Just upload a file and get an URL back!
 
 The aim is to provide a very simple web application, with few package dependencies, so that anyone can install it on his own server.
 
-A [demo](http://fileshelter.suroot.com) instance is available, with the following limitations:
+A [demo](http://fileshelter.dtdns.net) instance is available, with the following limitations:
 - Maximum duration is set to 3 days
 - Maximum download limit is set to 10
 - Maximum file size is set to 1 MB
