@@ -45,6 +45,7 @@
 <message id="msg-years">Years</message>
 <message id="msg-expires">Expires</message>
 
+<message id="msg-max-hits-limit">Limit downloads</message>
 <message id="msg-max-hits">Max downloads</message>
 <message id="msg-password">Password</message>
 

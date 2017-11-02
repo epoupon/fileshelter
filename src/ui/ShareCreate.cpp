@@ -25,6 +25,7 @@
 #include <Wt/WFileUpload>
 #include <Wt/WProgressBar>
 #include <Wt/WSpinBox>
+#include <Wt/WCheckBox>
 #include <Wt/WComboBox>
 #include <Wt/WIntValidator>
 #include <Wt/WStringListModel>
@@ -92,21 +93,15 @@ class ShareParameters
 
 static std::pair<std::size_t, std::size_t> computeHitsRange(void)
 {
-	std::size_t max, min;
+	std::size_t max;
 	auto maxValidityHits = Share::getMaxValidatityHits();
 
 	if (maxValidityHits > 0)
-	{
-		min = 1;
 		max = maxValidityHits;
-	}
 	else
-	{
-		min = 0;
 		max = std::numeric_limits<int>::max();
-	}
 
-	return std::make_pair(min, max);
+	return std::make_pair(1, max);
 }
 
 class ShareCreateFormModel : public Wt::WFormModel
@@ -118,6 +113,7 @@ class ShareCreateFormModel : public Wt::WFormModel
 		static const Field FileField;
 		static const Field DurationValidityField;
 		static const Field DurationUnitValidityField;
+		static const Field HitsValidityLimitField;
 		static const Field HitsValidityField;
 		static const Field PasswordField;
 
@@ -127,6 +123,7 @@ class ShareCreateFormModel : public Wt::WFormModel
 			addField(DescriptionField, Wt::WString::tr("msg-optional"));
 			addField(DurationValidityField);
 			addField(DurationUnitValidityField);
+			addField(HitsValidityLimitField);
 			addField(HitsValidityField);
 			addField(PasswordField, Wt::WString::tr("msg-optional"));
 
@@ -145,6 +142,8 @@ class ShareCreateFormModel : public Wt::WFormModel
 			updateDurationValidator();
 
 			// Hits validity
+			setValue(HitsValidityLimitField, Share::getDefaultValidatityHits() != 0);
+
 			auto hitsRange = computeHitsRange();
 			auto hitsValidator = new Wt::WIntValidator();
 			hitsValidator->setMandatory(true);
@@ -154,6 +153,8 @@ class ShareCreateFormModel : public Wt::WFormModel
 			std::size_t suggestedValidityHits = Share::getDefaultValidatityHits();
 			if (suggestedValidityHits > hitsRange.second)
 				suggestedValidityHits = hitsRange.second;
+			else if (suggestedValidityHits < hitsRange.first)
+				suggestedValidityHits = hitsRange.first;
 
 			setValue(HitsValidityField, suggestedValidityHits);
 		}
@@ -271,6 +272,7 @@ const Wt::WFormModel::Field ShareCreateFormModel::DescriptionField = "desc";
 const Wt::WFormModel::Field ShareCreateFormModel::FileField = "file";
 const Wt::WFormModel::Field ShareCreateFormModel::DurationValidityField = "duration-validity";
 const Wt::WFormModel::Field ShareCreateFormModel::DurationUnitValidityField = "duration-unit-validity";
+const Wt::WFormModel::Field ShareCreateFormModel::HitsValidityLimitField = "hits-validity-limit";
 const Wt::WFormModel::Field ShareCreateFormModel::HitsValidityField = "hits-validity";
 const Wt::WFormModel::Field ShareCreateFormModel::PasswordField = "password";
 
@@ -293,36 +295,62 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 		Wt::WLineEdit *desc = new Wt::WLineEdit();
 		setFormWidget(ShareCreateFormModel::DescriptionField, desc);
 
-		// Duration validity
-		auto durationValidity = new Wt::WSpinBox();
-		setFormWidget(ShareCreateFormModel::DurationValidityField, durationValidity);
-
-		// Duration validity unit
-		auto durationUnitValidity = new Wt::WComboBox();
-		setFormWidget(ShareCreateFormModel::DurationUnitValidityField, durationUnitValidity);
-		durationUnitValidity->setModel(model->durationValidityModel());
-
-		// each time the unit is changed, make sure to update the limits
-		durationUnitValidity->changed().connect(std::bind([=]
+		if (Share::userCanSetValidatityDuration())
 		{
-			updateModel(model);
-			model->updateDurationValidator();
+			setCondition("if-validity-duration", true);
+			// Duration validity
+			auto durationValidity = new Wt::WSpinBox();
+			setFormWidget(ShareCreateFormModel::DurationValidityField, durationValidity);
 
-			// Revalidate the fields if necessary
-			if (model->isValidated(ShareCreateFormModel::DurationValidityField))
+			// Duration validity unit
+			auto durationUnitValidity = new Wt::WComboBox();
+			setFormWidget(ShareCreateFormModel::DurationUnitValidityField, durationUnitValidity);
+			durationUnitValidity->setModel(model->durationValidityModel());
+
+			// each time the unit is changed, make sure to update the limits
+			durationUnitValidity->changed().connect(std::bind([=]
 			{
-				model->validateField(ShareCreateFormModel::DurationValidityField);
-				model->validateField(ShareCreateFormModel::DurationUnitValidityField);
-			}
+				updateModel(model);
+				model->updateDurationValidator();
 
-			updateView(model);
-		}));
+				// Revalidate the fields if necessary
+				if (model->isValidated(ShareCreateFormModel::DurationValidityField))
+				{
+					model->validateField(ShareCreateFormModel::DurationValidityField);
+					model->validateField(ShareCreateFormModel::DurationUnitValidityField);
+				}
+
+				updateView(model);
+			}));
+		}
 
 		// Hits validity
-		auto hitsRange = computeHitsRange();
-		auto hitsValidity = new Wt::WSpinBox();
-		hitsValidity->setRange(hitsRange.first, hitsRange.second);
-		setFormWidget(ShareCreateFormModel::HitsValidityField, hitsValidity);
+
+		if (Share::userCanSetValidatityHits())
+		{
+			setCondition("if-validity-hits", true);
+
+			auto hitsRange = computeHitsRange();
+			auto hitsValidity = new Wt::WSpinBox();
+			hitsValidity->setRange(hitsRange.first, hitsRange.second);
+			setFormWidget(ShareCreateFormModel::HitsValidityField, hitsValidity);
+
+			// If the maximum number of download is unlimited, add a checkbox to enable a limit
+			if (Share::getMaxValidatityHits() == 0)
+			{
+				setCondition("if-validity-hits-limit", true);
+				auto hitsValidityLimit = new Wt::WCheckBox();
+				setFormWidget(ShareCreateFormModel::HitsValidityLimitField, hitsValidityLimit);
+
+				hitsValidityLimit->changed().connect(std::bind([=] ()
+					{
+						model->setReadOnly(ShareCreateFormModel::HitsValidityField,
+								!(hitsValidityLimit->checkState() == Wt::Checked));
+						updateModel(model);
+						updateViewField(model, ShareCreateFormModel::HitsValidityField);
+					}));
+			}
+		}
 
 		// Password
 		auto password = new Wt::WLineEdit();
@@ -357,7 +385,11 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 				else if (unit == Wt::WString::tr("msg-years"))
 					params.maxDuration.unit = Duration::Unit::Years;
 
-				params.maxHits = Wt::asNumber(model->value(ShareCreateFormModel::HitsValidityField));
+				if (Wt::asNumber(model->value(ShareCreateFormModel::HitsValidityLimitField)))
+					params.maxHits = Wt::asNumber(model->value(ShareCreateFormModel::HitsValidityField));
+				else
+					params.maxHits = 0;
+
 				params.password = model->valueText(ShareCreateFormModel::PasswordField);
 
 				_sigValidated.emit(params);
