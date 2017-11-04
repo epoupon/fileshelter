@@ -174,6 +174,12 @@ Share::getDefaultValidatityDuration(void)
 	return defaultDuration;
 }
 
+bool
+Share::userCanSetValidatityDuration(void)
+{
+	return Config::instance().getBool("user-defined-validy-days", true);
+}
+
 
 std::size_t
 Share::getMaxValidatityHits(void)
@@ -191,6 +197,12 @@ Share::getDefaultValidatityHits(void)
 		defaultHits = maxHits;
 
 	return defaultHits;
+}
+
+bool
+Share::userCanSetValidatityHits(void)
+{
+	return Config::instance().getBool("user-defined-validy-hits", true);
 }
 
 } // namespace Database

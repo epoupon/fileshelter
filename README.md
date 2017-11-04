@@ -18,6 +18,7 @@ A [docker image](https://github.com/paulgalow/fileshelter-docker) is available, 
 - Multiple file upload (a zip is created server side)
 - Period of validity (from one hour to years)
 - Optional download limit
+- Customizable interface to allow or to prevent users to set the download limit or the duration validity
 - Optional password protection (download and upload)
 - Practically unique links, using [UUID](https://fr.wikipedia.org/wiki/Universal_Unique_Identifier)
 - Private link, used to remove the file or to check the download counter
