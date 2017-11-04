@@ -28,7 +28,6 @@
 <message id="msg-hits">Загрузок</message>
 <message id="msg-share-delete">Удалить файл</message>
 <message id="msg-confirm-action">Вы уверены?</message>
-<message id="msg-passwords-dont-match">Пароль не совпадает</message>
 <message id="msg-bad-password">Неверный пароль</message>
 <message id="msg-internal-error">Внутренняя ошибка!</message>
 <message id="msg-share-protected-by-password">Этот файл защищен паролем !</message>
@@ -46,7 +45,6 @@
 
 <message id="msg-max-hits">Количество загрузок</message>
 <message id="msg-password">Пароль</message>
-<message id="msg-password-confirm">Подтвердить пароль</message>
 
 <message id="msg-download-link">Публичная ссылка для загрузки</message>
 <message id="msg-edit-link">Управление ссылкой</message>
@@ -62,7 +60,6 @@
 <message id="Wt.WDateValidator.DateTooLate"> Дата должна быть до {1}</message>
 <message id="Wt.WDateValidator.WrongDateRange"> Дата должна быть между {1} и {2}</message>
 <message id="Wt.WDateValidator.WrongFormat">Формат '{1}'</message>
-
 <message id="Wt.WIntValidator.NotAnInteger">Должно быть целым числом</message>
 <message id="Wt.WIntValidator.TooSmall"> Число должно быть больше, чем {1}</message>
 <message id="Wt.WIntValidator.BadRange"> Число должно быть между {1} и {2}</message>

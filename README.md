@@ -12,14 +12,18 @@ A [demo](http://fileshelter.suroot.com) instance is available, with the followin
 - Maximum download limit is set to 10
 - Maximum file size is set to 1 MB
 
+A [docker image](https://github.com/paulgalow/fileshelter-docker) is available, thanks to Paul Galow.
+
 ## Features
 - Multiple file upload (a zip is created server side)
 - Period of validity (from one hour to years)
 - Optional download limit
+- Customizable interface to allow or to prevent users to set the download limit or the duration validity
 - Optional password protection (download and upload)
 - Practically unique links, using [UUID](https://fr.wikipedia.org/wiki/Universal_Unique_Identifier)
 - Private link, used to remove the file or to check the download counter
 - Terms of service support
+- Multiple language support (english, french, german, russian)
 
 Once the expiry date or the download limit is reached, the download is no longer available and the file is deleted.
 

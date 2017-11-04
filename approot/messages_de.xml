@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<messages xmlns:if="Wt.WTemplate.conditions">
+<!--FORMS message blocks-->
+
+<message id="msg-home-desc">
+	<p>${tr:msg-app-name} erlaubt ihnen einen einfachen Datei-Austausch über das Internet.</p>
+	<p>Laden Sie einfach eine Datei hoch und erhalten Sie einen Download-Link !</p>
+</message>
+
+<message id="msg-tos">Nutzungsbedingungen</message>
+
+<message id="msg-home">Startseite</message>
+
+<message id="msg-share-create">Share anlegen</message>
+<message id="msg-share-edit">Bearbeiten</message>
+<message id="msg-share-download">Download</message>
+<message id="msg-share-not-found">Share nicht gefunden !</message>
+<message id="msg-share-deleted">Share erfolgreich entfernt !</message>
+<message id="msg-share-create-success">Share erfolgreich angelegt !</message>
+<message id="msg-upload">Hochladen</message>
+<message id="msg-download">Herunterladen</message>
+<message id="msg-delete">Löschen</message>
+<message id="msg-unlock">Entsperren</message>
+<message id="msg-description">Beschreibung</message>
+<message id="msg-file-name">Datei-Name</message>
+<message id="msg-file-size">Datei-Grösse</message>
+<message id="msg-file">Datei</message>
+<message id="msg-optional">Optional</message>
+<message id="msg-hits">Downloads</message>
+<message id="msg-share-delete">Share löschen</message>
+<message id="msg-confirm-action">Sind Sie sicher ?</message>
+<message id="msg-bad-password">Falsches Passwort</message>
+<message id="msg-internal-error">Interner Fehler !</message>
+<message id="msg-share-protected-by-password">Dieses Share ist durch ein Passwort geschützt</message>
+<message id="msg-share-create-protected-by-password">Ein Passwort ist erforderlich, um ein Share anzulegen</message>
+<message id="msg-no-file-selected">Es wurde keine Datei ausgewählt !</message>
+<message id="msg-max-file-size">Die Grösse der Datei darf folgenden Wert nicht überschreiten: {1}</message>
+
+<message id="msg-validity-period">Gültigkeit</message>
+<message id="msg-hours">Stunde(n)</message>
+<message id="msg-days">Tag(e)</message>
+<message id="msg-weeks">Woche(n)</message>
+<message id="msg-months">Monat(e)</message>
+<message id="msg-years">Jahr(e)</message>
+<message id="msg-expires">Läuft ab</message>
+
+<message id="msg-max-hits">Max Downloads</message>
+<message id="msg-password">Passwort</message>
+
+<message id="msg-download-link">Öffentlicher Download-Link</message>
+<message id="msg-edit-link">Privater editierbarer Link</message>
+
+<message id="msg-share-create-too-large">Dateien zu groß !</message>
+<message id="msg-share-create-failed">Fehler beim Anlegen des Shares !</message>
+<message id="msg-share-no-longer-available">Dieses Share ist nicht länger gültig !</message>
+
+<message id="Wt.WMessageBox.Yes">Ja</message>
+<message id="Wt.WMessageBox.No">Nein</message>
+<message id="Wt.WValidator.Invalid">Dieses Feld darf nicht leer sein</message>
+<message id="Wt.WDateValidator.DateTooEarly">Das Datum muss hinter dem {1} liegen</message>
+<message id="Wt.WDateValidator.DateTooLate">Das Datum muss vor dem {1} liegen</message>
+<message id="Wt.WDateValidator.WrongDateRange">Das Datum muss zwischen {1} und {2} liegen</message>
+<message id="Wt.WDateValidator.WrongFormat">Das Format muss '{1}' entsprechen</message>
+<message id="Wt.WIntValidator.NotAnInteger">Muss eine ganze Zahl sein</message>
+<message id="Wt.WIntValidator.TooSmall">Die Zahl muss größer sein als {1}</message>
+<message id="Wt.WIntValidator.BadRange">Die Zahl muss zwischen {1} und {2} liegen</message>
+<message id="Wt.WIntValidator.TooLarge">Die Zahl muss kleiner sein als {1}</message>
+
+</messages>

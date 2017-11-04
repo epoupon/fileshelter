@@ -149,25 +149,60 @@ Share::getMaxFileSize(void)
 boost::posix_time::time_duration
 Share::getMaxValidatityDuration(void)
 {
-	static const auto durationDay =  boost::posix_time::hours(24);
-	auto maxDuration = boost::posix_time::hours(Config::instance().getULong("max-validity-days", 30) * 24);
+	const auto durationDay =  boost::posix_time::hours(24);
+	auto maxDuration = durationDay * Config::instance().getULong("max-validity-days", 100);
 
-	if (maxDuration < durationDay)
+	if (durationDay > maxDuration)
 		maxDuration = durationDay;
 
 	return maxDuration;
 }
 
+boost::posix_time::time_duration
+Share::getDefaultValidatityDuration(void)
+{
+	const auto durationDay =  boost::posix_time::hours(24);
+	auto defaultDuration = durationDay * Config::instance().getULong("default-validity-days", 7);
+	auto maxDuration = getMaxValidatityDuration();
+
+	if (defaultDuration < durationDay)
+		defaultDuration = durationDay;
+
+	if (defaultDuration > maxDuration)
+		defaultDuration = maxDuration;
+
+	return defaultDuration;
+}
+
+bool
+Share::userCanSetValidatityDuration(void)
+{
+	return Config::instance().getBool("user-defined-validy-days", true);
+}
+
+
 std::size_t
 Share::getMaxValidatityHits(void)
 {
-	return Config::instance().getULong("max-validity-hits", 50);
+	return Config::instance().getULong("max-validity-hits", 100);
 }
 
 std::size_t
 Share::getDefaultValidatityHits(void)
 {
-	return Config::instance().getULong("default-validity-hits", 30);
+	auto defaultHits = Config::instance().getULong("default-validity-hits", 30);
+	auto maxHits = getMaxValidatityHits();
+
+	if (maxHits != 0 && maxHits < defaultHits)
+		defaultHits = maxHits;
+
+	return defaultHits;
+}
+
+bool
+Share::userCanSetValidatityHits(void)
+{
+	return Config::instance().getBool("user-defined-validy-hits", true);
 }
 
 } // namespace Database

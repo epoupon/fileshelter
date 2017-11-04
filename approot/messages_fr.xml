@@ -29,13 +29,13 @@
 <message id="msg-hits">Téléchargements</message>
 <message id="msg-share-delete">Supprimer le partage</message>
 <message id="msg-confirm-action">Etes vous sûr ?</message>
-<message id="msg-passwords-dont-match">Les mots de passe ne correspondent pas</message>
 <message id="msg-bad-password">Mot de passe invalide</message>
 <message id="msg-internal-error">Erreur interne !</message>
 <message id="msg-share-protected-by-password">Ce partage est protégé par un mot de passe</message>
 <message id="msg-share-create-protected-by-password">La création d'un partage est protégée par un mot de passe</message>
 <message id="msg-no-file-selected">Aucun fichier selectionné !</message>
 <message id="msg-max-file-size">La taille totale des fichiers ne doit pas dépasser {1}</message>
+<message id="msg-advanced-options">Options avancés</message>
 
 <message id="msg-validity-period">Durée de validité</message>
 <message id="msg-hours">Heures</message>
@@ -45,13 +45,12 @@
 <message id="msg-years">Années</message>
 <message id="msg-expires">Expire le</message>
 
+<message id="msg-max-hits-limit">Limiter les téléchargements</message>
 <message id="msg-max-hits">Limite de téléchargements</message>
 <message id="msg-password">Mot de passe</message>
-<message id="msg-password-confirm">Confirmation du mot de passe</message>
 
 <message id="msg-download-link">Lien de téléchargement public</message>
 <message id="msg-edit-link">Lien d'édition privé</message>
-
 
 <message id="msg-share-create-too-large">Fichiers trop volumineux !</message>
 <message id="msg-share-create-failed">Impossible de créer le partage !</message>
@@ -64,7 +63,6 @@
 <message id="Wt.WDateValidator.DateTooLate">La date doit être avant {1}</message>
 <message id="Wt.WDateValidator.WrongDateRange">La date doit être comprise entre {1} et {2}</message>
 <message id="Wt.WDateValidator.WrongFormat">Le format doit être '{1}'</message>
-
 <message id="Wt.WIntValidator.NotAnInteger">Doit être un nombre entier</message>
 <message id="Wt.WIntValidator.TooSmall">Le nombre doit être plus grand que {1}</message>
 <message id="Wt.WIntValidator.BadRange">Le nombre doit être compris entre {1} et {2}</message>
