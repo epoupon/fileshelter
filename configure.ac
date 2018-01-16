@@ -11,6 +11,8 @@ AC_PROG_LN_S
 
 PKG_CHECK_MODULES(libzip, libzip >= 0.11)
 
+AC_ARG_VAR([WT_RESOURCES_DIR],[Specify Wt's resources directory (default are '/usr/share/Wt/resources' and '/usr/local/share/Wt/resources')'])
+
 AC_CHECK_HEADERS([Wt/WApplication],
                  [],
                  [AC_MSG_ERROR([Header not found or unusable !])])
@@ -54,7 +56,6 @@ AC_CHECK_LIB([wthttp],
 	     [main],
 	     ,
 	     [AC_MSG_ERROR([libwthttp not found!])])
-
 
 AC_CHECK_LIB(	[config++],
 		[main],

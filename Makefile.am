@@ -24,15 +24,18 @@ dist_sysconf_DATA = \
 
 install-data-hook:
 	cd $(DESTDIR)$(fileshelter_docrootdir); \
-	for wt_dir in "/usr/local/share/Wt/resources" "/usr/share/Wt/resources"; do \
-		if [ -d $$wt_dir ]; then \
-			if ! [ -e  ./resources ] ; then \
-				$(LN_S) /usr/share/Wt/resources resources; \
-			fi; \
-			break; \
-		fi \
-	done
+	rm -f resources; \
+	if ! [ -z "$(WT_RESOURCES_DIR)" ]; then \
+		$(LN_S) "$(WT_RESOURCES_DIR)" resources; \
+	else \
+		for wt_dir in "/usr/local/share/Wt/resources" "/usr/share/Wt/resources"; do \
+			if [ -d $$wt_dir ]; then \
+				$(LN_S) $$wt_dir resources; \
+				break; \
+			fi \
+		done \
+	fi
 
 uninstall-local:
-	rm -f -r $(fileshelter_docrootdir)/resources
+	rm -f $(DESTDIR)$(fileshelter_docrootdir)/resources
 

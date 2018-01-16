@@ -62,6 +62,11 @@ cd build
 ```
 configure will complain if a mandatory library is missing.
 
+FileShelter tries to create a link to the Wt's resources directory. By default, "/usr/local/share/Wt/resources" and "/usr/share/Wt/resources" are searched, but you can provide a custom location by using the WT_RESOURCES_DIR variable:
+```sh
+../configure --prefix=/usr --sysconfdir=/etc WT_RESOURCES_DIR=/path/to/Wt/resources
+```
+
 ```sh
 make
 ```
@@ -70,6 +75,8 @@ make
 make install
 ```
 This last command requires root privileges.
+
+
 
 ## Configuration
 FileShelter uses a configuration file, installed in '/etc/fileshelter.conf'.
