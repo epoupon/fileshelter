@@ -35,7 +35,7 @@
 <message id="msg-share-create-protected-by-password">La création d'un partage est protégée par un mot de passe</message>
 <message id="msg-no-file-selected">Aucun fichier selectionné !</message>
 <message id="msg-max-file-size">La taille totale des fichiers ne doit pas dépasser {1}</message>
-<message id="msg-advanced-options">Options avancés</message>
+<message id="msg-advanced-options">Options avancées</message>
 
 <message id="msg-validity-period">Durée de validité</message>
 <message id="msg-hours">Heures</message>
