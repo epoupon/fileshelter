@@ -1,3 +1,9 @@
+summary {
+	margin-bottom: 15px;
+	font-weight: bold;
+}
+
 .fs-nav {
 	line-height: 32px;
 }
+

@@ -45,8 +45,8 @@
 			</div>
 		</div>
 		<details>
-			<summary style="margin-bottom:15px">
-				<label class="control-label">${tr:msg-advanced-options}</label>
+			<summary>
+				${tr:msg-advanced-options}
 			</summary>
 
 			${<if-validity-duration>}
