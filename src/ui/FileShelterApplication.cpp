@@ -206,7 +206,6 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 	auto container = new Wt::WContainerWidget();
 	main->bindWidget("contents", container);
 
-	main->bindWidget("github-link", new Wt::WAnchor("https://github.com/epoupon/fileshelter", "<i class=\"fa fa-github\"> Github</i>"));
 	main->bindWidget("tos", new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/tos"), Wt::WString::tr("msg-tos")));
 
 	// Same order as Idx enum

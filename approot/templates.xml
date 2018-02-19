@@ -8,7 +8,7 @@
 		<div class="jumbotron">
 			${contents}
 		</div>
-		<p class="text-right">${tos} | ${github-link}</p>
+		<p class="text-right">${tos} | <a href="https://github.com/epoupon/fileshelter" rel="noreferrer"><i class="fa fa-github"> Github</i></a></p>
 	</div>
 </message>
 
