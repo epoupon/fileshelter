@@ -19,12 +19,12 @@
 
 #pragma once
 
-#include <Wt/WAnchor>
-#include <Wt/WText>
+#include <Wt/WAnchor.h>
+#include <Wt/WString.h>
 
 #include "database/Share.hpp"
 
-Wt::WAnchor* createShareDownloadAnchor(Database::Share::pointer share);
-Wt::WAnchor* createShareEditAnchor(Database::Share::pointer share);
+std::unique_ptr<Wt::WAnchor> createShareDownloadAnchor(Database::Share::pointer share);
+std::unique_ptr<Wt::WAnchor> createShareEditAnchor(Database::Share::pointer share);
 Wt::WString sizeToString(std::size_t size);
 

@@ -17,15 +17,15 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Wt/WTemplate>
-#include <Wt/WEnvironment>
+#include "ShareCreated.hpp"
+
+//#include <Wt/WEnvironment>
+#include <Wt/WTemplate.h>
 
 #include "utils/Logger.hpp"
 #include "database/Share.hpp"
 
 #include "FileShelterApplication.hpp"
-
-#include "ShareCreated.hpp"
 #include "ShareCommon.hpp"
 
 
@@ -51,18 +51,18 @@ ShareCreated::refresh(void)
 
 	std::string editUUID = wApp->internalPathNextPart("/share-created/");
 
-	Wt::Dbo::Transaction transaction(DboSession());
+	Wt::Dbo::Transaction transaction(FsApp->getDboSession());
 
-	Database::Share::pointer share = Database::Share::getByEditUUID(DboSession(), editUUID);
+	Database::Share::pointer share = Database::Share::getByEditUUID(FsApp->getDboSession(), editUUID);
 	if (!share)
 	{
 		FS_LOG(UI, ERROR) << "Edit UUID '" << editUUID << "' not found";
-		Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-not-found"), this);
+		Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-not-found"));
 		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 		return;
 	}
 
-	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-created"), this);
+	Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-created"));
 	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
 	t->bindWidget("download-link", createShareDownloadAnchor(share));

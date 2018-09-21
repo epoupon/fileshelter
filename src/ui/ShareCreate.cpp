@@ -17,20 +17,23 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Wt/WEnvironment>
-#include <Wt/WFormModel>
-#include <Wt/WTemplateFormView>
-#include <Wt/WPushButton>
-#include <Wt/WLineEdit>
-#include <Wt/WFileUpload>
-#include <Wt/WProgressBar>
-#include <Wt/WSpinBox>
-#include <Wt/WCheckBox>
-#include <Wt/WComboBox>
-#include <Wt/WIntValidator>
-#include <Wt/WStringListModel>
-#include <Wt/WAbstractItemModel>
-#include <Wt/WDateTime>
+#include "ShareCreate.hpp"
+
+#include <Wt/WAbstractItemModel.h>
+#include <Wt/WCheckBox.h>
+#include <Wt/WComboBox.h>
+#include <Wt/WDateTime.h>
+#include <Wt/WEnvironment.h>
+#include <Wt/WFileUpload.h>
+#include <Wt/WFormModel.h>
+#include <Wt/WIntValidator.h>
+#include <Wt/WLocalDateTime.h>
+#include <Wt/WLineEdit.h>
+#include <Wt/WProgressBar.h>
+#include <Wt/WPushButton.h>
+#include <Wt/WSpinBox.h>
+#include <Wt/WStringListModel.h>
+#include <Wt/WTemplateFormView.h>
 
 #include "utils/Config.hpp"
 #include "utils/Logger.hpp"
@@ -39,11 +42,9 @@
 
 #include "database/Share.hpp"
 
-#include "ShareCreatePassword.hpp"
-
 #include "FileShelterApplication.hpp"
+#include "ShareCreatePassword.hpp"
 #include "ShareCommon.hpp"
-#include "ShareCreate.hpp"
 
 namespace UserInterface {
 
@@ -66,6 +67,7 @@ struct Duration
 
 Wt::WDateTime operator+(const Wt::WDateTime& dateTime, const Duration& duration)
 {
+
 	switch (duration.unit)
 	{
 		case Duration::Unit::Hours:
@@ -117,8 +119,7 @@ class ShareCreateFormModel : public Wt::WFormModel
 		static const Field HitsValidityField;
 		static const Field PasswordField;
 
-		ShareCreateFormModel(Wt::WObject *parent = 0)
-			: Wt::WFormModel(parent)
+		ShareCreateFormModel()
 		{
 			addField(DescriptionField, Wt::WString::tr("msg-optional"));
 			addField(DurationValidityField);
@@ -130,13 +131,13 @@ class ShareCreateFormModel : public Wt::WFormModel
 			initializeModels();
 
 			// Duration Validity Unit
-			setValidator(DurationUnitValidityField, new Wt::WValidator(true));  // mandatory
+			setValidator(DurationUnitValidityField, std::make_unique<Wt::WValidator>(true));  // mandatory
 
 			// Duration Validity
-			auto durationValidator = new Wt::WIntValidator();
+			auto durationValidator = std::make_unique<Wt::WIntValidator>();
 			durationValidator->setMandatory(true);
 			durationValidator->setBottom(1);
-			setValidator(DurationValidityField, durationValidator);
+			setValidator(DurationValidityField, std::move(durationValidator));
 
 			updateValidityDuration( Share::getDefaultValidatityDuration() );
 			updateDurationValidator();
@@ -145,10 +146,10 @@ class ShareCreateFormModel : public Wt::WFormModel
 			setValue(HitsValidityLimitField, Share::getDefaultValidatityHits() != 0);
 
 			auto hitsRange = computeHitsRange();
-			auto hitsValidator = new Wt::WIntValidator();
+			auto hitsValidator = std::make_unique<Wt::WIntValidator>();
 			hitsValidator->setMandatory(true);
 			hitsValidator->setRange(hitsRange.first, hitsRange.second);
-			setValidator(HitsValidityField, hitsValidator);
+			setValidator(HitsValidityField, std::move(hitsValidator));
 
 			std::size_t suggestedValidityHits = Share::getDefaultValidatityHits();
 			if (suggestedValidityHits > hitsRange.second)
@@ -162,20 +163,22 @@ class ShareCreateFormModel : public Wt::WFormModel
 		void updateDurationValidator(void)
 		{
 			auto maxValidityDuration = Share::getMaxValidatityDuration();
-			auto durationValidator = dynamic_cast<Wt::WIntValidator*>(validator(DurationValidityField));
+			auto durationValidator = std::dynamic_pointer_cast<Wt::WIntValidator>(validator(DurationValidityField));
+
+			auto maxValidityDurationHours = std::chrono::duration_cast<std::chrono::hours>(maxValidityDuration).count();
 
 			int maxValue = 1;
 			auto unit = valueText(DurationUnitValidityField);
 			if (unit == Wt::WString::tr("msg-hours"))
-				maxValue = maxValidityDuration.hours();
+				maxValue = maxValidityDurationHours;
 			else if (unit == Wt::WString::tr("msg-days"))
-				maxValue = maxValidityDuration.hours() / 24;
+				maxValue = maxValidityDurationHours / 24;
 			else if (unit == Wt::WString::tr("msg-weeks"))
-				maxValue = maxValidityDuration.hours() / 24 / 7;
+				maxValue = maxValidityDurationHours / 24 / 7;
 			else if (unit == Wt::WString::tr("msg-months"))
-				maxValue = maxValidityDuration.hours() / 24 / 31;
+				maxValue = maxValidityDurationHours / 24 / 31;
 			else if (unit == Wt::WString::tr("msg-years"))
-				maxValue = maxValidityDuration.hours() / 24 / 365;
+				maxValue = maxValidityDurationHours / 24 / 365;
 
 			durationValidator->setTop(maxValue);
 
@@ -194,52 +197,54 @@ class ShareCreateFormModel : public Wt::WFormModel
 				// make it share the same state as DurationValidityField
 				validateField(DurationValidityField);
 				setValidation(field, validation(DurationValidityField));
-				return validation(field).state() == Wt::WValidator::Valid;
+				return validation(field).state() == Wt::ValidationState::Valid;
 			}
 			else
 			{
 				return Wt::WFormModel::validateField(field);
 			}
 
-			setValidation(field, Wt::WValidator::Result( error.empty() ? Wt::WValidator::Valid : Wt::WValidator::Invalid, error));
-			return validation(field).state() == Wt::WValidator::Valid;
+			setValidation(field, Wt::WValidator::Result( error.empty() ? Wt::ValidationState::Valid : Wt::ValidationState::Invalid, error));
+			return validation(field).state() == Wt::ValidationState::Valid;
 		}
 
-		Wt::WAbstractItemModel *durationValidityModel() { return _durationValidityModel; }
+		std::shared_ptr<Wt::WAbstractItemModel> durationValidityModel() { return _durationValidityModel; }
 
 	private:
 
-		void updateValidityDuration(boost::posix_time::time_duration duration)
+		void updateValidityDuration(std::chrono::seconds duration)
 		{
 			auto maxValidityDuration = Share::getMaxValidatityDuration();
 			if (duration > maxValidityDuration)
 				duration = maxValidityDuration;
 
+			auto durationHours = std::chrono::duration_cast<std::chrono::hours>(duration).count();
+
 			int value;
 			Wt::WString unit;
-			if (duration.hours() % 24)
+			if (durationHours % 24)
 			{
-				value = duration.hours();
+				value = durationHours;
 				unit = Wt::WString::tr("msg-hours");
 			}
-			if ((duration.hours() / 24 % 365) == 0)
+			if ((durationHours / 24 % 365) == 0)
 			{
-				value = duration.hours() / 24 / 365;
+				value = durationHours / 24 / 365;
 				unit = Wt::WString::tr("msg-years");
 			}
-			else if ((duration.hours() / 24 % 31) == 0)
+			else if ((durationHours / 24 % 31) == 0)
 			{
-				value = duration.hours() / 24 / 31;
+				value = durationHours / 24 / 31;
 				unit = Wt::WString::tr("msg-months");
 			}
-			else if ((duration.hours() / 24 % 7) == 0)
+			else if ((durationHours / 24 % 7) == 0)
 			{
-				value = duration.hours() / 24 / 7;
+				value = durationHours / 24 / 7;
 				unit = Wt::WString::tr("msg-weeks");
 			}
 			else
 			{
-				value = duration.hours() / 24;
+				value = durationHours / 24;
 				unit = Wt::WString::tr("msg-days");
 			}
 
@@ -249,23 +254,23 @@ class ShareCreateFormModel : public Wt::WFormModel
 
 		void initializeModels(void)
 		{
-			auto maxDuration = Share::getMaxValidatityDuration();
+			auto maxDuration = std::chrono::duration_cast<std::chrono::hours>(Share::getMaxValidatityDuration());
 
-			_durationValidityModel = new Wt::WStringListModel(this);
+			_durationValidityModel = std::make_shared<Wt::WStringListModel>();
 
 			_durationValidityModel->addString( Wt::WString::tr("msg-hours") );
 			_durationValidityModel->addString( Wt::WString::tr("msg-days") );
 
-			if (maxDuration >= boost::posix_time::hours(7*24))
+			if (maxDuration >= std::chrono::hours(7*24))
 				_durationValidityModel->addString( Wt::WString::tr("msg-weeks") );
-			if (maxDuration >= boost::posix_time::hours(31*24))
+			if (maxDuration >= std::chrono::hours(31*24))
 				_durationValidityModel->addString( Wt::WString::tr("msg-months") );
-			if (maxDuration >= boost::posix_time::hours(365*24))
+			if (maxDuration >= std::chrono::hours(365*24))
 				_durationValidityModel->addString( Wt::WString::tr("msg-years") );
 
 		}
 
-		Wt::WStringListModel*	_durationValidityModel;
+		std::shared_ptr<Wt::WStringListModel>	_durationValidityModel;
 };
 
 const Wt::WFormModel::Field ShareCreateFormModel::DescriptionField = "desc";
@@ -282,35 +287,31 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 
 	Wt::Signal<ShareParameters>& validated() { return _sigValidated;}
 
-	ShareCreateFormView(Wt::WContainerWidget *parent = 0)
-	: Wt::WTemplateFormView(parent)
+	ShareCreateFormView()
 	{
-		auto model = new ShareCreateFormModel(this);
+		auto model = std::make_shared<ShareCreateFormModel>();
 
 		setTemplateText(tr("template-form-share-create"));
 		addFunction("id", &WTemplate::Functions::id);
 		addFunction("block", &WTemplate::Functions::id);
 
 		// Desc
-		Wt::WLineEdit *desc = new Wt::WLineEdit();
-		setFormWidget(ShareCreateFormModel::DescriptionField, desc);
+		setFormWidget(ShareCreateFormModel::DescriptionField, std::make_unique<Wt::WLineEdit>());
 
 		if (Share::userCanSetValidatityDuration())
 		{
 			setCondition("if-validity-duration", true);
 			// Duration validity
-			auto durationValidity = new Wt::WSpinBox();
-			setFormWidget(ShareCreateFormModel::DurationValidityField, durationValidity);
+			setFormWidget(ShareCreateFormModel::DurationValidityField, std::make_unique<Wt::WSpinBox>());
 
 			// Duration validity unit
-			auto durationUnitValidity = new Wt::WComboBox();
-			setFormWidget(ShareCreateFormModel::DurationUnitValidityField, durationUnitValidity);
+			auto durationUnitValidity = std::make_unique<Wt::WComboBox>();
 			durationUnitValidity->setModel(model->durationValidityModel());
 
 			// each time the unit is changed, make sure to update the limits
-			durationUnitValidity->changed().connect(std::bind([=]
+			durationUnitValidity->changed().connect([=]
 			{
-				updateModel(model);
+				updateModel(model.get());
 				model->updateDurationValidator();
 
 				// Revalidate the fields if necessary
@@ -320,8 +321,10 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 					model->validateField(ShareCreateFormModel::DurationUnitValidityField);
 				}
 
-				updateView(model);
-			}));
+				updateView(model.get());
+			});
+
+			setFormWidget(ShareCreateFormModel::DurationUnitValidityField, std::move(durationUnitValidity));
 		}
 
 		// Hits validity
@@ -331,39 +334,38 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 			setCondition("if-validity-hits", true);
 
 			auto hitsRange = computeHitsRange();
-			auto hitsValidity = new Wt::WSpinBox();
+			auto hitsValidity = std::make_unique<Wt::WSpinBox>();
 			hitsValidity->setRange(hitsRange.first, hitsRange.second);
-			setFormWidget(ShareCreateFormModel::HitsValidityField, hitsValidity);
+			setFormWidget(ShareCreateFormModel::HitsValidityField, std::move(hitsValidity));
 
 			// If the maximum number of download is unlimited, add a checkbox to enable a limit
 			if (Share::getMaxValidatityHits() == 0)
 			{
 				setCondition("if-validity-hits-limit", true);
-				auto hitsValidityLimit = new Wt::WCheckBox();
-				setFormWidget(ShareCreateFormModel::HitsValidityLimitField, hitsValidityLimit);
+				auto hitsValidityLimit = std::make_unique<Wt::WCheckBox>();
+				auto hitsValidityLimitRaw = hitsValidityLimit.get();
+				setFormWidget(ShareCreateFormModel::HitsValidityLimitField, std::move(hitsValidityLimit));
 
-				hitsValidityLimit->changed().connect(std::bind([=] ()
+				hitsValidityLimit->changed().connect([=] ()
 					{
 						model->setReadOnly(ShareCreateFormModel::HitsValidityField,
-								!(hitsValidityLimit->checkState() == Wt::Checked));
-						updateModel(model);
-						updateViewField(model, ShareCreateFormModel::HitsValidityField);
-					}));
+								!(hitsValidityLimitRaw->checkState() == Wt::CheckState::Checked));
+						updateModel(model.get());
+						updateViewField(model.get(), ShareCreateFormModel::HitsValidityField);
+					});
 			}
 		}
 
 		// Password
-		auto password = new Wt::WLineEdit();
-		password->setEchoMode(Wt::WLineEdit::Password);
-		setFormWidget(ShareCreateFormModel::PasswordField, password);
+		auto password = std::make_unique<Wt::WLineEdit>();
+		password->setEchoMode(Wt::EchoMode::Password);
+		setFormWidget(ShareCreateFormModel::PasswordField, std::move(password));
 
 		// Buttons
-		Wt::WPushButton *uploadBtn = new Wt::WPushButton(tr("msg-upload"));
-		uploadBtn->setStyleClass("btn-primary");
-		bindWidget("create-btn", uploadBtn);
-		uploadBtn->clicked().connect(std::bind([=]
+		Wt::WPushButton *uploadBtn = bindNew<Wt::WPushButton>("create-btn", tr("msg-upload"));
+		uploadBtn->clicked().connect([=]
 		{
-			updateModel(model);
+			updateModel(model.get());
 
 			if (model->validate())
 			{
@@ -395,11 +397,10 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 				_sigValidated.emit(params);
 			}
 
-			updateView(model);
-		}));
+			updateView(model.get());
+		});
 
-		updateView(model);
-
+		updateView(model.get());
 	}
 
 	private:
@@ -407,14 +408,13 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 
 };
 
-ShareCreate::ShareCreate(Wt::WContainerWidget* parent)
-: Wt::WContainerWidget(parent),
- _parameters(std::make_shared<ShareParameters>())
+ShareCreate::ShareCreate()
+: _parameters(std::make_shared<ShareParameters>())
 {
-	wApp->internalPathChanged().connect(std::bind([=]
+	wApp->internalPathChanged().connect([=]
 	{
 		refresh();
-	}));
+	});
 
 	refresh();
 }
@@ -424,7 +424,7 @@ ShareCreate::displayError(Wt::WString error)
 {
 	clear();
 
-	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-not-created"), this);
+	Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-not-created"));
 
 	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 	t->bindString("error", error);
@@ -449,11 +449,11 @@ ShareCreate::displayPassword()
 {
 	clear();
 
-	auto view = new ShareCreatePassword(this);
-	view->success().connect(std::bind([=]
+	auto view = addNew<ShareCreatePassword>();
+	view->success().connect([=]
 	{
 		displayCreate();
-	}));
+	});
 }
 
 void
@@ -461,27 +461,25 @@ ShareCreate::displayCreate()
 {
 	clear();
 
-	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-create"), this);
+	Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-create"));
 	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
-	t->bindWidget("msg-max-size", new Wt::WText(Wt::WString::tr("msg-max-file-size").arg( sizeToString(Share::getMaxFileSize() * 1024*1024) )));
+	t->bindNew<Wt::WText>("msg-max-size", Wt::WString::tr("msg-max-file-size").arg( sizeToString(Share::getMaxFileSize() * 1024*1024) ));
 
-	Wt::WFileUpload *upload = new Wt::WFileUpload();
+	Wt::WFileUpload *upload = t->bindNew<Wt::WFileUpload>("file");
 	upload->setFileTextSize(80);
-	upload->setProgressBar(new Wt::WProgressBar());
+	upload->setProgressBar(std::make_unique<Wt::WProgressBar>());
 	upload->setMultiple(true);
-	t->bindWidget("file", upload);
 
-	ShareCreateFormView* form = new ShareCreateFormView();
-	t->bindWidget("form", form);
+	ShareCreateFormView* form = t->bindNew<ShareCreateFormView>("form");
 
-	upload->fileTooLarge().connect(std::bind([=] ()
+	upload->fileTooLarge().connect([=] ()
 	{
 		FS_LOG(UI, WARNING) << "File too large!";
 		displayError(Wt::WString::tr("msg-share-create-too-large"));
-	}));
+	});
 
-	form->validated().connect(std::bind([=] (ShareParameters params)
+	form->validated().connect([=] (ShareParameters params)
 	{
 		FS_LOG(UI, DEBUG) << "Starting upload...";
 
@@ -489,9 +487,9 @@ ShareCreate::displayCreate()
 		form->hide();
 		upload->upload();
 		*_parameters = params;
-	}, std::placeholders::_1));
+	});
 
-	upload->uploaded().connect(std::bind([=] ()
+	upload->uploaded().connect([=] ()
 	{
 		auto uploadedFiles = upload->uploadedFiles();
 
@@ -537,7 +535,7 @@ ShareCreate::displayCreate()
 						boost::filesystem::path(uploadedFile.spoolFileName()));
 				}
 			}
-			catch(std::exception& e)
+			catch (std::exception& e)
 			{
 				FS_LOG(UI, ERROR) << "Cannot create zip file: " << e.what();
 				displayError(Wt::WString::tr("msg-internal-error"));
@@ -545,39 +543,38 @@ ShareCreate::displayCreate()
 			}
 		}
 
-		Wt::Dbo::Transaction transaction(DboSession());
+		Wt::Dbo::Transaction transaction(FsApp->getDboSession());
 
-		Database::Share::pointer share = Database::Share::create(DboSession(), sharePath);
+		Database::Share::pointer share = Database::Share::create(FsApp->getDboSession(), sharePath);
 		if (!share)
 		{
 			displayError(Wt::WString::tr("msg-internal-error"));
 			return;
 		}
 
+		auto now = Wt::WLocalDateTime::currentDateTime().toUTC();
+
 		share.modify()->setDesc(_parameters->description.toUTF8());
 		share.modify()->setFileName(fileName.toUTF8());
 		share.modify()->setMaxHits(_parameters->maxHits);
-		share.modify()->setCreationTime(boost::posix_time::second_clock::universal_time());
+		share.modify()->setCreationTime(now);
 		share.modify()->setClientAddr(wApp->environment().clientAddress());
 
 		// calculate the expiry date from the duration
-		auto now = boost::posix_time::second_clock::universal_time();
-		Wt::WDateTime expiryDateTime(now);
-
-		share.modify()->setExpiryTime((expiryDateTime + _parameters->maxDuration).toPosixTime());
+		share.modify()->setExpiryTime(now + _parameters->maxDuration);
 
 		if (!_parameters->password.empty())
 			share.modify()->setPassword(_parameters->password);
 
 		transaction.commit();
 
-		FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Share created. Client = " << share->getClientAddr() << ", size = " << share->getFileSize() << ", name = '" << share->getFileName() << "', desc = '" << share->getDesc() << "', expiry " << share->getExpiryTime() << ", download limit = " << share->getMaxHits() << ", password protected = " << share->hasPassword();
+		FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Share created. Client = " << share->getClientAddr() << ", size = " << share->getFileSize() << ", name = '" << share->getFileName() << "', desc = '" << share->getDesc() << "', expiry " << share->getExpiryTime().toString() << ", download limit = " << share->getMaxHits() << ", password protected = " << share->hasPassword();
 
 		wApp->setInternalPath("/share-created/" + share->getEditUUID(), true);
 
 		// Clear the widget in order to flush the temporary uploaded files
 		clear();
-	}));
+	});
 
 }
 

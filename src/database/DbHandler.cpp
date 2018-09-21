@@ -17,12 +17,12 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Wt/Dbo/FixedSqlConnectionPool>
-#include <Wt/Dbo/backend/Sqlite3>
+#include "DbHandler.hpp"
+
+#include <Wt/Dbo/FixedSqlConnectionPool.h>
+#include <Wt/Dbo/backend/Sqlite3.h>
 
 #include "utils/Logger.hpp"
-
-#include "DbHandler.hpp"
 
 #include "Share.hpp"
 
@@ -56,15 +56,14 @@ Handler::Handler(Wt::Dbo::SqlConnectionPool& connectionPool)
 	}
 }
 
-Wt::Dbo::SqlConnectionPool*
+std::unique_ptr<Wt::Dbo::SqlConnectionPool>
 Handler::createConnectionPool(boost::filesystem::path p)
 {
-	FS_LOG(DB, INFO) << "Creating connection pool on file " << p;
+	FS_LOG(DB, INFO) << "Creating connection pool on file " << p.string();
 
-	Wt::Dbo::backend::Sqlite3 *connection = new Wt::Dbo::backend::Sqlite3(p.string());
+	auto connection = std::make_unique<Wt::Dbo::backend::Sqlite3>(p.string());
 
-	//  connection->setProperty("show-queries", "true");
-	return new Wt::Dbo::FixedSqlConnectionPool(connection, 1);
+	return std::make_unique<Wt::Dbo::FixedSqlConnectionPool>(std::move(connection), 1);
 }
 
 } // namespace Database

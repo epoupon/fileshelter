@@ -17,20 +17,21 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Wt/Auth/PasswordVerifier>
-#include <Wt/Auth/HashFunction>
+#include "Share.hpp"
+
+#include <Wt/WLocalDateTime.h>
+
+#include <Wt/Auth/PasswordVerifier.h>
+#include <Wt/Auth/HashFunction.h>
 
 #include "utils/Config.hpp"
 #include "utils/Logger.hpp"
 #include "utils/UUID.hpp"
 
-#include "Share.hpp"
-
 namespace Database {
 
 Share::Share(void)
-: _hits(0),
-_maxHits(0),
+:
 _downloadUUID(generateUUID()),
 _editUUID(generateUUID())
 {
@@ -39,14 +40,14 @@ _editUUID(generateUUID())
 Share::pointer
 Share::create(Wt::Dbo::Session& session, boost::filesystem::path path)
 {
-	auto share = session.add(new Share());
+	auto share = session.add(std::make_unique<Share>());
 	auto storePath = share->getPath();
 
 	boost::system::error_code ec;
 	boost::filesystem::rename(path, storePath, ec);
 	if (ec)
 	{
-		FS_LOG(DB, ERROR) << "Move file failed from " << path << " to " << storePath << ": " << ec.message();
+		FS_LOG(DB, ERROR) << "Move file failed from " << path.string() << " to " << storePath.string() << ": " << ec.message();
 		share.remove();
 		return Share::pointer();
 	}
@@ -62,7 +63,7 @@ Share::destroy()
 	boost::system::error_code ec;
 	boost::filesystem::remove(getPath(), ec);
 	if (ec)
-		FS_LOG(DB, ERROR) << "Cannot remove file " << getPath() << ": " << ec.message();
+		FS_LOG(DB, ERROR) << "Cannot remove file " << getPath().string() << ": " << ec.message();
 }
 
 Share::pointer
@@ -100,7 +101,7 @@ Share::hasExpired(void) const
 	if (_maxHits > 0 && _hits >= _maxHits)
 		return true;
 
-	auto now = boost::posix_time::second_clock::universal_time();
+	auto now = Wt::WLocalDateTime::currentDateTime().toUTC();
 	if (now >= _expiryTime)
 		return true;
 
@@ -111,9 +112,10 @@ Share::hasExpired(void) const
 void
 Share::setPassword(Wt::WString password)
 {
-	auto hashFunc = new Wt::Auth::BCryptHashFunction(Config::instance().getULong("bcrypt-count", 12));
+	auto hashFunc = std::make_unique<Wt::Auth::BCryptHashFunction>(Config::instance().getULong("bcrypt-count", 12));
+
 	Wt::Auth::PasswordVerifier verifier;
-	verifier.addHashFunction(hashFunc);
+	verifier.addHashFunction(std::move(hashFunc));
 
 	auto hash = verifier.hashPassword(password);
 
@@ -125,9 +127,9 @@ Share::setPassword(Wt::WString password)
 bool
 Share::verifyPassword(Wt::WString password) const
 {
-	auto hashFunc = new Wt::Auth::BCryptHashFunction();
+	auto hashFunc = std::make_unique<Wt::Auth::BCryptHashFunction>(Config::instance().getULong("bcrypt-count", 12));
 	Wt::Auth::PasswordVerifier verifier;
-	verifier.addHashFunction(hashFunc);
+	verifier.addHashFunction(std::move(hashFunc));
 
 	Wt::Auth::PasswordHash hash(_hashFunc, _salt, _password);
 
@@ -146,10 +148,10 @@ Share::getMaxFileSize(void)
 	return Config::instance().getULong("max-file-size", 100);
 }
 
-boost::posix_time::time_duration
+std::chrono::seconds
 Share::getMaxValidatityDuration(void)
 {
-	const auto durationDay =  boost::posix_time::hours(24);
+	const auto durationDay =  std::chrono::hours(24);
 	auto maxDuration = durationDay * Config::instance().getULong("max-validity-days", 100);
 
 	if (durationDay > maxDuration)
@@ -158,11 +160,11 @@ Share::getMaxValidatityDuration(void)
 	return maxDuration;
 }
 
-boost::posix_time::time_duration
+std::chrono::seconds
 Share::getDefaultValidatityDuration(void)
 {
-	const auto durationDay =  boost::posix_time::hours(24);
-	auto defaultDuration = durationDay * Config::instance().getULong("default-validity-days", 7);
+	const auto durationDay =  std::chrono::duration_cast<std::chrono::seconds>(std::chrono::hours(24));
+	auto defaultDuration = std::chrono::duration_cast<std::chrono::seconds>(durationDay * Config::instance().getULong("default-validity-days", 7));
 	auto maxDuration = getMaxValidatityDuration();
 
 	if (defaultDuration < durationDay)

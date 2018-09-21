@@ -28,28 +28,13 @@ A [docker image](https://github.com/paulgalow/fileshelter-docker) is available, 
 Once the expiry date or the download limit is reached, the download is no longer available and the file is deleted.
 
 ## Installation
-### From packages
-Check the [release](https://github.com/epoupon/fileshelter/releases) page to get the latest package for your distribution.
-
 ### From Source
 #### Debian/Ubuntu dependencies
 ```sh
-apt-get install build-essential autoconf automake libboost-dev libwtdbosqlite-dev libwthttp-dev libwtdbo-dev libwt-dev libconfig++-dev libzip-dev
+apt-get install build-essential autoconf automake libboost-dev libconfig++-dev libzip-dev
 ```
-#### CentOS 7 dependencies
-You need to install [wt](https://www.webtoolkit.eu/wt/doc/reference/html/InstallationUnix.html) from source:
-```sh
-yum groupinstall 'Development Tools'
-yum install boost-devel
-git clone https://github.com/emweb/wt.git wt
-cd wt; mkdir build
-cmake ../ -DWT_CPP_11_MODE=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr
-make install
-```
-Once this is done, you can install fileshelter's extra dependencies:
-```sh
-yum install libconfig-devel
-```
+
+You also need wt4, that is not packaged yet on Debian. See [installation instructions](https://www.webtoolkit.eu/wt/doc/reference/html/InstallationUnix.html).
 
 #### Build
 ```sh
@@ -62,11 +47,6 @@ cd build
 ```
 configure will complain if a mandatory library is missing.
 
-FileShelter tries to create a link to the Wt's resources directory. By default, "/usr/local/share/Wt/resources" and "/usr/share/Wt/resources" are searched, but you can provide a custom location by using the WT_RESOURCES_DIR variable:
-```sh
-../configure --prefix=/usr --sysconfdir=/etc WT_RESOURCES_DIR=/path/to/Wt/resources
-```
-
 ```sh
 make
 ```
@@ -75,7 +55,6 @@ make
 make install
 ```
 This last command requires root privileges.
-
 
 
 ## Configuration

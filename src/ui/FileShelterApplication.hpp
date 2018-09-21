@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <Wt/WApplication>
+#include <Wt/WApplication.h>
 
 #include "database/DbHandler.hpp"
 
@@ -28,21 +28,21 @@ namespace UserInterface {
 class FileShelterApplication : public Wt::WApplication
 {
 	public:
-		static Wt::WApplication *create(const Wt::WEnvironment& env, Wt::Dbo::SqlConnectionPool& connectionPool);
+		static std::unique_ptr<Wt::WApplication> create(const Wt::WEnvironment& env, Wt::Dbo::SqlConnectionPool& connectionPool);
 		static FileShelterApplication* instance();
 
 		FileShelterApplication(const Wt::WEnvironment& env, Wt::Dbo::SqlConnectionPool& connectionPool);
 
 		// Session application data
 		Database::Handler& getDbHandler() { return _db;}
+		Wt::Dbo::Session& getDboSession() {return _db.getSession(); }
 
 	private:
 
 		Database::Handler	_db;
 };
 
-Database::Handler& DbHandler();
-Wt::Dbo::Session& DboSession();
+#define FsApp FileShelterApplication::instance()
 
 } // namespace UserInterface
 

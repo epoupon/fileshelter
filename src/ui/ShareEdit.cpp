@@ -17,19 +17,18 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Wt/WEnvironment>
-#include <Wt/WTemplate>
-#include <Wt/WPushButton>
-#include <Wt/WMessageBox>
+#include "ShareEdit.hpp"
+
+#include <Wt/WEnvironment.h>
+#include <Wt/WTemplate.h>
+#include <Wt/WPushButton.h>
+#include <Wt/WMessageBox.h>
 
 #include "utils/Logger.hpp"
 #include "database/Share.hpp"
 
 #include "FileShelterApplication.hpp"
-
-#include "ShareEdit.hpp"
 #include "ShareCommon.hpp"
-
 
 namespace UserInterface {
 
@@ -53,9 +52,9 @@ ShareEdit::refresh(void)
 
 	std::string editUUID = wApp->internalPathNextPart("/share-edit/");
 
-	Wt::Dbo::Transaction transaction(DboSession());
+	Wt::Dbo::Transaction transaction(FsApp->getDboSession());
 
-	Database::Share::pointer share = Database::Share::getByEditUUID(DboSession(), editUUID);
+	Database::Share::pointer share = Database::Share::getByEditUUID(FsApp->getDboSession(), editUUID);
 	if (!share || !boost::filesystem::exists(share->getPath()))
 	{
 		FS_LOG(UI, ERROR) << "Edit UUID '" << editUUID << "' not found";
@@ -65,7 +64,7 @@ ShareEdit::refresh(void)
 
 	FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Editing share from " << wApp->environment().clientAddress();
 
-	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-edit"), this);
+	Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-edit"));
 	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
 	if (!share->getDesc().empty())
@@ -75,7 +74,7 @@ ShareEdit::refresh(void)
 	}
 	t->bindString("file-name", Wt::WString::fromUTF8(share->getFileName()));
 	t->bindString("file-size", sizeToString(share->getFileSize()));
-	t->bindString("expiry-date-time", boost::posix_time::to_simple_string(share->getExpiryTime()) + " UTC");
+	t->bindString("expiry-date-time", share->getExpiryTime().toString() + " UTC");
 
 	auto hits = std::to_string(share->getHits());
 	if (share->getMaxHits() > 0)
@@ -84,29 +83,24 @@ ShareEdit::refresh(void)
 
 	t->bindWidget("download-link", createShareDownloadAnchor(share));
 
-	auto *deleteBtn = new Wt::WPushButton(tr("msg-delete"));
-	deleteBtn->addStyleClass("btn btn-danger");
-	t->bindWidget("delete-btn", deleteBtn);
+	Wt::WPushButton* deleteBtn = t->bindNew<Wt::WPushButton>("delete-btn", tr("msg-delete"));
 
-	deleteBtn->clicked().connect(std::bind([=] ()
+	deleteBtn->clicked().connect([=] ()
 	{
-		Wt::WMessageBox *messageBox = new Wt::WMessageBox
-			(tr("msg-share-delete"),
+		auto messageBox = deleteBtn->addChild(std::make_unique<Wt::WMessageBox>(tr("msg-share-delete"),
 			tr("msg-confirm-action"),
-			 Wt::Question, Wt::Yes | Wt::No);
+			 Wt::Icon::Question,
+			 Wt::StandardButton::Yes | Wt::StandardButton::No));
 
 		messageBox->setModal(true);
 
-		messageBox->buttonClicked().connect(std::bind([=] ()
+		messageBox->buttonClicked().connect([=] (Wt::StandardButton btn)
 		{
-			auto result = messageBox->buttonResult();
-			delete messageBox;
-
-			if (result == Wt::Yes)
+			if (btn == Wt::StandardButton::Yes)
 			{
-				Wt::Dbo::Transaction transaction(DboSession());
+				Wt::Dbo::Transaction transaction(FsApp->getDboSession());
 
-				Database::Share::pointer share = Database::Share::getByEditUUID(DboSession(), editUUID);
+				Database::Share::pointer share = Database::Share::getByEditUUID(FsApp->getDboSession(), editUUID);
 
 				if (share)
 				{
@@ -117,11 +111,11 @@ ShareEdit::refresh(void)
 
 				displayRemoved();
 			}
-
-		}));
+			deleteBtn->removeChild(messageBox);
+		});
 
 		messageBox->show();
-	}));
+	});
 
 }
 
@@ -130,7 +124,7 @@ ShareEdit::displayRemoved(void)
 {
 	clear();
 
-	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-removed"), this);
+	Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-removed"));
 	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 }
 
@@ -139,7 +133,7 @@ ShareEdit::displayNotFound(void)
 {
 	clear();
 
-	Wt::WTemplate *t = new Wt::WTemplate(tr("template-share-not-found"), this);
+	Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-not-found"));
 	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 }
 

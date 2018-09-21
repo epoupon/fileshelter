@@ -109,7 +109,7 @@
 		</details>
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-10">
-				${create-btn}
+				${create-btn class="btn-primary"}
 			</div>
 		</div>
 	</div>
@@ -134,7 +134,7 @@
 		</div>
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-5">
-				${unlock-btn}
+				${unlock-btn class="btn-primary"}
 			</div>
 		</div>
 	</div>
@@ -223,7 +223,7 @@
 		</div>
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-5">
-				${download-btn}
+				${download-btn class="btn btn-primary"}
 			</div>
 		</div>
 	</div>
@@ -284,7 +284,7 @@
 		</div>
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-5">
-				${delete-btn}
+				${delete-btn class="btn-danger"}
 			</div>
 		</div>
 	</div>

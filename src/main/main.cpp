@@ -20,7 +20,7 @@
 #include <iostream>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include <Wt/WServer>
+#include <Wt/WServer.h>
 
 #include "utils/Config.hpp"
 #include "utils/Logger.hpp"
@@ -43,6 +43,7 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 	args.push_back("--docroot=" + Config::instance().getString("docroot"));
 	args.push_back("--approot=" + Config::instance().getString("approot"));
 	args.push_back("--deploy-path=" + Config::instance().getString("deploy-path", "/"));
+	args.push_back("--resources-dir=" + Config::instance().getString("wt-resources"));
 
 	if (Config::instance().getBool("tls-enable", false))
 	{
@@ -163,21 +164,19 @@ int main(int argc, char *argv[])
 		Database::Cleaner dbCleaner(*connectionPool);
 
 		// bind entry point
-		server.addEntryPoint(Wt::Application, boost::bind(UserInterface::FileShelterApplication::create,
-					_1, boost::ref(*connectionPool)));
+		server.addEntryPoint(Wt::EntryPointType::Application,
+				std::bind(&UserInterface::FileShelterApplication::create,
+					std::placeholders::_1, std::ref(*connectionPool)));
 
-		// Start
 		FS_LOG(MAIN, INFO) << "Starting database cleaner...";
 		dbCleaner.start();
 
 		FS_LOG(MAIN, INFO) << "Starting server...";
 		server.start();
 
-		// Wait
 		FS_LOG(MAIN, INFO) << "Now running...";
-		Wt::WServer::waitForShutdown(argv[0]);
+		Wt::WServer::waitForShutdown();
 
-		// Stop
 		FS_LOG(MAIN, INFO) << "Stopping server...";
 		server.stop();
 

@@ -21,7 +21,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include <Wt/WStreamResource>
+#include <Wt/WStreamResource.h>
 
 
 namespace UserInterface {
@@ -30,7 +30,7 @@ class ShareResource : public Wt::WStreamResource
 {
 	public:
 
-		ShareResource(std::string downloadUUID, Wt::WObject *parent = 0);
+		ShareResource(std::string downloadUUID);
 		~ShareResource();
 
 		void setFileName(const std::string& name);

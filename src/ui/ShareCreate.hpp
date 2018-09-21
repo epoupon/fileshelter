@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <Wt/WString>
-#include <Wt/WContainerWidget>
+#include <Wt/WString.h>
+#include <Wt/WContainerWidget.h>
 
 
 namespace UserInterface {
@@ -30,7 +30,7 @@ class ShareParameters;
 class ShareCreate : public Wt::WContainerWidget
 {
 	public:
-		ShareCreate(Wt::WContainerWidget *parent = 0);
+		ShareCreate();
 
 	private:
 		void refresh(void);

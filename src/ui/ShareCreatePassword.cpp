@@ -17,15 +17,16 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Wt/WFormModel>
-#include <Wt/WLineEdit>
-#include <Wt/WPushButton>
+#include "ShareCreatePassword.hpp"
+
+#include <Wt/WFormModel.h>
+#include <Wt/WLineEdit.h>
+#include <Wt/WPushButton.h>
 
 #include "utils/Logger.hpp"
 #include "utils/Config.hpp"
 
 #include "FileShelterApplication.hpp"
-#include "ShareCreatePassword.hpp"
 
 namespace UserInterface {
 
@@ -41,15 +42,15 @@ class ShareCreatePasswordValidator : public Wt::WValidator
 		Result validate(const Wt::WString& input) const
 		{
 			auto res = Wt::WValidator::validate(input);
-			if (res.state() != Valid)
+			if (res.state() != Wt::ValidationState::Valid)
 				return res;
 
 			auto password = Config::instance().getString("upload-password", "");
 
 			if (input.toUTF8() == password)
-				return Result(Valid);
+				return Result(Wt::ValidationState::Valid);
 
-			return Result(Invalid, Wt::WString::tr("msg-bad-password"));
+			return Result(Wt::ValidationState::Invalid, Wt::WString::tr("msg-bad-password"));
 		}
 
 };
@@ -59,38 +60,34 @@ class ShareCreatePasswordFormModel : public Wt::WFormModel
 	public:
 		static const Field PasswordField;
 
-		ShareCreatePasswordFormModel(Wt::WObject *parent)
-		: Wt::WFormModel(parent)
+		ShareCreatePasswordFormModel()
 		{
 			addField(PasswordField);
 
-			setValidator(PasswordField, new ShareCreatePasswordValidator());
+			setValidator(PasswordField, std::make_unique<ShareCreatePasswordValidator>());
 		}
 };
 
 const Wt::WFormModel::Field ShareCreatePasswordFormModel::PasswordField = "password";
 
-ShareCreatePassword::ShareCreatePassword(Wt::WContainerWidget *parent)
-: Wt::WTemplateFormView(parent)
+ShareCreatePassword::ShareCreatePassword()
 {
-	auto model = new ShareCreatePasswordFormModel(this);
+	auto model = std::make_shared<ShareCreatePasswordFormModel>();
 
 	setTemplateText(tr("template-share-create-password"));
 	addFunction("id", &WTemplate::Functions::id);
 	addFunction("block", &WTemplate::Functions::id);
 
 	// Password
-	Wt::WLineEdit *password = new Wt::WLineEdit();
-	password->setEchoMode(Wt::WLineEdit::Password);
-	setFormWidget(ShareCreatePasswordFormModel::PasswordField, password);
+	auto password = std::make_unique<Wt::WLineEdit>();
+	password->setEchoMode(Wt::EchoMode::Password);
+	setFormWidget(ShareCreatePasswordFormModel::PasswordField, std::move(password));
 
 	// Buttons
-	Wt::WPushButton *unlockBtn = new Wt::WPushButton(tr("msg-unlock"));
-	unlockBtn->setStyleClass("btn-primary");
-	bindWidget("unlock-btn", unlockBtn);
-	unlockBtn->clicked().connect(std::bind([=]
+	Wt::WPushButton* unlockBtn = bindNew<Wt::WPushButton>("unlock-btn", tr("msg-unlock"));
+	unlockBtn->clicked().connect([=]
 	{
-		updateModel(model);
+		updateModel(model.get());
 
 		if (model->validate())
 		{
@@ -105,10 +102,10 @@ ShareCreatePassword::ShareCreatePassword(Wt::WContainerWidget *parent)
 		// Mitigate brute force attemps
 		sleep(1);
 
-		updateView(model);
-	}));
+		updateView(model.get());
+	});
 
-	updateView(model);
+	updateView(model.get());
 }
 
 

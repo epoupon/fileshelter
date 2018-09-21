@@ -17,28 +17,27 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ShareResource.hpp"
+
 #include <fstream>
 
-#include <Wt/WEnvironment>
-#include <Wt/Http/Response>
+#include <Wt/WEnvironment.h>
+#include <Wt/Http/Response.h>
 
 #include "database/Share.hpp"
 #include "utils/Logger.hpp"
 
 #include "FileShelterApplication.hpp"
 
-#include "ShareResource.hpp"
-
 
 namespace UserInterface {
 
-ShareResource::ShareResource(std::string downloadUUID, Wt::WObject *parent)
-  : WStreamResource(parent),
-    _downloadUUID(downloadUUID)
+ShareResource::ShareResource(std::string downloadUUID)
+  : _downloadUUID(downloadUUID)
 {
 }
 
-ShareResource::~ShareResource(void)
+ShareResource::~ShareResource()
 {
   beingDeleted();
 }
@@ -54,9 +53,9 @@ ShareResource::handleRequest(const Wt::Http::Request& request,
 
 		FS_LOG(UI, INFO) << "[" << _downloadUUID << "] New download from " << wApp->environment().clientAddress();
 
-		Wt::Dbo::Transaction transaction(DboSession());
+		Wt::Dbo::Transaction transaction(FsApp->getDboSession());
 
-		auto share = Database::Share::getByDownloadUUID(DboSession(), _downloadUUID);
+		auto share = Database::Share::getByDownloadUUID(FsApp->getDboSession(), _downloadUUID);
 		if (!share)
 		{
 			FS_LOG(UI, WARNING) <<  "[" << _downloadUUID << "] Share does not exist!";
@@ -88,7 +87,7 @@ ShareResource::handleRequest(const Wt::Http::Request& request,
 	std::ifstream is(_path.string().c_str(), std::ios::in | std::ios::binary);
 	if (!is)
 	{
-		FS_LOG(UI, ERROR) << "Cannot open " << _path;
+		FS_LOG(UI, ERROR) << "Cannot open " << _path.string();
 		return;
 	}
 

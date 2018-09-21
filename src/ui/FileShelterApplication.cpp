@@ -17,14 +17,16 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Wt/WEnvironment>
-#include <Wt/WBootstrapTheme>
-#include <Wt/WStackedWidget>
-#include <Wt/WNavigationBar>
-#include <Wt/WAnchor>
-#include <Wt/WMenu>
-#include <Wt/WTemplate>
-#include <Wt/WPushButton>
+#include "FileShelterApplication.hpp"
+
+#include <Wt/WEnvironment.h>
+#include <Wt/WBootstrapTheme.h>
+#include <Wt/WStackedWidget.h>
+#include <Wt/WNavigationBar.h>
+#include <Wt/WAnchor.h>
+#include <Wt/WMenu.h>
+#include <Wt/WTemplate.h>
+#include <Wt/WPushButton.h>
 
 #include "utils/Config.hpp"
 #include "utils/Logger.hpp"
@@ -34,12 +36,10 @@
 #include "ShareDownload.hpp"
 #include "ShareEdit.hpp"
 
-#include "FileShelterApplication.hpp"
-
 namespace UserInterface {
 
 // This theme is a workaround to correctly apply the viewport meta header
-class FsTheme : public Wt::WBootstrapTheme
+/*class FsTheme : public Wt::WBootstrapTheme
 {
 	public:
 		FsTheme(Wt::WObject *parent = 0) : Wt::WBootstrapTheme(parent) {}
@@ -50,17 +50,17 @@ class FsTheme : public Wt::WBootstrapTheme
 			Wt::WApplication::instance()->addMetaHeader("viewport", "width=device-width, initial-scale=1.0, user-scalable=no");
 			return res;
 		}
-};
+};*/
 
 
-Wt::WApplication*
+std::unique_ptr<Wt::WApplication>
 FileShelterApplication::create(const Wt::WEnvironment& env, Wt::Dbo::SqlConnectionPool& connectionPool)
 {
 	/*
 	 * You could read information from the environment to decide whether
 	 * the user has permission to start a new application
 	 */
-	return new FileShelterApplication(env, connectionPool);
+	return std::make_unique<FileShelterApplication>(env, connectionPool);
 }
 
 FileShelterApplication*
@@ -80,29 +80,23 @@ enum Idx
 };
 
 
-static Wt::WWebWidget* createHome()
+static std::unique_ptr<Wt::WWebWidget> createHome()
 {
-	Wt::WTemplate *home = new Wt::WTemplate(Wt::WString::tr("template-home"));
+	auto home = std::make_unique<Wt::WTemplate>(Wt::WString::tr("template-home"));
 	home->addFunction("tr", &Wt::WTemplate::Functions::tr);
 	home->addFunction("block", &Wt::WTemplate::Functions::block);
 
-#if WT_VERSION >= 0X03030400
-	Wt::WPushButton *createBtn = new Wt::WPushButton("<i class=\"fa fa-upload\"></i> " + Wt::WString::tr("msg-share-create"), Wt::XHTMLText);
-#else
-	Wt::WPushButton *createBtn = new Wt::WPushButton(Wt::WString::tr("msg-share-create"));
-#endif
+	Wt::WPushButton* createBtn = home->bindNew<Wt::WPushButton>("share-create-btn", "<i class=\"fa fa-upload\"></i> " + Wt::WString::tr("msg-share-create"), Wt::TextFormat::XHTML);
 
 	createBtn->addStyleClass("btn-primary");
-	createBtn->setLink( Wt::WLink(Wt::WLink::InternalPath, "/share-create") );
-
-	home->bindWidget("share-create-btn", createBtn);
+	createBtn->setLink( Wt::WLink(Wt::LinkType::InternalPath, "/share-create") );
 
 	return home;
 }
 
-static Wt::WWebWidget* createToS(void)
+static std::unique_ptr<Wt::WWebWidget> createToS(void)
 {
-	Wt::WTemplate *tos = new Wt::WTemplate();
+	auto tos = std::make_unique<Wt::WTemplate>();
 
 	// Override the ToS with a custom version is specified
 	auto path = Config::instance().getOptPath("tos-custom");
@@ -161,10 +155,10 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 : Wt::WApplication(env),
   _db(connectionPool)
 {
-	auto bootstrapTheme = new FsTheme(this);
-	bootstrapTheme->setVersion(Wt::WBootstrapTheme::Version3);
+	auto  bootstrapTheme = std::make_unique<Wt::WBootstrapTheme>();
+	bootstrapTheme->setVersion(Wt::BootstrapVersion::v3);
 	bootstrapTheme->setResponsive(true);
-	setTheme(bootstrapTheme);
+	setTheme(std::move(bootstrapTheme));
 
 	useStyleSheet("css/fileshelter.css");
 	useStyleSheet("resources/font-awesome/css/font-awesome.min.css");
@@ -183,38 +177,35 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 
 	enableInternalPaths();
 
-	auto main = new Wt::WTemplate(Wt::WString::tr("template-main"), root());
+	Wt::WTemplate* main = root()->addNew<Wt::WTemplate>(Wt::WString::tr("template-main"));
 
-	auto navbar = new Wt::WNavigationBar();
-	main->bindWidget("navbar-top", navbar);
+	Wt::WNavigationBar* navbar = main->bindNew<Wt::WNavigationBar>("navbar-top");
 	navbar->setResponsive(true);
-	navbar->setTitle("<i class=\"fa fa-external-link\"></i> " + Wt::WString::tr("msg-app-name"), Wt::WLink(Wt::WLink::InternalPath, "/home"));
+	navbar->setTitle("<i class=\"fa fa-external-link\"></i> " + Wt::WString::tr("msg-app-name"), Wt::WLink(Wt::LinkType::InternalPath, "/home"));
 
-	auto menu = new Wt::WMenu();
+	Wt::WMenu* menu = navbar->addMenu(std::make_unique<Wt::WMenu>());
 	{
 		auto menuItem = menu->insertItem(0, Wt::WString::tr("msg-home"));
-		menuItem->setLink(Wt::WLink(Wt::WLink::InternalPath, "/home"));
+		menuItem->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/home"));
 		menuItem->setSelectable(false);
 	}
 	{
 		auto menuItem = menu->insertItem(1, Wt::WString::tr("msg-share-create"));
-		menuItem->setLink(Wt::WLink(Wt::WLink::InternalPath, "/share-create"));
+		menuItem->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/share-create"));
 		menuItem->setSelectable(false);
 	}
-	navbar->addMenu(menu);
 
-	auto container = new Wt::WContainerWidget();
-	main->bindWidget("contents", container);
+	Wt::WContainerWidget* container = main->bindNew<Wt::WContainerWidget>("contents");
 
-	main->bindWidget("tos", new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/tos"), Wt::WString::tr("msg-tos")));
+	main->bindNew<Wt::WAnchor>("tos", Wt::WLink(Wt::LinkType::InternalPath, "/tos"), Wt::WString::tr("msg-tos"));
 
 	// Same order as Idx enum
-	Wt::WStackedWidget* mainStack = new Wt::WStackedWidget(container);
+	Wt::WStackedWidget* mainStack = container->addNew<Wt::WStackedWidget>();
 	mainStack->addWidget(createHome());
-	mainStack->addWidget(new ShareCreate());
-	mainStack->addWidget(new ShareCreated());
-	mainStack->addWidget(new ShareDownload());
-	mainStack->addWidget(new ShareEdit());
+	mainStack->addNew<ShareCreate>();
+	mainStack->addNew<ShareCreated>();
+	mainStack->addNew<ShareDownload>();
+	mainStack->addNew<ShareEdit>();
 	mainStack->addWidget(createToS());
 
 	internalPathChanged().connect(std::bind([=]
@@ -223,16 +214,6 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 	}));
 
 	handlePathChange(mainStack);
-}
-
-
-Database::Handler& DbHandler()
-{
-	return FileShelterApplication::instance()->getDbHandler();
-}
-Wt::Dbo::Session& DboSession()
-{
-	return DbHandler().getSession();
 }
 
 } // namespace UserInterface

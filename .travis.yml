@@ -14,8 +14,8 @@ before_install:
 - popd
 - git clone https://github.com/emweb/wt.git wt
 - pushd wt;
-- git checkout 3.3.4
-- cmake -DWT_CPP_11_MODE=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr && sudo make install
+- git checkout 4.0.4
+- cmake -DCMAKE_INSTALL_PREFIX=/usr && sudo make install
 - popd
 script: autoreconf -vfi && ./configure && make
 env:

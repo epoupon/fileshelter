@@ -19,12 +19,11 @@
 
 #pragma once
 
-#include <Wt/WServer>
-#include <Wt/WApplication>
-#include <Wt/WLogger>
-
 #include <string>
 
+#include <Wt/WServer.h>
+#include <Wt/WApplication.h>
+#include <Wt/WLogger.h>
 
 enum class Severity
 {

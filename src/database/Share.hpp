@@ -23,21 +23,22 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
-#include <Wt/Dbo/Dbo>
+#include <Wt/Dbo/Dbo.h>
+#include <Wt/Dbo/WtSqlTraits.h>
+#include <Wt/WDateTime.h>
 
 namespace Database {
 
 class Share
 {
-
 	public:
-		typedef Wt::Dbo::ptr<Share> pointer;
+		using pointer = Wt::Dbo::ptr<Share>;
 
 		Share();
 
 		static std::size_t getMaxFileSize();
-		static boost::posix_time::time_duration getMaxValidatityDuration();
-		static boost::posix_time::time_duration getDefaultValidatityDuration();
+		static std::chrono::seconds getMaxValidatityDuration();
+		static std::chrono::seconds getDefaultValidatityDuration();
 		static bool userCanSetValidatityDuration();
 
 		static std::size_t getMaxValidatityHits();
@@ -64,8 +65,8 @@ class Share
 		bool				hasPassword(void) const { return !_password.empty(); }
 		bool				verifyPassword(Wt::WString password) const;
 		std::string			getDesc(void) const { return _desc; }
-		boost::posix_time::ptime	getCreationTime(void) const { return _creationTime; }
-		boost::posix_time::ptime	getExpiryTime(void) const { return _expiryTime; }
+		Wt::WDateTime			getCreationTime(void) const { return _creationTime; }
+		Wt::WDateTime			getExpiryTime(void) const { return _expiryTime; }
 		bool				hasExpired(void) const;
 		std::size_t			getMaxHits(void) const { return _maxHits; }
 		std::size_t			getHits(void) const { return _hits; }
@@ -78,11 +79,11 @@ class Share
 		void setFileSize(std::size_t size) { _filesize = size; }
 		void setPassword(Wt::WString password);
 		void setDesc(std::string desc) { _desc = desc; }
-		void setCreationTime(boost::posix_time::ptime time) { _creationTime = time; }
-		void setValidityDuration(boost::posix_time::ptime time);
+		void setCreationTime(Wt::WDateTime time) { _creationTime = time; }
+		void setValidityDuration(Wt::WDateTime time);
 		void setMaxHits(std::size_t maxHits)	{ _maxHits = maxHits; }
 		void incHits()				{ _hits++; }
-		void setExpiryTime(boost::posix_time::ptime expiryTime) { _expiryTime = expiryTime; }
+		void setExpiryTime(Wt::WDateTime expiryTime) { _expiryTime = expiryTime; }
 		void setClientAddr(std::string addr) { _clientAddress = addr; }
 
 
@@ -107,20 +108,20 @@ class Share
 
 	private:
 
-		std::string				_filename;
-		long long				_filesize;
-		std::string				_checksum;
-		std::string				_clientAddress;	// Client IP address that uploaded the file
-		std::string				_password;	// optional
-		std::string				_salt;
-		std::string				_hashFunc;
-		std::string				_desc;		// optional
+		std::string	_filename;
+		long long	_filesize = 0;
+		std::string	_checksum;
+		std::string	_clientAddress;	// Client IP address that uploaded the file
+		std::string	_password;	// optional
+		std::string	_salt;
+		std::string	_hashFunc;
+		std::string	_desc;		// optional
 
-		boost::posix_time::ptime		_creationTime;
-		boost::posix_time::ptime		_expiryTime;
+		Wt::WDateTime	_creationTime;
+		Wt::WDateTime	_expiryTime;
 
-		int					_hits;
-		int					_maxHits;	//optional
+		int		_hits = 0;
+		int		_maxHits = 0;	//optional
 
 		std::string		_downloadUUID;
 		std::string		_editUUID;

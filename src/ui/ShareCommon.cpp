@@ -17,24 +17,27 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Wt/WApplication>
-#include <Wt/WEnvironment>
+#include <Wt/WApplication.h>
+#include <Wt/WEnvironment.h>
 #include <iomanip>
 #include <sstream>
 
 #include "ShareCommon.hpp"
 
-Wt::WAnchor* createShareDownloadAnchor(Database::Share::pointer share)
+std::unique_ptr<Wt::WAnchor>
+createShareDownloadAnchor(Database::Share::pointer share)
 {
 	std::string downloadPath = "/share-download/" + share->getDownloadUUID();
-	return new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, downloadPath), wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + wApp->environment().deploymentPath() + downloadPath);
+
+	return std::make_unique<Wt::WAnchor>(Wt::WLink(Wt::LinkType::InternalPath, downloadPath), wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + wApp->environment().deploymentPath() + downloadPath);
 }
 
-Wt::WAnchor* createShareEditAnchor(Database::Share::pointer share)
+std::unique_ptr<Wt::WAnchor>
+createShareEditAnchor(Database::Share::pointer share)
 {
 	std::string editPath = "/share-edit/" + share->getEditUUID();
 
-	return new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, editPath), wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + wApp->environment().deploymentPath() + editPath);
+	return std::make_unique<Wt::WAnchor>(Wt::WLink(Wt::LinkType::InternalPath, editPath), wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + wApp->environment().deploymentPath() + editPath);
 }
 
 template <typename T>

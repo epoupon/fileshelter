@@ -17,11 +17,13 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/asio/placeholders.hpp>
+#include "DbCleaner.hpp"
+
+#include <Wt/WLocalDateTime.h>
+
 #include "utils/Logger.hpp"
 
 #include "Share.hpp"
-#include "DbCleaner.hpp"
 
 namespace Database {
 
@@ -43,21 +45,16 @@ void
 Cleaner::start(void)
 {
 	// Schedule an immediate cleanup
-	schedule(boost::posix_time::seconds(0));
+	schedule(std::chrono::seconds(0));
 
 	_ioService.start();
 }
 
 void
-Cleaner::schedule(boost::posix_time::time_duration duration)
+Cleaner::schedule(std::chrono::seconds seconds)
 {
-	auto now = boost::posix_time::second_clock::universal_time();
-	auto nextScanTime = now + duration;
-
-	_scheduleTimer.expires_at(nextScanTime);
-	_scheduleTimer.async_wait( boost::bind( &Cleaner::process, this, boost::asio::placeholders::error));
-
-	FS_LOG(DB, INFO) << "Scheduled next scan at UTC " << nextScanTime;
+	_scheduleTimer.expires_from_now(seconds);
+	_scheduleTimer.async_wait(std::bind(&Cleaner::process, this, std::placeholders::_1));
 }
 
 void
@@ -74,7 +71,7 @@ Cleaner::process(boost::system::error_code err)
 	if (err)
 		return;
 
-	auto now = boost::posix_time::second_clock::universal_time();
+	auto now = Wt::WLocalDateTime::currentServerDateTime().toUTC();
 
 	FS_LOG(DB, INFO) << "Cleaning expired shares...";
 	Wt::Dbo::Transaction transaction(_db.getSession());
@@ -85,8 +82,7 @@ Cleaner::process(boost::system::error_code err)
 	{
 		// In order not to delete a share that is being downloaded,
 		// really remove the share at least a day after it has expired
-		if (share->hasExpired()
-			&& now > share->getExpiryTime() + boost::posix_time::hours(24))
+		if (share->hasExpired() && now > share->getExpiryTime().addDays(1))
 		{
 			FS_LOG(DB, INFO) << "[" << share->getDownloadUUID() << "] Deleting expired share";
 
@@ -97,7 +93,7 @@ Cleaner::process(boost::system::error_code err)
 
 	FS_LOG(DB, INFO) << "Cleaning expired shares: complete!";
 
-	schedule(boost::posix_time::hours(6));
+	schedule(std::chrono::hours(6));
 }
 
 

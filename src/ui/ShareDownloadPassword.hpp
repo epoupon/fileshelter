@@ -19,22 +19,21 @@
 
 #pragma once
 
-#include <Wt/WSignal>
-#include <Wt/WTemplateFormView>
+#include <Wt/WSignal.h>
+#include <Wt/WTemplateFormView.h>
 
 namespace UserInterface
 {
 
 class ShareDownloadPassword : public Wt::WTemplateFormView
 {
-	private:
-		Wt::Signal<void> _sigSuccess;
-
 	public:
-		Wt::Signal<void>& success() { return _sigSuccess;}
+		Wt::Signal<>& success() { return _sigSuccess;}
 
-		ShareDownloadPassword(Wt::WContainerWidget *parent = 0);
+		ShareDownloadPassword();
 
+	private:
+		Wt::Signal<> _sigSuccess;
 };
 
 } // namespace UserInterface

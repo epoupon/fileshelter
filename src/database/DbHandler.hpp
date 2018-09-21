@@ -21,8 +21,8 @@
 
 #include <boost/filesystem.hpp>
 
-#include <Wt/Dbo/Dbo>
-#include <Wt/Dbo/SqlConnectionPool>
+#include <Wt/Dbo/Dbo.h>
+#include <Wt/Dbo/SqlConnectionPool.h>
 
 namespace Database {
 
@@ -34,7 +34,7 @@ class Handler
 
 		Wt::Dbo::Session& getSession() { return _session; }
 
-		static Wt::Dbo::SqlConnectionPool*	createConnectionPool(boost::filesystem::path db);
+		static std::unique_ptr<Wt::Dbo::SqlConnectionPool> createConnectionPool(boost::filesystem::path db);
 
 	private:
 
