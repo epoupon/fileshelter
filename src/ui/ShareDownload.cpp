@@ -95,6 +95,7 @@ ShareDownload::displayDownload(void)
 	}
 	t->bindString("file-name", Wt::WString::fromUTF8(share->getFileName()));
 	t->bindString("file-size", sizeToString(share->getFileSize()));
+	t->bindString("expiry-date-time", share->getExpiryTime().toString() + " UTC");
 
 	Wt::WPushButton* downloadBtn = t->bindNew<Wt::WPushButton>("download-btn", tr("msg-download"));
 
