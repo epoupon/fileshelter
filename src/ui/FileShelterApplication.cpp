@@ -19,6 +19,8 @@
 
 #include "FileShelterApplication.hpp"
 
+#include <fstream>
+
 #include <Wt/WEnvironment.h>
 #include <Wt/WBootstrapTheme.h>
 #include <Wt/WStackedWidget.h>
