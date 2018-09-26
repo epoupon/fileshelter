@@ -38,19 +38,6 @@
 
 namespace UserInterface {
 
-// This theme is a workaround to correctly apply the viewport meta header
-/*class FsTheme : public Wt::WBootstrapTheme
-{
-	public:
-		FsTheme(Wt::WObject *parent = 0) : Wt::WBootstrapTheme(parent) {}
-
-		std::vector< Wt::WCssStyleSheet > styleSheets(void) const
-		{
-			auto res = Wt::WBootstrapTheme::styleSheets();
-			Wt::WApplication::instance()->addMetaHeader("viewport", "width=device-width, initial-scale=1.0, user-scalable=no");
-			return res;
-		}
-};*/
 
 
 std::unique_ptr<Wt::WApplication>
@@ -162,6 +149,8 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 
 	useStyleSheet("css/fileshelter.css");
 	useStyleSheet("resources/font-awesome/css/font-awesome.min.css");
+
+	addMetaHeader(Wt::MetaHeaderType::Meta, "viewport", "width=device-width, user-scalable=no");
 
 	// Resouce bundles
 	messageResourceBundle().use(appRoot() + "templates");
