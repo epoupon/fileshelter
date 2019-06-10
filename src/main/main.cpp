@@ -34,9 +34,10 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 {
 	std::vector<std::string> args;
 
-	boost::filesystem::path wtConfigPath = Config::instance().getPath("working-dir") / "wt_config.xml";
-	boost::filesystem::path wtLogFilePath = Config::instance().getPath("working-dir") / "fileshelter.log";
-	boost::filesystem::path userMsgPath = Config::instance().getPath("working-dir") / "user_messages.xml";
+	const boost::filesystem::path wtConfigPath {Config::instance().getPath("working-dir") / "wt_config.xml"};
+	const boost::filesystem::path wtLogFilePath {Config::instance().getPath("working-dir") / "fileshelter.log"};
+	const boost::filesystem::path wtAccessLogFilePath {Config::instance().getPath("working-dir") / "fileshelter.access.log"};
+	const boost::filesystem::path userMsgPath {Config::instance().getPath("working-dir") / "user_messages.xml"};
 
 	args.push_back(execPath);
 	args.push_back("--config=" + wtConfigPath.string());
@@ -44,6 +45,7 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 	args.push_back("--approot=" + Config::instance().getString("approot"));
 	args.push_back("--deploy-path=" + Config::instance().getString("deploy-path", "/"));
 	args.push_back("--resources-dir=" + Config::instance().getString("wt-resources"));
+	args.push_back("--accesslog=" + wtAccessLogFilePath.string());
 
 	if (Config::instance().getBool("tls-enable", false))
 	{
@@ -65,6 +67,7 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 
 		pt.put("server.application-settings.<xmlattr>.location", "*");
 		pt.put("server.application-settings.log-file", wtLogFilePath.string());
+		pt.put("server.application-settings.log-config", Config::instance().getString("log-config", "* -debug -info:WebRequest"));
 		pt.put("server.application-settings.max-request-size", Config::instance().getULong("max-file-size", 100) * 1024 /* kB */);
 		pt.put("server.application-settings.behind-reverse-proxy", Config::instance().getBool("behind-reverse-proxy", false));
 		pt.put("server.application-settings.progressive-bootstrap", true);
@@ -154,8 +157,6 @@ int main(int argc, char *argv[])
 
 		Wt::WServer server(argv[0]);
 		server.setServerConfiguration (wtServerArgs.size(), const_cast<char**>(wtArgv));
-
-		Wt::WServer::instance()->logger().configure("*"); // log everything, TODO configure this?
 
 		// Initializing a connection pool to the database that will be shared along services
 		std::unique_ptr<Wt::Dbo::SqlConnectionPool>

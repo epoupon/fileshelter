@@ -99,7 +99,7 @@ server {
 ```sh
 fileshelter
 ```
-Logs are output in the working directory, in the file 'fileshelter.log'
+Logs are output in the working directory, in the files 'fileshelter.log' and 'fileshelter.access.log'
 
 Alternatively, you may want to specify another configuration file:
 ```sh

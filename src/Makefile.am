@@ -28,6 +28,7 @@ fileshelter_SOURCES = \
 	$(srcdir)/ui/ShareResource.hpp		\
 	$(srcdir)/utils/Config.cpp		\
 	$(srcdir)/utils/Config.hpp		\
+	$(srcdir)/utils/Exception.hpp		\
 	$(srcdir)/utils/Logger.cpp		\
 	$(srcdir)/utils/Logger.hpp		\
 	$(srcdir)/utils/UUID.cpp		\
