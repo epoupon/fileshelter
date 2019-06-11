@@ -24,6 +24,7 @@ A [docker image](https://github.com/paulgalow/fileshelter-docker) is available, 
 - Private link, used to remove the file or to check the download counter
 - Terms of service support
 - Multiple language support (english, french, german, russian)
+- Low memory requirement (the demo instance runs on a Raspberry Pi3B+, using less than 2% of total memory)
 
 Once the expiry date or the download limit is reached, the download is no longer available and the file is deleted.
 
@@ -34,7 +35,7 @@ Once the expiry date or the download limit is reached, the download is no longer
 apt-get install build-essential autoconf automake libboost-dev libconfig++-dev libzip-dev
 ```
 
-You also need wt4, that is not packaged yet on Debian. See [installation instructions](https://www.webtoolkit.eu/wt/doc/reference/html/InstallationUnix.html).
+You also need wt4, that is not packaged yet on Debian. See [installation instructions](https://www.webtoolkit.eu/wt/doc/reference/html/InstallationUnix.html). You may need to build Wt4 in "Release" mode if you want to compile it natively on a Raspberry Pi3B+.
 
 #### Build
 ```sh
