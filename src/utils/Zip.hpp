@@ -19,8 +19,8 @@
 
 #pragma once
 
+#include <filesystem>
 #include <string>
-#include <boost/filesystem/path.hpp>
 
 typedef struct zip zip_t;
 
@@ -28,10 +28,10 @@ class ZipFileWriter
 {
 	public:
 
-		ZipFileWriter(boost::filesystem::path file);
+		ZipFileWriter(std::filesystem::path file);
 		~ZipFileWriter();
 
-		void add(std::string fileName, boost::filesystem::path file);
+		void add(const std::string& fileName, const std::filesystem::path& file);
 
 	private:
 		zip_t *_zip;

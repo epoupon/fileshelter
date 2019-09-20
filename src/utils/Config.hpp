@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <boost/filesystem.hpp>
-#include <boost/optional.hpp>
+#include <filesystem>
+#include <optional>
 
 #include <libconfig.h++>
 
@@ -31,26 +31,28 @@ class Config
 
 		Config(const Config&) = delete;
 		Config& operator=(const Config&) = delete;
+		Config(Config&&) = delete;
+		Config& operator=(Config&&) = delete;
 		~Config();
 
 		static Config& instance();
 
-		void		setFile(boost::filesystem::path p);
+		void		setFile(const std::filesystem::path& p);
 
 		// Default values are returned in case of setting not found
-		std::string	getString(std::string setting, std::string def = "");
-		boost::optional<boost::filesystem::path> getOptPath(std::string setting);
-		unsigned long	getULong(std::string setting, unsigned long def = 0);
-		long		getLong(std::string setting, long def = 0);
-		bool		getBool(std::string setting, bool def = false);
+		std::string	getString(const std::string& setting, const std::string& def = "");
+		std::optional<std::filesystem::path> getOptPath(const std::string& setting);
+		unsigned long	getULong(const std::string& setting, unsigned long def = 0);
+		long		getLong(const std::string& setting, long def = 0);
+		bool		getBool(const std::string& setting, bool def = false);
 
 		// Optional versions
-		boost::filesystem::path getPath(std::string setting, boost::filesystem::path def = boost::filesystem::path());
+		std::filesystem::path getPath(const std::string& setting, const std::filesystem::path& def = std::filesystem::path());
 
 	private:
 
 		Config();
 
-		libconfig::Config	*_config;
+		libconfig::Config*	_config {};
 };
 

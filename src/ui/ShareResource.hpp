@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include <Wt/WStreamResource.h>
 
@@ -41,7 +41,7 @@ class ShareResource : public Wt::WStreamResource
 				  Wt::Http::Response& response);
 
 		std::string _downloadUUID;
-		boost::filesystem::path _path;
+		std::filesystem::path _path;
 };
 
 } // namespace UserInterface

@@ -19,7 +19,6 @@
 
 #include "ShareCreated.hpp"
 
-//#include <Wt/WEnvironment>
 #include <Wt/WTemplate.h>
 
 #include "utils/Logger.hpp"

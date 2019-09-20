@@ -503,12 +503,12 @@ ShareCreate::displayCreate()
 			return;
 		}
 
-		boost::filesystem::path sharePath;
+		std::filesystem::path sharePath;
 		Wt::WString fileName;
 
 		if (uploadedFiles.size() == 1)
 		{
-			sharePath = boost::filesystem::path(uploadedFiles.front().spoolFileName());
+			sharePath = std::filesystem::path(uploadedFiles.front().spoolFileName());
 			fileName = Wt::WString::fromUTF8(uploadedFiles.front().clientFileName());
 			uploadedFiles.front().stealSpoolFile();
 		}
@@ -526,13 +526,13 @@ ShareCreate::displayCreate()
 			sharePath = Config::instance().getPath("working-dir") / "tmp" / generateUUID();
 			try
 			{
-				ZipFileWriter zip(sharePath);
+				ZipFileWriter zip {sharePath};
 
-				std::vector<boost::filesystem::path> files;
+				std::vector<std::filesystem::path> files;
 				for (auto uploadedFile : uploadedFiles)
 				{
 					zip.add(uploadedFile.clientFileName(),
-						boost::filesystem::path(uploadedFile.spoolFileName()));
+						std::filesystem::path(uploadedFile.spoolFileName()));
 				}
 			}
 			catch (std::exception& e)

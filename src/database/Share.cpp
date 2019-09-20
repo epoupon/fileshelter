@@ -38,13 +38,13 @@ _editUUID(generateUUID())
 }
 
 Share::pointer
-Share::create(Wt::Dbo::Session& session, boost::filesystem::path path)
+Share::create(Wt::Dbo::Session& session, std::filesystem::path path)
 {
 	auto share = session.add(std::make_unique<Share>());
 	auto storePath = share->getPath();
 
-	boost::system::error_code ec;
-	boost::filesystem::rename(path, storePath, ec);
+	std::error_code ec;
+	std::filesystem::rename(path, storePath, ec);
 	if (ec)
 	{
 		FS_LOG(DB, ERROR) << "Move file failed from " << path.string() << " to " << storePath.string() << ": " << ec.message();
@@ -52,7 +52,7 @@ Share::create(Wt::Dbo::Session& session, boost::filesystem::path path)
 		return Share::pointer();
 	}
 
-	share.modify()->setFileSize(boost::filesystem::file_size(storePath));
+	share.modify()->setFileSize(std::filesystem::file_size(storePath));
 
 	return share;
 }
@@ -60,8 +60,8 @@ Share::create(Wt::Dbo::Session& session, boost::filesystem::path path)
 void
 Share::destroy()
 {
-	boost::system::error_code ec;
-	boost::filesystem::remove(getPath(), ec);
+	std::error_code ec;
+	std::filesystem::remove(getPath(), ec);
 	if (ec)
 		FS_LOG(DB, ERROR) << "Cannot remove file " << getPath().string() << ": " << ec.message();
 }
@@ -71,7 +71,7 @@ Share::getByEditUUID(Wt::Dbo::Session& session, std::string UUID)
 {
 	pointer res = session.find<Share>().where("edit_UUID = ?").bind(UUID);
 
-	if (!res || !boost::filesystem::exists(res->getPath()))
+	if (!res || !std::filesystem::exists(res->getPath()))
 		return pointer();
 
 	return res;
@@ -82,7 +82,7 @@ Share::getByDownloadUUID(Wt::Dbo::Session& session, std::string UUID)
 {
 	pointer res = session.find<Share>().where("download_UUID = ?").bind(UUID);
 
-	if (!res || !boost::filesystem::exists(res->getPath()))
+	if (!res || !std::filesystem::exists(res->getPath()))
 		return pointer();
 
 	return res;
@@ -136,7 +136,7 @@ Share::verifyPassword(Wt::WString password) const
 	return verifier.verify(password, hash);
 }
 
-boost::filesystem::path
+std::filesystem::path
 Share::getPath(void) const
 {
 	return Config::instance().getPath("working-dir") / "files" / _downloadUUID;

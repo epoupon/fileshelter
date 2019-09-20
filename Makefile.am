@@ -8,6 +8,10 @@ fileshelter_approotdir=$(pkgdatadir)/approot
 
 fileshelter_cssdir=$(fileshelter_docrootdir)/css
 
+dist_pkgdata_DATA = \
+		systemd/default.service	\
+		conf/fileshelter.conf
+
 dist_fileshelter_css_DATA = \
 		 docroot/css/fileshelter.css
 
@@ -18,7 +22,4 @@ dist_fileshelter_approot_DATA = \
 		approot/messages_fr.xml \
 		approot/messages_ru.xml \
 		approot/tos.xml
-
-dist_sysconf_DATA = \
-	        $(top_srcdir)/conf/fileshelter.conf
 

@@ -17,7 +17,9 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <filesystem>
 #include <iostream>
+
 #include <boost/property_tree/xml_parser.hpp>
 
 #include <Wt/WServer.h>
@@ -34,10 +36,10 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 {
 	std::vector<std::string> args;
 
-	const boost::filesystem::path wtConfigPath {Config::instance().getPath("working-dir") / "wt_config.xml"};
-	const boost::filesystem::path wtLogFilePath {Config::instance().getPath("working-dir") / "fileshelter.log"};
-	const boost::filesystem::path wtAccessLogFilePath {Config::instance().getPath("working-dir") / "fileshelter.access.log"};
-	const boost::filesystem::path userMsgPath {Config::instance().getPath("working-dir") / "user_messages.xml"};
+	const std::filesystem::path wtConfigPath {Config::instance().getPath("working-dir") / "wt_config.xml"};
+	const std::filesystem::path wtLogFilePath {Config::instance().getPath("log-file", "")};
+	const std::filesystem::path wtAccessLogFilePath {Config::instance().getPath("access-log-file", "")};
+	const std::filesystem::path userMsgPath {Config::instance().getPath("working-dir") / "user_messages.xml"};
 
 	args.push_back(execPath);
 	args.push_back("--config=" + wtConfigPath.string());
@@ -45,7 +47,9 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 	args.push_back("--approot=" + Config::instance().getString("approot"));
 	args.push_back("--deploy-path=" + Config::instance().getString("deploy-path", "/"));
 	args.push_back("--resources-dir=" + Config::instance().getString("wt-resources"));
-	args.push_back("--accesslog=" + wtAccessLogFilePath.string());
+
+	if (!wtAccessLogFilePath.empty())
+		args.push_back("--accesslog=" + wtAccessLogFilePath.string());
 
 	if (Config::instance().getBool("tls-enable", false))
 	{
@@ -120,7 +124,7 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 int main(int argc, char *argv[])
 {
 
-	boost::filesystem::path configFilePath = "/etc/fileshelter.conf";
+	std::filesystem::path configFilePath = "/etc/fileshelter.conf";
 	int res = EXIT_FAILURE;
 
 	assert(argc > 0);
@@ -135,12 +139,12 @@ int main(int argc, char *argv[])
 
 		// Make sure the working directory exists
 		// TODO check with boost::system::error_code ec;
-		boost::filesystem::create_directories(Config::instance().getPath("working-dir") / "files");
+		std::filesystem::create_directories(Config::instance().getPath("working-dir") / "files");
 
 		// Recreate the tmp directory in order to flush it
 		auto tmpDir = Config::instance().getPath("working-dir") / "tmp";
-		boost::filesystem::remove_all(tmpDir);
-		boost::filesystem::create_directories(tmpDir);
+		std::filesystem::remove_all(tmpDir);
+		std::filesystem::create_directories(tmpDir);
 
 		// Set the WT_TMP_DIR inside the working dir, used to upload files
 		setenv("WT_TMP_DIR", tmpDir.string().c_str(), 1);

@@ -57,7 +57,7 @@ Handler::Handler(Wt::Dbo::SqlConnectionPool& connectionPool)
 }
 
 std::unique_ptr<Wt::Dbo::SqlConnectionPool>
-Handler::createConnectionPool(boost::filesystem::path p)
+Handler::createConnectionPool(const std::filesystem::path& p)
 {
 	FS_LOG(DB, INFO) << "Creating connection pool on file " << p.string();
 

@@ -28,7 +28,6 @@ fileshelter_SOURCES = \
 	$(srcdir)/ui/ShareResource.hpp		\
 	$(srcdir)/utils/Config.cpp		\
 	$(srcdir)/utils/Config.hpp		\
-	$(srcdir)/utils/Exception.hpp		\
 	$(srcdir)/utils/Logger.cpp		\
 	$(srcdir)/utils/Logger.hpp		\
 	$(srcdir)/utils/UUID.cpp		\
@@ -37,7 +36,6 @@ fileshelter_SOURCES = \
 	$(srcdir)/utils/Zip.hpp
 
 
-# BOOST_NO_CXX11_SCOPED_ENUMS prevents a link error with outdated boost filesystem lib
-fileshelter_CXXFLAGS=-std=c++14 -Wall -I$(srcdir)/ui -DBOOST_NO_CXX11_SCOPED_ENUMS $(libzip_CFLAGS)
+fileshelter_CXXFLAGS=-std=c++17 -Wall -I$(srcdir)/ui $(libzip_CFLAGS)
 fileshelter_LDADD=$(libzip_LIBS)
 

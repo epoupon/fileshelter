@@ -22,7 +22,7 @@
 
 #include "Zip.hpp"
 
-ZipFileWriter::ZipFileWriter(boost::filesystem::path file)
+ZipFileWriter::ZipFileWriter(std::filesystem::path file)
 {
 	int err_code;
 
@@ -37,7 +37,7 @@ ZipFileWriter::~ZipFileWriter()
 }
 
 void
-ZipFileWriter::add(std::string fileName, boost::filesystem::path file)
+ZipFileWriter::add(const std::string& fileName, const std::filesystem::path& file)
 {
 
 	struct zip_source *source = zip_source_file(_zip,

@@ -44,7 +44,7 @@ Config::instance()
 }
 
 void
-Config::setFile(boost::filesystem::path p)
+Config::setFile(const std::filesystem::path& p)
 {
 	if (_config != nullptr)
 		delete _config;
@@ -55,7 +55,7 @@ Config::setFile(boost::filesystem::path p)
 }
 
 std::string
-Config::getString(std::string setting, std::string def)
+Config::getString(const std::string& setting, const std::string& def)
 {
 	try {
 		return _config->lookup(setting);
@@ -66,25 +66,25 @@ Config::getString(std::string setting, std::string def)
 	}
 }
 
-boost::optional<boost::filesystem::path>
-Config::getOptPath(std::string setting)
+std::optional<std::filesystem::path>
+Config::getOptPath(const std::string& setting)
 {
 	try {
 		const char* res = _config->lookup(setting);
-		return boost::filesystem::path(std::string(res));
+		return std::filesystem::path {res};
 	}
 	catch (std::exception &e)
 	{
-		return boost::none;
+		return std::nullopt;
 	}
 }
 
-boost::filesystem::path
-Config::getPath(std::string setting, boost::filesystem::path path)
+std::filesystem::path
+Config::getPath(const std::string& setting, const std::filesystem::path& path)
 {
 	try {
 		const char* res = _config->lookup(setting);
-		return boost::filesystem::path(std::string(res));
+		return std::filesystem::path {std::string(res)};
 	}
 	catch (std::exception &e)
 	{
@@ -93,7 +93,7 @@ Config::getPath(std::string setting, boost::filesystem::path path)
 }
 
 unsigned long
-Config::getULong(std::string setting, unsigned long def)
+Config::getULong(const std::string& setting, unsigned long def)
 {
 	try {
 		return static_cast<unsigned int>(_config->lookup(setting));
@@ -105,7 +105,7 @@ Config::getULong(std::string setting, unsigned long def)
 }
 
 long
-Config::getLong(std::string setting, long def)
+Config::getLong(const std::string& setting, long def)
 {
 	try {
 		return _config->lookup(setting);
@@ -117,7 +117,7 @@ Config::getLong(std::string setting, long def)
 }
 
 bool
-Config::getBool(std::string setting, bool def)
+Config::getBool(const std::string& setting, bool def)
 {
 	try {
 		return _config->lookup(setting);

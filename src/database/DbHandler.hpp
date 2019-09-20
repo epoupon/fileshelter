@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include <Wt/Dbo/Dbo.h>
 #include <Wt/Dbo/SqlConnectionPool.h>
@@ -34,7 +34,7 @@ class Handler
 
 		Wt::Dbo::Session& getSession() { return _session; }
 
-		static std::unique_ptr<Wt::Dbo::SqlConnectionPool> createConnectionPool(boost::filesystem::path db);
+		static std::unique_ptr<Wt::Dbo::SqlConnectionPool> createConnectionPool(const std::filesystem::path& db);
 
 	private:
 

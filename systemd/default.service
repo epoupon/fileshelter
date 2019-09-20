@@ -1,0 +1,16 @@
+[Unit]
+Description=FileShelter
+After=network.target
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=1
+WorkingDirectory=/var/fileshelter
+ExecStart=/usr/bin/fileshelter
+User=fileshelter
+Group=fileshelter
+
+[Install]
+WantedBy=multi-user.target
+

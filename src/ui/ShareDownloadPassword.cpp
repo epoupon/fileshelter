@@ -106,9 +106,6 @@ ShareDownloadPassword::ShareDownloadPassword()
 
 		FS_LOG(UI, DEBUG) << "Download password validation failed";
 
-		// Mitigate brute force attemps
-		sleep(1);
-
 		updateView(model.get());
 	});
 

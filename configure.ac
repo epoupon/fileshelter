@@ -1,5 +1,5 @@
 AC_PREREQ(2.59)
-AC_INIT(fileshelter, 3.1.0, test@test)
+AC_INIT(fileshelter, 4.0.0, test@test)
 AM_INIT_AUTOMAKE
 AC_CONFIG_HEADER(src/config/config.h)
 
@@ -7,7 +7,6 @@ AC_LANG_CPLUSPLUS
 
 # Checks for programs
 AC_PROG_CXX
-AC_PROG_LN_S
 
 PKG_CHECK_MODULES(libzip, libzip >= 0.11)
 
@@ -22,25 +21,15 @@ AC_CHECK_LIB([pthread],
 		,
 		[AC_MSG_ERROR([libpthread not found!])])
 
+AC_CHECK_LIB([stdc++fs],
+		[main],
+		,
+		[AC_MSG_ERROR([libstdc++fs not found!])])
+
 AC_CHECK_LIB([boost_system],
 		[main],
 		,
 		[AC_MSG_ERROR([libboost_system not found!])])
-
-AC_CHECK_LIB(	[boost_signals],
-		[main],
-		,
-		[AC_MSG_ERROR([libboost_signals not found!])])
-
-AC_CHECK_LIB(	[boost_filesystem],
-		[main],
-		,
-		[AC_MSG_ERROR([libboost_filesystem not found!])])
-
-AC_CHECK_LIB(	[boost_date_time],
-		[main],
-		,
-		[AC_MSG_ERROR([libboost_date_time not found!])])
 
 AC_CHECK_LIB([wt],
              [main],

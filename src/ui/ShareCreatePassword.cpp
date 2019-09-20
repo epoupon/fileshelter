@@ -19,6 +19,8 @@
 
 #include "ShareCreatePassword.hpp"
 
+#include <unistd.h>
+
 #include <Wt/WFormModel.h>
 #include <Wt/WLineEdit.h>
 #include <Wt/WPushButton.h>

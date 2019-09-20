@@ -19,9 +19,8 @@
 
 #pragma once
 
+#include <filesystem>
 #include <vector>
-#include <boost/filesystem/path.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 #include <Wt/Dbo/Dbo.h>
 #include <Wt/Dbo/WtSqlTraits.h>
@@ -47,7 +46,7 @@ class Share
 
 		// Helpers
 		// Create a new share, will move the underlying file in the working directory
-		static pointer	create(Wt::Dbo::Session& session, boost::filesystem::path file);
+		static pointer	create(Wt::Dbo::Session& session, std::filesystem::path file);
 
 		// Remove the underlying file, must call remove on dbo object after that
 		void	destroy();
@@ -59,7 +58,7 @@ class Share
 		static std::vector<pointer> getAll(Wt::Dbo::Session& session);
 
 		// Getters
-		boost::filesystem::path		getPath(void) const;
+		std::filesystem::path		getPath(void) const;
 		std::string			getFileName(void) const { return _filename; }
 		std::size_t			getFileSize(void) const { return _filesize; }
 		bool				hasPassword(void) const { return !_password.empty(); }

@@ -55,7 +55,7 @@ ShareEdit::refresh(void)
 	Wt::Dbo::Transaction transaction(FsApp->getDboSession());
 
 	Database::Share::pointer share = Database::Share::getByEditUUID(FsApp->getDboSession(), editUUID);
-	if (!share || !boost::filesystem::exists(share->getPath()))
+	if (!share || !std::filesystem::exists(share->getPath()))
 	{
 		FS_LOG(UI, ERROR) << "Edit UUID '" << editUUID << "' not found";
 		displayNotFound();
