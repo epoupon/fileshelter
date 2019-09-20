@@ -1,6 +1,6 @@
 language: cpp
 sudo: required
-dist: trusty
+dist: xenial
 matrix:
   include:
     - os: linux
@@ -9,21 +9,17 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-6
+            - g++-8
       env:
         - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
       compiler:
         - gcc
 before_install:
 - eval "${MATRIX_EVAL}"
-- sudo apt-get install build-essential autoconf automake cmake libboost-all-dev libconfig++-dev
-- wget https://nih.at/libzip/libzip-0.11.2.tar.gz
-- tar xvfp libzip-0.11.2.tar.gz
-- pushd libzip-0.11.2 && ./configure --prefix=/usr && make && sudo make install
-- popd
+- sudo apt-get install build-essential autoconf automake cmake libboost-all-dev libconfig++-dev libzip-dev
 - git clone https://github.com/emweb/wt.git wt
 - pushd wt;
-- git checkout 4.0.4
+- git checkout 4.1.0
 - cmake -DCMAKE_INSTALL_PREFIX=/usr && sudo make install
 - popd
 script: autoreconf -vfi && ./configure && make
