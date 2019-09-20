@@ -12,7 +12,7 @@ PKG_CHECK_MODULES(libzip, libzip >= 0.11)
 
 AC_ARG_VAR([WT_RESOURCES_DIR],[Specify Wt's resources directory (default are '/usr/share/Wt/resources' and '/usr/local/share/Wt/resources')'])
 
-AC_CHECK_HEADERS([Wt/WApplication],
+AC_CHECK_HEADERS([Wt/WApplication.h],
                  [],
                  [AC_MSG_ERROR([Header not found or unusable !])])
 
