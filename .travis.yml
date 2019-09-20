@@ -26,3 +26,5 @@ script: autoreconf -vfi && ./configure && make
 env:
   global:
     - MAKEFLAGS="-j 2"
+after_failure:
+  - cat config.log
