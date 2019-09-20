@@ -20,9 +20,9 @@ before_install:
 - git clone https://github.com/emweb/wt.git wt
 - pushd wt;
 - git checkout 4.1.0
-- cmake -DCMAKE_INSTALL_PREFIX=/usr && sudo make install
+- cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr && sudo make install
 - popd
-script: autoreconf -vfi && ./configure && make
+script: autoreconf -vfi && CXXFLAGS="-Wall -Wextra -Werror" ./configure && make
 env:
   global:
     - MAKEFLAGS="-j 2"

@@ -30,7 +30,7 @@
 
 namespace UserInterface {
 
-ShareCreated::ShareCreated(Wt::WContainerWidget* parent)
+ShareCreated::ShareCreated()
 {
 	wApp->internalPathChanged().connect(std::bind([=]
 	{

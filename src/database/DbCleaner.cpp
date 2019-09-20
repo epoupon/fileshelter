@@ -27,13 +27,6 @@
 
 namespace Database {
 
-boost::gregorian::date
-getNextDay(const boost::gregorian::date& current)
-{
-	boost::gregorian::day_iterator it(current);
-	return *(++it);
-}
-
 Cleaner::Cleaner(Wt::Dbo::SqlConnectionPool& connectionPool)
 : _scheduleTimer(_ioService),
  _db(connectionPool)

@@ -36,6 +36,6 @@ fileshelter_SOURCES = \
 	$(srcdir)/utils/Zip.hpp
 
 
-fileshelter_CXXFLAGS=-std=c++17 -Wall -I$(srcdir)/ui $(libzip_CFLAGS)
+fileshelter_CXXFLAGS=-std=c++17 -I$(srcdir)/ui $(libzip_CFLAGS)
 fileshelter_LDADD=$(libzip_LIBS)
 

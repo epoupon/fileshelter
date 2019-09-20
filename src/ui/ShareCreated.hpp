@@ -26,7 +26,7 @@ namespace UserInterface {
 class ShareCreated : public Wt::WContainerWidget
 {
 	public:
-		ShareCreated(Wt::WContainerWidget* parent = 0);
+		ShareCreated();
 
 	private:
 		void refresh(void);
