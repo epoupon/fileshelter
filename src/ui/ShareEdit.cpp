@@ -32,18 +32,18 @@
 
 namespace UserInterface {
 
-ShareEdit::ShareEdit(Wt::WContainerWidget* parent)
+ShareEdit::ShareEdit()
 {
-	wApp->internalPathChanged().connect(std::bind([=]
+	wApp->internalPathChanged().connect([=]
 	{
 		refresh();
-	}));
+	});
 
 	refresh();
 }
 
 void
-ShareEdit::refresh(void)
+ShareEdit::refresh()
 {
 	if (!wApp->internalPathMatches("/share-edit"))
 		return;
@@ -98,10 +98,9 @@ ShareEdit::refresh(void)
 		{
 			if (btn == Wt::StandardButton::Yes)
 			{
-				Wt::Dbo::Transaction transaction(FsApp->getDboSession());
+				Wt::Dbo::Transaction transaction {FsApp->getDboSession()};
 
 				Database::Share::pointer share = Database::Share::getByEditUUID(FsApp->getDboSession(), editUUID);
-
 				if (share)
 				{
 					FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Deleting share from " << wApp->environment().clientAddress();
@@ -120,7 +119,7 @@ ShareEdit::refresh(void)
 }
 
 void
-ShareEdit::displayRemoved(void)
+ShareEdit::displayRemoved()
 {
 	clear();
 
@@ -129,7 +128,7 @@ ShareEdit::displayRemoved(void)
 }
 
 void
-ShareEdit::displayNotFound(void)
+ShareEdit::displayNotFound()
 {
 	clear();
 

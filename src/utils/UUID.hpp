@@ -21,5 +21,5 @@
 
 #include <string>
 
-std::string generateUUID(void);
+std::string generateUUID();
 

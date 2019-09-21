@@ -33,10 +33,10 @@ class ShareCreate : public Wt::WContainerWidget
 		ShareCreate();
 
 	private:
-		void refresh(void);
+		void refresh();
 
-		void displayCreate(void);
-		void displayPassword(void);
+		void displayCreate();
+		void displayPassword();
 		void displayError(Wt::WString error);
 
 		std::shared_ptr<ShareParameters> _parameters;

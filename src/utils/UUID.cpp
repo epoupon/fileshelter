@@ -25,7 +25,7 @@
 
 #include "UUID.hpp"
 
-std::string generateUUID(void)
+std::string generateUUID()
 {
 	boost::uuids::uuid uuid = boost::uuids::random_generator()();
 

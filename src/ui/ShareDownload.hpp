@@ -26,10 +26,10 @@ namespace UserInterface {
 class ShareDownload : public Wt::WContainerWidget
 {
 	public:
-		ShareDownload(Wt::WContainerWidget* parent = 0);
+		ShareDownload();
 
 	private:
-		void refresh(void);
+		void refresh();
 
 		void displayNotFound();
 		void displayPassword();

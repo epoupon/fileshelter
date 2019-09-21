@@ -35,7 +35,7 @@ Cleaner::Cleaner(Wt::Dbo::SqlConnectionPool& connectionPool)
 }
 
 void
-Cleaner::start(void)
+Cleaner::start()
 {
 	// Schedule an immediate cleanup
 	schedule(std::chrono::seconds(0));
@@ -47,11 +47,15 @@ void
 Cleaner::schedule(std::chrono::seconds seconds)
 {
 	_scheduleTimer.expires_from_now(seconds);
-	_scheduleTimer.async_wait(std::bind(&Cleaner::process, this, std::placeholders::_1));
+	_scheduleTimer.async_wait([this](boost::system::error_code err)
+			{
+				if (!err)
+					process();
+			});
 }
 
 void
-Cleaner::stop(void)
+Cleaner::stop()
 {
 	_scheduleTimer.cancel();
 
@@ -59,11 +63,8 @@ Cleaner::stop(void)
 }
 
 void
-Cleaner::process(boost::system::error_code err)
+Cleaner::process()
 {
-	if (err)
-		return;
-
 	auto now = Wt::WLocalDateTime::currentServerDateTime().toUTC();
 
 	FS_LOG(DB, INFO) << "Cleaning expired shares...";

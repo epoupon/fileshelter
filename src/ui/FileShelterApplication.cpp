@@ -83,7 +83,7 @@ static std::unique_ptr<Wt::WWebWidget> createHome()
 	return home;
 }
 
-static std::unique_ptr<Wt::WWebWidget> createToS(void)
+static std::unique_ptr<Wt::WWebWidget> createToS()
 {
 	auto tos = std::make_unique<Wt::WTemplate>();
 
@@ -199,10 +199,10 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 	mainStack->addNew<ShareEdit>();
 	mainStack->addWidget(createToS());
 
-	internalPathChanged().connect(std::bind([=]
+	internalPathChanged().connect([=]
 	{
 		handlePathChange(mainStack);
-	}));
+	});
 
 	handlePathChange(mainStack);
 }

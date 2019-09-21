@@ -32,16 +32,16 @@ namespace UserInterface {
 
 ShareCreated::ShareCreated()
 {
-	wApp->internalPathChanged().connect(std::bind([=]
+	wApp->internalPathChanged().connect([=]
 	{
 		refresh();
-	}));
+	});
 
 	refresh();
 }
 
 void
-ShareCreated::refresh(void)
+ShareCreated::refresh()
 {
 	if (!wApp->internalPathMatches("/share-created"))
 		return;

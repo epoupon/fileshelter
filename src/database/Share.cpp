@@ -30,7 +30,7 @@
 
 namespace Database {
 
-Share::Share(void)
+Share::Share()
 :
 _downloadUUID(generateUUID()),
 _editUUID(generateUUID())
@@ -96,7 +96,7 @@ Share::getAll(Wt::Dbo::Session& session)
 }
 
 bool
-Share::hasExpired(void) const
+Share::hasExpired() const
 {
 	if (_maxHits > 0 && _hits >= _maxHits)
 		return true;
@@ -137,19 +137,19 @@ Share::verifyPassword(Wt::WString password) const
 }
 
 std::filesystem::path
-Share::getPath(void) const
+Share::getPath() const
 {
 	return Config::instance().getPath("working-dir") / "files" / _downloadUUID;
 }
 
 std::size_t
-Share::getMaxFileSize(void)
+Share::getMaxFileSize()
 {
 	return Config::instance().getULong("max-file-size", 100);
 }
 
 std::chrono::seconds
-Share::getMaxValidatityDuration(void)
+Share::getMaxValidatityDuration()
 {
 	const auto durationDay =  std::chrono::hours(24);
 	auto maxDuration = durationDay * Config::instance().getULong("max-validity-days", 100);
@@ -161,7 +161,7 @@ Share::getMaxValidatityDuration(void)
 }
 
 std::chrono::seconds
-Share::getDefaultValidatityDuration(void)
+Share::getDefaultValidatityDuration()
 {
 	const auto durationDay =  std::chrono::duration_cast<std::chrono::seconds>(std::chrono::hours(24));
 	auto defaultDuration = std::chrono::duration_cast<std::chrono::seconds>(durationDay * Config::instance().getULong("default-validity-days", 7));
@@ -177,20 +177,20 @@ Share::getDefaultValidatityDuration(void)
 }
 
 bool
-Share::userCanSetValidatityDuration(void)
+Share::userCanSetValidatityDuration()
 {
 	return Config::instance().getBool("user-defined-validy-days", true);
 }
 
 
 std::size_t
-Share::getMaxValidatityHits(void)
+Share::getMaxValidatityHits()
 {
 	return Config::instance().getULong("max-validity-hits", 100);
 }
 
 std::size_t
-Share::getDefaultValidatityHits(void)
+Share::getDefaultValidatityHits()
 {
 	auto defaultHits = Config::instance().getULong("default-validity-hits", 30);
 	auto maxHits = getMaxValidatityHits();
@@ -202,7 +202,7 @@ Share::getDefaultValidatityHits(void)
 }
 
 bool
-Share::userCanSetValidatityHits(void)
+Share::userCanSetValidatityHits()
 {
 	return Config::instance().getBool("user-defined-validy-hits", true);
 }

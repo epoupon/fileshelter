@@ -40,7 +40,7 @@ class Cleaner
 	private:
 
 		void schedule(std::chrono::seconds duration);
-		void process(boost::system::error_code ec);
+		void process();
 
 		Wt::WIOService _ioService;
 		boost::asio::system_timer _scheduleTimer;

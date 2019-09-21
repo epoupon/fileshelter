@@ -58,20 +58,20 @@ class Share
 		static std::vector<pointer> getAll(Wt::Dbo::Session& session);
 
 		// Getters
-		std::filesystem::path		getPath(void) const;
-		std::string			getFileName(void) const { return _filename; }
-		std::size_t			getFileSize(void) const { return _filesize; }
-		bool				hasPassword(void) const { return !_password.empty(); }
+		std::filesystem::path		getPath() const;
+		std::string			getFileName() const { return _filename; }
+		std::size_t			getFileSize() const { return _filesize; }
+		bool				hasPassword() const { return !_password.empty(); }
 		bool				verifyPassword(Wt::WString password) const;
-		std::string			getDesc(void) const { return _desc; }
-		Wt::WDateTime			getCreationTime(void) const { return _creationTime; }
-		Wt::WDateTime			getExpiryTime(void) const { return _expiryTime; }
-		bool				hasExpired(void) const;
-		std::size_t			getMaxHits(void) const { return _maxHits; }
-		std::size_t			getHits(void) const { return _hits; }
-		std::string			getDownloadUUID(void) const { return _downloadUUID; }
-		std::string			getEditUUID(void) const { return _editUUID; }
-		std::string			getClientAddr(void) const { return _clientAddress; }
+		std::string			getDesc() const { return _desc; }
+		Wt::WDateTime			getCreationTime() const { return _creationTime; }
+		Wt::WDateTime			getExpiryTime() const { return _expiryTime; }
+		bool				hasExpired() const;
+		std::size_t			getMaxHits() const { return _maxHits; }
+		std::size_t			getHits() const { return _hits; }
+		std::string			getDownloadUUID() const { return _downloadUUID; }
+		std::string			getEditUUID() const { return _editUUID; }
+		std::string			getClientAddr() const { return _clientAddress; }
 
 		// Setters
 		void setFileName(std::string name) { _filename = name; }

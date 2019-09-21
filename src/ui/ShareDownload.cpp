@@ -34,7 +34,7 @@
 
 namespace UserInterface {
 
-ShareDownload::ShareDownload(Wt::WContainerWidget* parent)
+ShareDownload::ShareDownload()
 {
 	wApp->internalPathChanged().connect([=]
 	{
@@ -45,7 +45,7 @@ ShareDownload::ShareDownload(Wt::WContainerWidget* parent)
 }
 
 void
-ShareDownload::refresh(void)
+ShareDownload::refresh()
 {
 	if (!wApp->internalPathMatches("/share-download"))
 		return;
@@ -70,7 +70,7 @@ ShareDownload::refresh(void)
 }
 
 void
-ShareDownload::displayDownload(void)
+ShareDownload::displayDownload()
 {
 	clear();
 

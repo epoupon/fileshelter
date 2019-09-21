@@ -93,7 +93,7 @@ class ShareParameters
 		Wt::WString	password;
 };
 
-static std::pair<std::size_t, std::size_t> computeHitsRange(void)
+static std::pair<std::size_t, std::size_t> computeHitsRange()
 {
 	std::size_t max;
 	auto maxValidityHits = Share::getMaxValidatityHits();
@@ -160,7 +160,7 @@ class ShareCreateFormModel : public Wt::WFormModel
 			setValue(HitsValidityField, suggestedValidityHits);
 		}
 
-		void updateDurationValidator(void)
+		void updateDurationValidator()
 		{
 			auto maxValidityDuration = Share::getMaxValidatityDuration();
 			auto durationValidator = std::dynamic_pointer_cast<Wt::WIntValidator>(validator(DurationValidityField));
@@ -252,7 +252,7 @@ class ShareCreateFormModel : public Wt::WFormModel
 			setValue(DurationUnitValidityField, unit);
 		}
 
-		void initializeModels(void)
+		void initializeModels()
 		{
 			auto maxDuration = std::chrono::duration_cast<std::chrono::hours>(Share::getMaxValidatityDuration());
 
@@ -431,7 +431,7 @@ ShareCreate::displayError(Wt::WString error)
 }
 
 void
-ShareCreate::refresh(void)
+ShareCreate::refresh()
 {
 	if (!wApp->internalPathMatches("/share-create"))
 		return;

@@ -26,12 +26,12 @@ namespace UserInterface {
 class ShareEdit : public Wt::WContainerWidget
 {
 	public:
-		ShareEdit(Wt::WContainerWidget* parent = 0);
+		ShareEdit();
 
 	private:
-		void refresh(void);
-		void displayRemoved(void);
-		void displayNotFound(void);
+		void refresh();
+		void displayRemoved();
+		void displayNotFound();
 
 };
 
