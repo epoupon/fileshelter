@@ -1,6 +1,6 @@
 language: cpp
 sudo: required
-dist: xenial
+dist: bionic
 matrix:
   include:
     - os: linux
@@ -16,7 +16,7 @@ matrix:
         - gcc
 before_install:
 - eval "${MATRIX_EVAL}"
-- sudo apt-get install build-essential autoconf automake cmake libboost-all-dev libconfig++-dev libzip-dev
+- sudo apt-get install build-essential autoconf automake cmake libboost-all-dev libzip-dev libconfig++-dev
 - git clone https://github.com/emweb/wt.git wt
 - pushd wt;
 - git checkout 4.1.0
