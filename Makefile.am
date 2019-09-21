@@ -9,7 +9,7 @@ fileshelter_approotdir=$(pkgdatadir)/approot
 fileshelter_cssdir=$(fileshelter_docrootdir)/css
 
 dist_pkgdata_DATA = \
-		systemd/default.service	\
+		systemd/fileshelter.service	\
 		conf/fileshelter.conf
 
 dist_fileshelter_css_DATA = \
