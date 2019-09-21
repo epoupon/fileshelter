@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/epoupon/fileshelter.svg?branch=master)](https://travis-ci.org/epoupon/fileshelter)
 
-FileShelter is a self-hosted software that allows you to easily share files over the Internet.
+_FileShelter_ is a self-hosted software that allows you to easily share files over the Internet.
 Just upload a file and get an URL back!
 
 The aim is to provide a very simple web application, with few package dependencies, so that anyone can install it on his own server.
@@ -106,7 +106,7 @@ systemctl enable fileshelter
 
 #### Upgrade
 
-To upgrade _Fileshelter_ from sources, you need to update the master branch and rebuild/install it:
+To upgrade _FileShelter_ from source, you need to update the master branch and rebuild/install it:
 ```sh
 cd build
 git pull
@@ -170,13 +170,6 @@ journalctl -u fileshelter.service
 
 To connect to _Fileshelter_, just open your favorite browser and go to http://localhost:5091
 
-## Credits
-* Wt (http://www.webtoolkit.eu/)
-* bootstrap3 (http://getbootstrap.com/)
-
-
-It is highly recommended to run fileshelter as a non root user. Therefore make sure the user has write permissions on the working directory.
-
 ### Reverse proxy settings
 You have to set the 'behind-reverse-proxy' option to 'true' in the configuration file.
 
@@ -206,7 +199,7 @@ server {
 }
 ```
 
-To connect to FileShelter, just open your favorite browser and go to http://localhost:5091
+To connect to _FileShelter_, just open your favorite browser and go to http://localhost:5091
 
 ## Credits
 - Wt, awesome framework: http://www.webtoolkit.eu/
