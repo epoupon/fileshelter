@@ -43,6 +43,7 @@
 #include "database/Share.hpp"
 
 #include "FileShelterApplication.hpp"
+#include "PasswordUtils.hpp"
 #include "ShareCreatePassword.hpp"
 #include "ShareCommon.hpp"
 
@@ -438,7 +439,7 @@ ShareCreate::refresh()
 
 	clear();
 
-	if (!Config::instance().getString("upload-password", "").empty())
+	if (isUploadPassordRequired())
 		displayPassword();
 	else
 		displayCreate();

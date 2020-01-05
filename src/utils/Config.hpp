@@ -39,6 +39,8 @@ class Config
 
 		void		setFile(const std::filesystem::path& p);
 
+		std::vector<std::string>	getStrings(const std::string& setting);
+
 		// Default values are returned in case of setting not found
 		std::string	getString(const std::string& setting, const std::string& def = "");
 		std::optional<std::filesystem::path> getOptPath(const std::string& setting);

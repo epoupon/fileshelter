@@ -54,6 +54,26 @@ Config::setFile(const std::filesystem::path& p)
 	_config->readFile(p.string().c_str());
 }
 
+std::vector<std::string>
+Config::getStrings(const std::string& setting)
+{
+	try
+	{
+		std::vector<std::string> res;
+
+		const libconfig::Setting& values {_config->lookup(setting)};
+		for (int i {}; i < values.getLength(); ++i)
+			res.push_back(values[i]);
+
+		return res;
+
+	}
+	catch (std::exception& e)
+	{
+		return {};
+	}
+}
+
 std::string
 Config::getString(const std::string& setting, const std::string& def)
 {

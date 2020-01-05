@@ -29,6 +29,7 @@
 #include "utils/Config.hpp"
 
 #include "FileShelterApplication.hpp"
+#include "PasswordUtils.hpp"
 
 namespace UserInterface {
 
@@ -47,9 +48,7 @@ class ShareCreatePasswordValidator : public Wt::WValidator
 			if (res.state() != Wt::ValidationState::Valid)
 				return res;
 
-			auto password = Config::instance().getString("upload-password", "");
-
-			if (input.toUTF8() == password)
+			if (checkUploadPassord(input.toUTF8()))
 				return Result(Wt::ValidationState::Valid);
 
 			return Result(Wt::ValidationState::Invalid, Wt::WString::tr("msg-bad-password"));
