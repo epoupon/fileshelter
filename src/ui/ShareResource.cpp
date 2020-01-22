@@ -72,6 +72,8 @@ ShareResource::handleRequest(const Wt::Http::Request& request,
 		}
 
 		suggestFileName(Wt::WString::fromUTF8(share->getFileName()));
+		setMimeType("application/octet-stream");
+
 		_path = share->getPath();
 		share.modify()->incHits();
 	}
