@@ -1,5 +1,5 @@
 AC_PREREQ(2.59)
-AC_INIT(fileshelter, 4.1.0, test@test)
+AC_INIT(fileshelter, 4.2.0, test@test)
 AM_INIT_AUTOMAKE
 AC_CONFIG_HEADER(src/config/config.h)
 
