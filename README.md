@@ -5,7 +5,7 @@
 _FileShelter_ is a self-hosted software that allows you to easily share files over the Internet.
 Just upload a file and get an URL back!
 
-The aim is to provide a very simple web application, with few package dependencies, so that anyone can install it on his own server.
+The aim is to provide a very simple web application, with few package dependencies, so that anyone can install it on their own server.
 
 A [demo](http://fileshelter.demo.poupon.io) instance is available, with the following limitations:
 - Maximum duration is set to 3 days
