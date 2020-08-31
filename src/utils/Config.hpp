@@ -21,6 +21,7 @@
 
 #include <filesystem>
 #include <optional>
+#include <vector>
 
 #include <libconfig.h++>
 
