@@ -15,16 +15,15 @@ A [demo](http://fileshelter.demo.poupon.io) instance is available, with the foll
 A [docker image](https://github.com/paulgalow/fileshelter-docker) is available, thanks to Paul Galow.
 
 ## Features
-- Multiple file upload (a zip is created server side)
+- Multiple files upload (a zip is created server side)
 - Period of validity (from one hour to years)
-- Optional download limit
-- Customizable interface to allow or to prevent users to set the download limit or the duration validity
+- Customizable interface to set the duration validity
 - Optional password protection (download and upload)
 - Practically unique links, using [UUID](https://fr.wikipedia.org/wiki/Universal_Unique_Identifier)
-- Private link, used to remove the file or to check the download counter
+- Private links, used to remove the files or to check the download counters
 - Terms of service support
 - Multiple language support (english, french, german, russian)
-- Low memory requirement (the demo instance runs on a Raspberry Pi3B+, using less than 2% of total memory)
+- Low memory requirements: the demo instance runs on a Raspberry Pi3B+
 
 Once the expiry date or the download limit is reached, the download is no longer available and the file is deleted.
 

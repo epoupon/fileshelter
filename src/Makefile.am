@@ -2,16 +2,24 @@ bin_PROGRAMS = fileshelter
 
 fileshelter_SOURCES = \
 	$(srcdir)/main/main.cpp			\
-	$(srcdir)/database/DbCleaner.cpp	\
-	$(srcdir)/database/DbCleaner.hpp	\
-	$(srcdir)/database/DbHandler.cpp	\
-	$(srcdir)/database/DbHandler.hpp	\
+	$(srcdir)/database/Db.cpp		\
+	$(srcdir)/database/Db.hpp		\
+	$(srcdir)/database/File.cpp		\
+	$(srcdir)/database/File.hpp		\
 	$(srcdir)/database/Share.cpp		\
 	$(srcdir)/database/Share.hpp		\
+	$(srcdir)/resources/ShareResource.cpp		\
+	$(srcdir)/resources/ShareResource.hpp		\
+	$(srcdir)/share/ShareCleaner.cpp	\
+	$(srcdir)/share/ShareCleaner.hpp	\
+	$(srcdir)/share/ShareUtils.cpp		\
+	$(srcdir)/share/ShareUtils.hpp		\
 	$(srcdir)/ui/FileShelterApplication.cpp	\
 	$(srcdir)/ui/FileShelterApplication.hpp	\
 	$(srcdir)/ui/PasswordUtils.cpp		\
 	$(srcdir)/ui/PasswordUtils.hpp		\
+	$(srcdir)/ui/ProgressBar.cpp		\
+	$(srcdir)/ui/ProgressBar.hpp		\
 	$(srcdir)/ui/ShareCommon.cpp		\
 	$(srcdir)/ui/ShareCommon.hpp		\
 	$(srcdir)/ui/ShareCreate.cpp		\
@@ -26,18 +34,17 @@ fileshelter_SOURCES = \
 	$(srcdir)/ui/ShareEdit.hpp		\
 	$(srcdir)/ui/ShareDownloadPassword.cpp	\
 	$(srcdir)/ui/ShareDownloadPassword.hpp	\
-	$(srcdir)/ui/ShareResource.cpp		\
-	$(srcdir)/ui/ShareResource.hpp		\
 	$(srcdir)/utils/Config.cpp		\
 	$(srcdir)/utils/Config.hpp		\
 	$(srcdir)/utils/Logger.cpp		\
 	$(srcdir)/utils/Logger.hpp		\
+	$(srcdir)/utils/String.cpp		\
+	$(srcdir)/utils/String.hpp		\
 	$(srcdir)/utils/UUID.cpp		\
 	$(srcdir)/utils/UUID.hpp		\
-	$(srcdir)/utils/Zip.cpp			\
-	$(srcdir)/utils/Zip.hpp
+	$(srcdir)/utils/Zipper.cpp		\
+	$(srcdir)/utils/Zipper.hpp
 
 
-fileshelter_CXXFLAGS=-std=c++17 -I$(srcdir)/ui $(libzip_CFLAGS)
-fileshelter_LDADD=$(libzip_LIBS)
+fileshelter_CXXFLAGS=-std=c++17 -I$(srcdir)/ui -Wpedantic
 

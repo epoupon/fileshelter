@@ -19,12 +19,14 @@
 <message id="msg-share-create-success">Share successfully created!</message>
 <message id="msg-upload">Upload</message>
 <message id="msg-download">Download</message>
+<message id="msg-download-as-btn"><i class="fa fa-download"></i></message>
 <message id="msg-delete">Delete</message>
 <message id="msg-unlock">Unlock</message>
 <message id="msg-description">Description</message>
 <message id="msg-file-name">File name</message>
 <message id="msg-file-size">File size</message>
 <message id="msg-file">File</message>
+<message id="msg-files">Files</message>
 <message id="msg-optional">Optional</message>
 <message id="msg-hits">Downloads</message>
 <message id="msg-share-delete">Delete share</message>
@@ -34,8 +36,9 @@
 <message id="msg-share-protected-by-password">This share is protected by a password</message>
 <message id="msg-share-create-protected-by-password">A password is required to create a share</message>
 <message id="msg-no-file-selected">No file has been selected!</message>
-<message id="msg-max-file-size">The total size of the files must not exceed {1}</message>
+<message id="msg-max-share-size">The total size of the files must not exceed {1}</message>
 <message id="msg-advanced-options">Advanced options</message>
+<message id="msg-upload-in-progress">Upload in progress...</message>
 
 <message id="msg-validity-period">Validity period</message>
 <message id="msg-hours">Hours</message>

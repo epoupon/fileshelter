@@ -24,6 +24,9 @@
 
 #include "database/Share.hpp"
 
+
+std::string getDownloadURL(const Database::Share::pointer& share);
+
 std::unique_ptr<Wt::WAnchor> createShareDownloadAnchor(Database::Share::pointer share);
 std::unique_ptr<Wt::WAnchor> createShareEditAnchor(Database::Share::pointer share);
 Wt::WString sizeToString(std::size_t size);

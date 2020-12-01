@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Emeric Poupon
+ * Copyright (C) 2020 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -19,28 +19,22 @@
 
 #pragma once
 
-#include <optional>
-#include <string_view>
-
-#include <Wt/WContainerWidget.h>
-
-#include "utils/UUID.hpp"
+#include <Wt/WContainerWidget>
+#include <Wt/WTemplate>
+#include <Wt/WText>
 
 namespace UserInterface
 {
 
-	class ShareDownload : public Wt::WContainerWidget
+	class ProgressBar : public Wt::WTemplate
 	{
 		public:
-			ShareDownload();
+			ProgressBar();
+			void setValue(unsigned value);
 
 		private:
-			void refresh() override;
-
-			void displayNotFound();
-			void displayPassword(const UUID& downloadUUID);
-			void displayDownload(const UUID& downloadUUID, std::optional<std::string_view> password = std::nullopt);
+			Wt::WContainerWidget* _progress {};
+			Wt::WText* _text {};
 	};
 
-} // namespace UserInterface
-
+}

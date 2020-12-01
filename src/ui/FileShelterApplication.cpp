@@ -30,6 +30,7 @@
 #include <Wt/WTemplate.h>
 #include <Wt/WPushButton.h>
 
+#include "database/Db.hpp"
 #include "utils/Config.hpp"
 #include "utils/Logger.hpp"
 
@@ -41,15 +42,14 @@
 namespace UserInterface {
 
 
-
 std::unique_ptr<Wt::WApplication>
-FileShelterApplication::create(const Wt::WEnvironment& env, Wt::Dbo::SqlConnectionPool& connectionPool)
+FileShelterApplication::create(const Wt::WEnvironment& env, Database::Db& db)
 {
 	/*
 	 * You could read information from the environment to decide whether
 	 * the user has permission to start a new application
 	 */
-	return std::make_unique<FileShelterApplication>(env, connectionPool);
+	return std::make_unique<FileShelterApplication>(env, db);
 }
 
 FileShelterApplication*
@@ -69,7 +69,9 @@ enum Idx
 };
 
 
-static std::unique_ptr<Wt::WWebWidget> createHome()
+static
+std::unique_ptr<Wt::WWebWidget>
+createHome()
 {
 	auto home = std::make_unique<Wt::WTemplate>(Wt::WString::tr("template-home"));
 	home->addFunction("tr", &Wt::WTemplate::Functions::tr);
@@ -85,7 +87,7 @@ static std::unique_ptr<Wt::WWebWidget> createHome()
 
 static std::unique_ptr<Wt::WWebWidget> createToS()
 {
-	auto tos = std::make_unique<Wt::WTemplate>();
+	auto tos {std::make_unique<Wt::WTemplate>()};
 
 	// Override the ToS with a custom version is specified
 	auto path = Config::instance().getOptPath("tos-custom");
@@ -106,7 +108,8 @@ static std::unique_ptr<Wt::WWebWidget> createToS()
 	return tos;
 }
 
-static void
+static
+void
 handlePathChange(Wt::WStackedWidget* stack)
 {
 	static std::map<std::string, int> indexes =
@@ -140,11 +143,11 @@ handlePathChange(Wt::WStackedWidget* stack)
  * constructor so it is typically also an argument for your custom
  * application constructor.
 */
-FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::Dbo::SqlConnectionPool& connectionPool)
-: Wt::WApplication(env),
-  _db(connectionPool)
+FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Database::Db& db)
+: Wt::WApplication {env},
+  _db {db}
 {
-	auto  bootstrapTheme = std::make_unique<Wt::WBootstrapTheme>();
+	auto bootstrapTheme {std::make_unique<Wt::WBootstrapTheme>()};
 	bootstrapTheme->setVersion(Wt::BootstrapVersion::v3);
 	bootstrapTheme->setResponsive(true);
 	setTheme(std::move(bootstrapTheme));
@@ -178,17 +181,20 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 	{
 		auto menuItem = menu->insertItem(0, Wt::WString::tr("msg-home"));
 		menuItem->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/home"));
-		menuItem->setSelectable(false);
+		menuItem->setSelectable(true);
 	}
 	{
 		auto menuItem = menu->insertItem(1, Wt::WString::tr("msg-share-create"));
 		menuItem->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/share-create"));
-		menuItem->setSelectable(false);
+		menuItem->setSelectable(true);
+	}
+	{
+		auto menuItem = menu->addItem(Wt::WString::tr("msg-tos"));
+		menuItem->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/tos"});
+		menuItem->setSelectable(true);
 	}
 
-	Wt::WContainerWidget* container = main->bindNew<Wt::WContainerWidget>("contents");
-
-	main->bindNew<Wt::WAnchor>("tos", Wt::WLink(Wt::LinkType::InternalPath, "/tos"), Wt::WString::tr("msg-tos"));
+	Wt::WContainerWidget* container {main->bindNew<Wt::WContainerWidget>("contents")};
 
 	// Same order as Idx enum
 	Wt::WStackedWidget* mainStack = container->addNew<Wt::WStackedWidget>();
@@ -206,5 +212,12 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Wt::
 
 	handlePathChange(mainStack);
 }
+
+Wt::Dbo::Session&
+FileShelterApplication::getDboSession()
+{
+	return _db.getTLSSession();
+}
+
 
 } // namespace UserInterface

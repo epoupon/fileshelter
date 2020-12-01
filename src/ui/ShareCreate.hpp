@@ -22,6 +22,7 @@
 #include <Wt/WString.h>
 #include <Wt/WContainerWidget.h>
 
+#include "utils/UUID.hpp"
 
 namespace UserInterface {
 
@@ -38,8 +39,7 @@ class ShareCreate : public Wt::WContainerWidget
 		void displayCreate();
 		void displayPassword();
 		void displayError(Wt::WString error);
-
-		std::shared_ptr<ShareParameters> _parameters;
+		static UUID createShare(const ShareParameters& parameters);
 
 };
 

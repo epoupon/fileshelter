@@ -24,10 +24,18 @@
 
 #include "ShareCommon.hpp"
 
+std::string
+getDownloadURL(const Database::Share::pointer& share)
+{
+	const std::string downloadPath {"/share-download/" + share->getDownloadUUID().getAsString()};
+
+	return wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + wApp->environment().deploymentPath() + downloadPath;
+}
+
 std::unique_ptr<Wt::WAnchor>
 createShareDownloadAnchor(Database::Share::pointer share)
 {
-	std::string downloadPath = "/share-download/" + share->getDownloadUUID();
+	const std::string downloadPath {"/share-download/" + share->getDownloadUUID().getAsString()};
 
 	return std::make_unique<Wt::WAnchor>(Wt::WLink(Wt::LinkType::InternalPath, downloadPath), wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + wApp->environment().deploymentPath() + downloadPath);
 }
@@ -35,9 +43,9 @@ createShareDownloadAnchor(Database::Share::pointer share)
 std::unique_ptr<Wt::WAnchor>
 createShareEditAnchor(Database::Share::pointer share)
 {
-	std::string editPath = "/share-edit/" + share->getEditUUID();
+	const std::string editPath {"/share-edit/" + share->getEditUUID().getAsString()};
 
-	return std::make_unique<Wt::WAnchor>(Wt::WLink(Wt::LinkType::InternalPath, editPath), wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + wApp->environment().deploymentPath() + editPath);
+	return std::make_unique<Wt::WAnchor>(Wt::WLink {Wt::LinkType::InternalPath, editPath}, wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + wApp->environment().deploymentPath() + editPath);
 }
 
 template <typename T>

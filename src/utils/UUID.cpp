@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Emeric Poupon
+ * Copyright (C) 2020 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -17,21 +17,56 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <sstream>
+#include "utils/UUID.hpp"
 
-#include <boost/uuid/uuid.hpp>            // uuid class
 #include <boost/uuid/uuid_generators.hpp> // generators
 #include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
 
-#include "UUID.hpp"
+#include <regex>
 
-std::string generateUUID()
+#include "utils/String.hpp"
+
+namespace StringUtils
 {
-	boost::uuids::uuid uuid = boost::uuids::random_generator()();
+	template <>
+	std::optional<UUID>
+	readAs(const std::string& str)
+	{
+		return UUID::fromString(str);
+	}
+}
+
+static
+bool
+stringIsUUID(std::string_view str)
+{
+	static const std::regex re { R"([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})"};
+
+	return std::regex_match(std::cbegin(str), std::cend(str), re);
+}
+
+UUID
+UUID::generate()
+{
+	boost::uuids::uuid uuid {boost::uuids::random_generator()()};
 
 	std::ostringstream oss;
 	oss << uuid;
 
-	return oss.str();
+	return UUID {oss.str()};
+}
+
+UUID::UUID(std::string_view str)
+: _value {StringUtils::stringToLower(str)}
+{
+}
+
+std::optional<UUID>
+UUID::fromString(std::string_view str)
+{
+	if (!stringIsUUID(str))
+		return std::nullopt;
+
+	return UUID {str};
 }
 

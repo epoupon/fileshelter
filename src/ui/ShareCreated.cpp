@@ -32,7 +32,7 @@ namespace UserInterface {
 
 ShareCreated::ShareCreated()
 {
-	wApp->internalPathChanged().connect([=]
+	wApp->internalPathChanged().connect([this]
 	{
 		refresh();
 	});
@@ -48,20 +48,22 @@ ShareCreated::refresh()
 
 	clear();
 
-	std::string editUUID = wApp->internalPathNextPart("/share-created/");
+	std::optional<UUID> editUUID {UUID::fromString(wApp->internalPathNextPart("/share-created/"))};
+	if (!editUUID)
+		return;
 
-	Wt::Dbo::Transaction transaction(FsApp->getDboSession());
+	Wt::Dbo::Transaction transaction {FsApp->getDboSession()};
 
-	Database::Share::pointer share = Database::Share::getByEditUUID(FsApp->getDboSession(), editUUID);
+	const Database::Share::pointer share {Database::Share::getByEditUUID(FsApp->getDboSession(), *editUUID)};
 	if (!share)
 	{
-		FS_LOG(UI, ERROR) << "Edit UUID '" << editUUID << "' not found";
+		FS_LOG(UI, ERROR) << "Edit UUID '" << editUUID->getAsString() << "' not found";
 		Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-not-found"));
 		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 		return;
 	}
 
-	Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-created"));
+	Wt::WTemplate *t {addNew<Wt::WTemplate>(tr("template-share-created"))};
 	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
 	t->bindWidget("download-link", createShareDownloadAnchor(share));

@@ -26,6 +26,7 @@
 
 #include "utils/Logger.hpp"
 #include "database/Share.hpp"
+#include "share/ShareUtils.hpp"
 
 #include "FileShelterApplication.hpp"
 #include "ShareCommon.hpp"
@@ -50,36 +51,32 @@ ShareEdit::refresh()
 
 	clear();
 
-	std::string editUUID = wApp->internalPathNextPart("/share-edit/");
+	const std::optional<UUID> editUUID {UUID::fromString(wApp->internalPathNextPart("/share-edit/"))};
 
-	Wt::Dbo::Transaction transaction(FsApp->getDboSession());
+	Wt::Dbo::Transaction transaction {FsApp->getDboSession()};
 
-	Database::Share::pointer share = Database::Share::getByEditUUID(FsApp->getDboSession(), editUUID);
-	if (!share || !std::filesystem::exists(share->getPath()))
+	const Database::Share::pointer share {Database::Share::getByEditUUID(FsApp->getDboSession(), *editUUID)};
+	if (!share || !ShareUtils::isShareAvailableForDownload(share))
 	{
-		FS_LOG(UI, ERROR) << "Edit UUID '" << editUUID << "' not found";
+		FS_LOG(UI, ERROR) << "Edit UUID '" << editUUID->getAsString() << "' not found";
 		displayNotFound();
 		return;
 	}
+	const Database::IdType shareId {share.id()};
 
-	FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Editing share from " << wApp->environment().clientAddress();
+	FS_LOG(UI, INFO) << "[" << share->getDownloadUUID().getAsString() << "] Editing share from " << wApp->environment().clientAddress();
 
-	Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-edit"));
+	Wt::WTemplate *t {addNew<Wt::WTemplate>(tr("template-share-edit"))};
 	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
 	if (!share->getDesc().empty())
 	{
 		t->setCondition("if-desc", true);
-		t->bindString("file-desc", Wt::WString::fromUTF8(share->getDesc()));
+		t->bindString("file-desc", Wt::WString::fromUTF8(std::string {share->getDesc()}));
 	}
-	t->bindString("file-name", Wt::WString::fromUTF8(share->getFileName()));
-	t->bindString("file-size", sizeToString(share->getFileSize()));
+	t->bindString("file-name", Wt::WString::fromUTF8(ShareUtils::computeFileName(share)));
+	t->bindString("file-size", sizeToString(share->getShareSize()));
 	t->bindString("expiry-date-time", share->getExpiryTime().toString() + " UTC");
-
-	auto hits = std::to_string(share->getHits());
-	if (share->getMaxHits() > 0)
-		hits += " / " + std::to_string(share->getMaxHits());
-	t->bindString("hits", hits);
 
 	t->bindWidget("download-link", createShareDownloadAnchor(share));
 
@@ -98,16 +95,7 @@ ShareEdit::refresh()
 		{
 			if (btn == Wt::StandardButton::Yes)
 			{
-				Wt::Dbo::Transaction transaction {FsApp->getDboSession()};
-
-				Database::Share::pointer share = Database::Share::getByEditUUID(FsApp->getDboSession(), editUUID);
-				if (share)
-				{
-					FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Deleting share from " << wApp->environment().clientAddress();
-					share.modify()->destroy();
-					share.remove();
-				}
-
+				ShareUtils::destroyShare(FsApp->getDboSession(), shareId);
 				displayRemoved();
 			}
 			deleteBtn->removeChild(messageBox);
@@ -123,7 +111,7 @@ ShareEdit::displayRemoved()
 {
 	clear();
 
-	Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-removed"));
+	Wt::WTemplate *t {addNew<Wt::WTemplate>(tr("template-share-removed"))};
 	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 }
 

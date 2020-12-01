@@ -33,7 +33,7 @@
 <message id="msg-share-protected-by-password">Этот файл защищен паролем !</message>
 <message id="msg-share-create-protected-by-password">Пароль обязателен !</message>
 <message id="msg-no-file-selected">Файл не выбран!</message>
-<message id="msg-max-file-size">максимальный размер файла не более {1}</message>
+<message id="msg-max-share-size">максимальный размер файла не более {1}</message>
 
 <message id="msg-validity-period">Период доступности</message>
 <message id="msg-hours">Часов</message>

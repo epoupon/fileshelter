@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Emeric Poupon
+ * Copyright (C) 2015 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -19,28 +19,16 @@
 
 #pragma once
 
-#include <optional>
-#include <string_view>
+#include <Wt/Dbo/ptr.h>
 
-#include <Wt/WContainerWidget.h>
-
-#include "utils/UUID.hpp"
-
-namespace UserInterface
+namespace Database
 {
+	using IdType = Wt::Dbo::dbo_default_traits::IdType;
+	using FileSize = std::uint64_t;
 
-	class ShareDownload : public Wt::WContainerWidget
+	static inline bool IdIsValid(IdType id)
 	{
-		public:
-			ShareDownload();
-
-		private:
-			void refresh() override;
-
-			void displayNotFound();
-			void displayPassword(const UUID& downloadUUID);
-			void displayDownload(const UUID& downloadUUID, std::optional<std::string_view> password = std::nullopt);
-	};
-
-} // namespace UserInterface
+		return id != Wt::Dbo::dbo_default_traits::invalidId();
+	}
+}
 

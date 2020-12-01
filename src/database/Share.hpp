@@ -20,110 +20,110 @@
 #pragma once
 
 #include <filesystem>
+#include <string>
+#include <string_view>
 #include <vector>
 
 #include <Wt/Dbo/Dbo.h>
 #include <Wt/Dbo/WtSqlTraits.h>
 #include <Wt/WDateTime.h>
 
+#include "utils/UUID.hpp"
+#include "Types.hpp"
+
+
+namespace Auth {
+	class PasswordHash;
+}
+
 namespace Database {
 
-class Share
+class File;
+
+class Share : public Wt::Dbo::Dbo<Share>
 {
 	public:
 		using pointer = Wt::Dbo::ptr<Share>;
 
-		Share();
-
-		static std::size_t getMaxFileSize();
-		static std::chrono::seconds getMaxValidatityDuration();
-		static std::chrono::seconds getDefaultValidatityDuration();
-		static bool userCanSetValidatityDuration();
-
-		static std::size_t getMaxValidatityHits();
-		static std::size_t getDefaultValidatityHits();
-		static bool userCanSetValidatityHits();
+		enum class State
+		{
+			Init,		// can't be downloaded, can be modified
+			Ready,		// can be download, can't be modified
+			Deleting,	// can't be downloaded, being deleted
+		};
 
 		// Helpers
-		// Create a new share, will move the underlying file in the working directory
-		static pointer	create(Wt::Dbo::Session& session, std::filesystem::path file);
+		static pointer	create(Wt::Dbo::Session& session);
 
-		// Remove the underlying file, must call remove on dbo object after that
-		void	destroy();
-
-		static pointer	getByEditUUID(Wt::Dbo::Session& session, std::string UUID);
-		static pointer	getByDownloadUUID(Wt::Dbo::Session& session, std::string UUID);
-		static pointer	delByEditUUID(Wt::Dbo::Session& session, std::string UUID);
+		static pointer	getById(Wt::Dbo::Session& session, IdType shareId);
+		static pointer	getByEditUUID(Wt::Dbo::Session& session, const UUID& uuid);
+		static pointer	getByDownloadUUID(Wt::Dbo::Session& session, const UUID& uuid);
 
 		static std::vector<pointer> getAll(Wt::Dbo::Session& session);
 
 		// Getters
-		std::filesystem::path		getPath() const;
-		std::string			getFileName() const { return _filename; }
-		std::size_t			getFileSize() const { return _filesize; }
+		State				getState() const { return _state; }
+		FileSize			getShareSize() const;
 		bool				hasPassword() const { return !_password.empty(); }
-		bool				verifyPassword(Wt::WString password) const;
-		std::string			getDesc() const { return _desc; }
-		Wt::WDateTime			getCreationTime() const { return _creationTime; }
-		Wt::WDateTime			getExpiryTime() const { return _expiryTime; }
-		bool				hasExpired() const;
-		std::size_t			getMaxHits() const { return _maxHits; }
-		std::size_t			getHits() const { return _hits; }
-		std::string			getDownloadUUID() const { return _downloadUUID; }
-		std::string			getEditUUID() const { return _editUUID; }
-		std::string			getClientAddr() const { return _clientAddress; }
+		std::string_view	getDesc() const { return _desc; }
+		Wt::WDateTime		getCreationTime() const { return _creationTime; }
+		Wt::WDateTime		getExpiryTime() const { return _expiryTime; }
+		UUID				getDownloadUUID() const { return *UUID::fromString(_downloadUUID); }
+		UUID				getEditUUID() const { return *UUID::fromString(_editUUID); }
+		std::string_view	getClientAddr() const { return _clientAddress; }
+		std::vector<Wt::Dbo::ptr<File>>	getFiles() const;
+		std::vector<IdType>	getFileIds() const;
+		std::size_t			getFileCount() const;
+		Wt::Auth::PasswordHash getPasswordHash() const;
 
 		// Setters
-		void setFileName(std::string name) { _filename = name; }
-		void setFileSize(std::size_t size) { _filesize = size; }
-		void setPassword(Wt::WString password);
-		void setDesc(std::string desc) { _desc = desc; }
+		void setDownloadUUID(const UUID& uuid) { _downloadUUID = uuid.getAsString(); }
+		void setEditUUID(const UUID& uuid) { _editUUID = uuid.getAsString(); }
+		void setState(State state) { _state = state; }
+		void setShareName(std::string_view name) { _shareName = name; }
+		void setPasswordHash(const Wt::Auth::PasswordHash& hash);
+		void setDesc(std::string_view desc) { _desc = desc; }
 		void setCreationTime(Wt::WDateTime time) { _creationTime = time; }
 		void setValidityDuration(Wt::WDateTime time);
-		void setMaxHits(std::size_t maxHits)	{ _maxHits = maxHits; }
-		void incHits()				{ _hits++; }
 		void setExpiryTime(Wt::WDateTime expiryTime) { _expiryTime = expiryTime; }
-		void setClientAddr(std::string addr) { _clientAddress = addr; }
-
+		void setClientAddr(std::string_view addr) { _clientAddress = addr; }
+		void incHits();
 
 		template<class Action>
 			void persist(Action& a)
 			{
-				Wt::Dbo::field(a, _filename,		"filename");
-				Wt::Dbo::field(a, _filesize,		"filesize");
-				Wt::Dbo::field(a, _checksum,		"checksum");
+				Wt::Dbo::field(a, _state,			"state");
+				Wt::Dbo::field(a, _shareName,		"share_name");
 				Wt::Dbo::field(a, _clientAddress,	"client_addr");
 				Wt::Dbo::field(a, _password,		"password");
-				Wt::Dbo::field(a, _salt,		"salt");
+				Wt::Dbo::field(a, _salt,			"salt");
 				Wt::Dbo::field(a, _hashFunc,		"hash_func");
-				Wt::Dbo::field(a, _desc,		"desc");
+				Wt::Dbo::field(a, _desc,			"desc");
 				Wt::Dbo::field(a, _creationTime,	"creation_time");
 				Wt::Dbo::field(a, _expiryTime,		"expiry_time");
-				Wt::Dbo::field(a, _maxHits,		"max_hits");
-				Wt::Dbo::field(a, _hits,		"hits");
 				Wt::Dbo::field(a, _downloadUUID,	"download_UUID");
 				Wt::Dbo::field(a, _editUUID,		"edit_UUID");
+
+				Wt::Dbo::hasMany(a, _files, Wt::Dbo::ManyToOne, "share");
 			}
 
 	private:
 
-		std::string	_filename;
-		long long	_filesize = 0;
-		std::string	_checksum;
-		std::string	_clientAddress;	// Client IP address that uploaded the file
-		std::string	_password;	// optional
+		State		_state {State::Init};
+		std::string	_shareName;
+		std::string	_clientAddress;		// Client IP address that uploaded the file
+		std::string	_password;			// optional
 		std::string	_salt;
 		std::string	_hashFunc;
-		std::string	_desc;		// optional
+		std::string	_desc;				// optional
 
 		Wt::WDateTime	_creationTime;
 		Wt::WDateTime	_expiryTime;
 
-		int		_hits = 0;
-		int		_maxHits = 0;	//optional
-
 		std::string		_downloadUUID;
 		std::string		_editUUID;
+
+		Wt::Dbo::collection<Wt::Dbo::ptr<File>> _files;
 
 
 };

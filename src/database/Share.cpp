@@ -19,73 +19,38 @@
 
 #include "Share.hpp"
 
-#include <Wt/WLocalDateTime.h>
+#include <Wt/Auth/PasswordHash.h>
 
-#include <Wt/Auth/PasswordVerifier.h>
-#include <Wt/Auth/HashFunction.h>
-
-#include "utils/Config.hpp"
 #include "utils/Logger.hpp"
-#include "utils/UUID.hpp"
+#include "File.hpp"
 
 namespace Database {
 
-Share::Share()
-:
-_downloadUUID(generateUUID()),
-_editUUID(generateUUID())
-{
-}
-
 Share::pointer
-Share::create(Wt::Dbo::Session& session, std::filesystem::path path)
+Share::create(Wt::Dbo::Session& session)
 {
-	auto share = session.add(std::make_unique<Share>());
-	auto storePath = share->getPath();
-
-	std::error_code ec;
-	std::filesystem::rename(path, storePath, ec);
-	if (ec)
-	{
-		FS_LOG(DB, ERROR) << "Move file failed from " << path.string() << " to " << storePath.string() << ": " << ec.message();
-		share.remove();
-		return Share::pointer();
-	}
-
-	share.modify()->setFileSize(std::filesystem::file_size(storePath));
-
-	return share;
-}
-
-void
-Share::destroy()
-{
-	std::error_code ec;
-	std::filesystem::remove(getPath(), ec);
-	if (ec)
-		FS_LOG(DB, ERROR) << "Cannot remove file " << getPath().string() << ": " << ec.message();
-}
-
-Share::pointer
-Share::getByEditUUID(Wt::Dbo::Session& session, std::string UUID)
-{
-	pointer res = session.find<Share>().where("edit_UUID = ?").bind(UUID);
-
-	if (!res || !std::filesystem::exists(res->getPath()))
-		return pointer();
+	pointer res {session.add(std::make_unique<Share>())};
+	session.flush();
 
 	return res;
 }
 
 Share::pointer
-Share::getByDownloadUUID(Wt::Dbo::Session& session, std::string UUID)
+Share::getByEditUUID(Wt::Dbo::Session& session, const UUID& uuid)
 {
-	pointer res = session.find<Share>().where("download_UUID = ?").bind(UUID);
+	return session.find<Share>().where("edit_UUID = ?").bind(uuid.getAsString());
+}
 
-	if (!res || !std::filesystem::exists(res->getPath()))
-		return pointer();
+Share::pointer
+Share::getById(Wt::Dbo::Session& session, IdType id)
+{
+	return session.find<Share>().where("id = ?").bind(id);
+}
 
-	return res;
+Share::pointer
+Share::getByDownloadUUID(Wt::Dbo::Session& session, const UUID& uuid)
+{
+	return session.find<Share>().where("download_UUID = ?").bind(uuid.getAsString());
 }
 
 std::vector<Share::pointer>
@@ -95,116 +60,52 @@ Share::getAll(Wt::Dbo::Session& session)
 	return std::vector<pointer>(res.begin(), res.end());
 }
 
-bool
-Share::hasExpired() const
+std::vector<File::pointer>
+Share::getFiles() const
 {
-	if (_maxHits > 0 && _hits >= _maxHits)
-		return true;
+	return std::vector<File::pointer>(_files.begin(), _files.end());
+}
 
-	auto now = Wt::WLocalDateTime::currentDateTime().toUTC();
-	if (now >= _expiryTime)
-		return true;
+std::vector<IdType>
+Share::getFileIds() const
+{
+	assert(self());
+	assert(IdIsValid(self()->id()));
+	assert(session());
 
-	return false;
+	Wt::Dbo::collection<IdType> res = session()->query<IdType>("SELECT id FROM file WHERE file.share_id = ?").bind(self()->id());
+	return std::vector<IdType>(res.begin(), res.end());
+}
 
+Wt::Auth::PasswordHash
+Share::getPasswordHash() const
+{
+	return {_hashFunc, _salt, _password};
+}
+
+FileSize
+Share::getShareSize() const
+{
+	assert(self());
+	assert(IdIsValid(self()->id()));
+	assert(session());
+
+	return session()->query<long long>("SELECT COALESCE(SUM(size), 0) from file WHERE file.share_id = ?").bind(self()->id());
 }
 
 void
-Share::setPassword(Wt::WString password)
+Share::setPasswordHash(const Wt::Auth::PasswordHash& hash)
 {
-	auto hashFunc = std::make_unique<Wt::Auth::BCryptHashFunction>(Config::instance().getULong("bcrypt-count", 12));
-
-	Wt::Auth::PasswordVerifier verifier;
-	verifier.addHashFunction(std::move(hashFunc));
-
-	auto hash = verifier.hashPassword(password);
-
 	_password = hash.value();
 	_salt = hash.salt();
 	_hashFunc = hash.function();
 }
 
-bool
-Share::verifyPassword(Wt::WString password) const
+void
+Share::incHits()
 {
-	auto hashFunc = std::make_unique<Wt::Auth::BCryptHashFunction>(Config::instance().getULong("bcrypt-count", 12));
-	Wt::Auth::PasswordVerifier verifier;
-	verifier.addHashFunction(std::move(hashFunc));
-
-	Wt::Auth::PasswordHash hash(_hashFunc, _salt, _password);
-
-	return verifier.verify(password, hash);
-}
-
-std::filesystem::path
-Share::getPath() const
-{
-	return Config::instance().getPath("working-dir") / "files" / _downloadUUID;
-}
-
-std::size_t
-Share::getMaxFileSize()
-{
-	return Config::instance().getULong("max-file-size", 100);
-}
-
-std::chrono::seconds
-Share::getMaxValidatityDuration()
-{
-	const auto durationDay =  std::chrono::hours(24);
-	auto maxDuration = durationDay * Config::instance().getULong("max-validity-days", 100);
-
-	if (durationDay > maxDuration)
-		maxDuration = durationDay;
-
-	return maxDuration;
-}
-
-std::chrono::seconds
-Share::getDefaultValidatityDuration()
-{
-	const auto durationDay =  std::chrono::duration_cast<std::chrono::seconds>(std::chrono::hours(24));
-	auto defaultDuration = std::chrono::duration_cast<std::chrono::seconds>(durationDay * Config::instance().getULong("default-validity-days", 7));
-	auto maxDuration = getMaxValidatityDuration();
-
-	if (defaultDuration < durationDay)
-		defaultDuration = durationDay;
-
-	if (defaultDuration > maxDuration)
-		defaultDuration = maxDuration;
-
-	return defaultDuration;
-}
-
-bool
-Share::userCanSetValidatityDuration()
-{
-	return Config::instance().getBool("user-defined-validy-days", true);
-}
-
-
-std::size_t
-Share::getMaxValidatityHits()
-{
-	return Config::instance().getULong("max-validity-hits", 100);
-}
-
-std::size_t
-Share::getDefaultValidatityHits()
-{
-	auto defaultHits = Config::instance().getULong("default-validity-hits", 30);
-	auto maxHits = getMaxValidatityHits();
-
-	if (maxHits != 0 && maxHits < defaultHits)
-		defaultHits = maxHits;
-
-	return defaultHits;
-}
-
-bool
-Share::userCanSetValidatityHits()
-{
-	return Config::instance().getBool("user-defined-validy-hits", true);
+	for (auto& file : _files)
+		file.modify()->incHits();
 }
 
 } // namespace Database

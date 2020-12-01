@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Emeric Poupon
+ * Copyright (C) 2020 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -19,7 +19,29 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 
-std::string generateUUID();
+#include "utils/String.hpp"
+
+class UUID
+{
+	public:
+
+		static UUID generate();
+		static std::optional<UUID> fromString(std::string_view str);
+
+		const std::string& getAsString() const { return _value; }
+
+	private:
+		UUID(std::string_view value);
+		std::string _value;
+};
+
+namespace StringUtils
+{
+	template <>
+	std::optional<UUID>
+	readAs(const std::string& str);
+}
 

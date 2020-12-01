@@ -5,10 +5,7 @@
 <message id="template-main">
 	${navbar-top}
 	<div class="container">
-		<div class="jumbotron">
-			${contents}
-		</div>
-		<p class="text-right">${tos} | <a href="https://github.com/epoupon/fileshelter" rel="noreferrer"><i class="fa fa-github"> Github</i></a></p>
+		${contents}
 	</div>
 </message>
 
@@ -18,20 +15,10 @@
 	${share-create-btn}
 </message>
 
-<message id="template-share-create">
+<message id="template-share-create-form">
 	<h1><i class="fa fa-upload"></i> ${tr:msg-share-create}</h1>
-	<div class="panel panel-default">
-		<div class="panel-body">
-			${file}
-		</div>
-		<div class="panel-footer">
-			${msg-max-size}
-		</div>
-	</div>
-	${form}
-</message>
-
-<message id="template-form-share-create">
+	${file-drop}
+	${files}
 	<div class="form-horizontal">
 		<div class="form-group">
 			<label class="control-label col-sm-2"  for="${id:desc}">
@@ -70,31 +57,6 @@
 			</div>
 			${</if-validity-duration>}
 
-			${<if-validity-hits>}
-			${<if-validity-hits-limit>}
-			<div class="form-group">
-				<label class="control-label col-sm-2"  for="${id:hits-validity-limit}">
-					${tr:msg-max-hits-limit}
-				</label>
-				<div class="col-sm-10">
-					${hits-validity-limit class="form-control-static"}
-				</div>
-			</div>
-			${</if-validity-hits-limit>}
-
-			<div class="form-group">
-				<label class="control-label col-sm-2"  for="${id:hits-validity}">
-					${tr:msg-max-hits}
-				</label>
-				<div class="col-sm-5">
-					${hits-validity}
-				</div>
-				<div class="help-block col-sm-5">
-					${hits-validity-info}
-				</div>
-			</div>
-			${</if-validity-hits>}
-
 			<div class="form-group">
 				<label class="control-label col-sm-2"  for="${id:password}">
 					${tr:msg-password}
@@ -107,12 +69,35 @@
 				</div>
 			</div>
 		</details>
+		${<if-max-share-size>}
+		<div class="alert alert-danger">
+			<i class="fa fa-warning" aria-hidden="true"></i> ${max-size}
+		</div>
+		${</if-max-share-size>}
+		${<if-has-duplicate-names>}
+		<div class="alert alert-danger">
+			<i class="fa fa-warning" aria-hidden="true"></i> ${tr:msg-has-duplicate-names}
+		</div>
+		${</if-has-duplicate-names>}
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-10">
 				${create-btn class="btn-primary"}
 			</div>
 		</div>
 	</div>
+</message>
+
+<message id="template-share-create-form-file">
+	<div class="row">
+		<div class="col-xs-8">${name}</div>
+		<div class="col-xs-2">${size}</div>
+		<div class="col-xs-2">${del-btn}</div>
+	</div>
+</message>
+
+<message id="template-share-create-progress">
+	${tr:msg-upload-in-progress}
+	${progress}
 </message>
 
 <message id="template-share-create-password">
@@ -204,7 +189,7 @@
 			<label class="control-label col-sm-2">
 				${tr:msg-description}
 			</label>
-			<div class="col-sm-5">
+			<div class="col-sm-10">
 				<div class="well well-sm">
 					${file-desc}
 				</div>
@@ -213,21 +198,11 @@
 		${</if-desc>}
 		<div class="form-group">
 			<label class="control-label col-sm-2">
-				${tr:msg-file-name}
+				${tr:msg-share-size}
 			</label>
-			<div class="col-sm-5">
+			<div class="col-sm-10">
 				<div class="well well-sm">
-					${file-name}
-				</div>
-			</div>
-		</div>
-		<div class="form-group">
-			<label class="control-label col-sm-2">
-				${tr:msg-file-size}
-			</label>
-			<div class="col-sm-5">
-				<div class="well well-sm">
-					${file-size}
+					${share-size}
 				</div>
 			</div>
 		</div>
@@ -235,17 +210,24 @@
 			<label class="control-label col-sm-2">
 				${tr:msg-expires}
 			</label>
-			<div class="col-sm-5">
+			<div class="col-sm-10">
 				<div class="well well-sm">
 					${expiry-date-time}
 				</div>
 			</div>
 		</div>
-		<div class="form-group">
-			<div class="col-sm-offset-2 col-sm-5">
-				${download-btn class="btn btn-primary"}
-			</div>
+		<div class="panel panel-default">
+			<div class="panel-heading"><h3>${tr:msg-files}</h3> ${download-as-zip-btn class="btn btn-primary"}</div>
+			<div class="panel-body">${files class="table table-striped table-hover"}</div>
 		</div>
+	</div>
+</message>
+
+<message id="template-share-download-file">
+	<div  class="row">
+		<div class="col-xs-8">${name}</div>
+		<div class="col-xs-2">${size}</div>
+		<div class="col-xs-2">${download-btn}</div>
 	</div>
 </message>
 
@@ -337,5 +319,10 @@
 	<h1><i class="fa fa-remove"></i> ${tr:msg-share-deleted}</h1>
 </message>
 
+<message id="template-progress-bar">
+	<div class="progress">
+		${progress}
+	</div>
+</message>
 
 </messages>

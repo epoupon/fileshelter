@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Emeric Poupon
+ * Copyright (C) 2020 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -22,25 +22,36 @@
 #include <optional>
 #include <string_view>
 
-#include <Wt/WContainerWidget.h>
+#include <Wt/WResource.h>
+#include <Wt/WLink.h>
 
 #include "utils/UUID.hpp"
 
-namespace UserInterface
+namespace Database
 {
+	class Db;
+}
 
-	class ShareDownload : public Wt::WContainerWidget
-	{
-		public:
-			ShareDownload();
+class ShareResource : public Wt::WResource
+{
+	public:
+		ShareResource(Database::Db& db);
+		~ShareResource();
 
-		private:
-			void refresh() override;
+		ShareResource(const ShareResource&) = delete;
+		ShareResource(ShareResource&&) = delete;
+		ShareResource& operator=(const ShareResource&) = delete;
+		ShareResource& operator=(ShareResource&&) = delete;
 
-			void displayNotFound();
-			void displayPassword(const UUID& downloadUUID);
-			void displayDownload(const UUID& downloadUUID, std::optional<std::string_view> password = std::nullopt);
-	};
+		static std::string_view getDeployPath();
+		static Wt::WLink createLink(const UUID& uuid, std::optional<std::string_view> password = std::nullopt);
 
-} // namespace UserInterface
+	private:
+
+		void handleRequest(const Wt::Http::Request& request, Wt::Http::Response& response) override;
+
+		static constexpr std::size_t _bufferSize {32768};
+		Database::Db& _db;
+};
+
 

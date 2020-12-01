@@ -20,29 +20,38 @@
 #pragma once
 
 #include <filesystem>
+#include <memory>
+#include <mutex>
 
-#include <Wt/WStreamResource.h>
+#include <Wt/Dbo/Dbo.h>
+#include <Wt/Dbo/Session.h>
+#include <Wt/Dbo/SqlConnectionPool.h>
 
+namespace Database {
 
-namespace UserInterface {
-
-class ShareResource : public Wt::WStreamResource
+class Db
 {
 	public:
+		Db(const std::filesystem::path& db);
 
-		ShareResource(std::string downloadUUID);
-		~ShareResource();
+		Db(const Db&) = delete;
+		Db(Db&&) = delete;
+		Db& operator=(const Db&) = delete;
+		Db& operator=(Db&&) = delete;
 
-		void setFileName(const std::string& name);
+		Wt::Dbo::Session& getTLSSession();
 
 	private:
 
-		void handleRequest(const Wt::Http::Request& request,
-				  Wt::Http::Response& response);
+		void prepare();
+		void doMigrationIfNeeded(Wt::Dbo::Session& session);
+		std::unique_ptr<Wt::Dbo::Session> createSession();
 
-		std::string _downloadUUID;
-		std::filesystem::path _path;
+		std::unique_ptr<Wt::Dbo::SqlConnectionPool> _connectionPool;
+		std::mutex _tlsSessionsMutex;
+		std::vector<std::unique_ptr<Wt::Dbo::Session>> _tlsSessions;
 };
 
-} // namespace UserInterface
+} // namespace Database
+
 

@@ -19,29 +19,33 @@
 
 #include "ShareCreate.hpp"
 
+#include <numeric>
+#include <unordered_set>
+
 #include <Wt/WAbstractItemModel.h>
-#include <Wt/WCheckBox.h>
 #include <Wt/WComboBox.h>
 #include <Wt/WDateTime.h>
 #include <Wt/WEnvironment.h>
-#include <Wt/WFileUpload.h>
+#include <Wt/WFileDropWidget.h>
 #include <Wt/WFormModel.h>
 #include <Wt/WIntValidator.h>
 #include <Wt/WLocalDateTime.h>
 #include <Wt/WLineEdit.h>
-#include <Wt/WProgressBar.h>
 #include <Wt/WPushButton.h>
 #include <Wt/WSpinBox.h>
+#include <Wt/WStackedWidget.h>
 #include <Wt/WStringListModel.h>
+#include <Wt/WTimer.h>
 #include <Wt/WTemplateFormView.h>
-
 #include "utils/Config.hpp"
+#include "utils/Exception.hpp"
 #include "utils/Logger.hpp"
 #include "utils/UUID.hpp"
-#include "utils/Zip.hpp"
 
 #include "database/Share.hpp"
+#include "share/ShareUtils.hpp"
 
+#include "ProgressBar.hpp"
 #include "FileShelterApplication.hpp"
 #include "PasswordUtils.hpp"
 #include "ShareCreatePassword.hpp"
@@ -85,48 +89,28 @@ Wt::WDateTime operator+(const Wt::WDateTime& dateTime, const Duration& duration)
 	return dateTime;
 }
 
-class ShareParameters
+struct ShareParameters
 {
-	public:
-		Wt::WString	description;
-		Duration	maxDuration;
-		std::size_t	maxHits;
-		Wt::WString	password;
+	Wt::WString	description;
+	Duration	maxDuration;
+	Wt::WString	password;
+	std::vector<const Wt::Http::UploadedFile*> uploadedFiles;
 };
-
-static std::pair<std::size_t, std::size_t> computeHitsRange()
-{
-	std::size_t max;
-	auto maxValidityHits = Share::getMaxValidatityHits();
-
-	if (maxValidityHits > 0)
-		max = maxValidityHits;
-	else
-		max = std::numeric_limits<int>::max();
-
-	return std::make_pair(1, max);
-}
 
 class ShareCreateFormModel : public Wt::WFormModel
 {
 	public:
 
-		// Associate each field with a unique string literal.
-		static const Field DescriptionField;
-		static const Field FileField;
-		static const Field DurationValidityField;
-		static const Field DurationUnitValidityField;
-		static const Field HitsValidityLimitField;
-		static const Field HitsValidityField;
-		static const Field PasswordField;
+		static inline const Field DescriptionField {"desc"};
+		static inline const Field DurationValidityField {"duration-validity"};
+		static inline const Field DurationUnitValidityField {"duration-unit-validity"};
+		static inline const Field PasswordField {"password"};
 
 		ShareCreateFormModel()
 		{
 			addField(DescriptionField, Wt::WString::tr("msg-optional"));
 			addField(DurationValidityField);
 			addField(DurationUnitValidityField);
-			addField(HitsValidityLimitField);
-			addField(HitsValidityField);
 			addField(PasswordField, Wt::WString::tr("msg-optional"));
 
 			initializeModels();
@@ -140,30 +124,13 @@ class ShareCreateFormModel : public Wt::WFormModel
 			durationValidator->setBottom(1);
 			setValidator(DurationValidityField, std::move(durationValidator));
 
-			updateValidityDuration( Share::getDefaultValidatityDuration() );
+			updateValidityDuration( ShareUtils::getDefaultValidatityDuration() );
 			updateDurationValidator();
-
-			// Hits validity
-			setValue(HitsValidityLimitField, Share::getDefaultValidatityHits() != 0);
-
-			auto hitsRange = computeHitsRange();
-			auto hitsValidator = std::make_unique<Wt::WIntValidator>();
-			hitsValidator->setMandatory(true);
-			hitsValidator->setRange(hitsRange.first, hitsRange.second);
-			setValidator(HitsValidityField, std::move(hitsValidator));
-
-			std::size_t suggestedValidityHits = Share::getDefaultValidatityHits();
-			if (suggestedValidityHits > hitsRange.second)
-				suggestedValidityHits = hitsRange.second;
-			else if (suggestedValidityHits < hitsRange.first)
-				suggestedValidityHits = hitsRange.first;
-
-			setValue(HitsValidityField, suggestedValidityHits);
 		}
 
 		void updateDurationValidator()
 		{
-			auto maxValidityDuration = Share::getMaxValidatityDuration();
+			auto maxValidityDuration = ShareUtils::getMaxValidatityDuration();
 			auto durationValidator = std::dynamic_pointer_cast<Wt::WIntValidator>(validator(DurationValidityField));
 
 			auto maxValidityDurationHours = std::chrono::duration_cast<std::chrono::hours>(maxValidityDuration).count();
@@ -215,7 +182,7 @@ class ShareCreateFormModel : public Wt::WFormModel
 
 		void updateValidityDuration(std::chrono::seconds duration)
 		{
-			auto maxValidityDuration = Share::getMaxValidatityDuration();
+			auto maxValidityDuration = ShareUtils::getMaxValidatityDuration();
 			if (duration > maxValidityDuration)
 				duration = maxValidityDuration;
 
@@ -255,7 +222,7 @@ class ShareCreateFormModel : public Wt::WFormModel
 
 		void initializeModels()
 		{
-			auto maxDuration = std::chrono::duration_cast<std::chrono::hours>(Share::getMaxValidatityDuration());
+			auto maxDuration = std::chrono::duration_cast<std::chrono::hours>(ShareUtils::getMaxValidatityDuration());
 
 			_durationValidityModel = std::make_shared<Wt::WStringListModel>();
 
@@ -274,32 +241,61 @@ class ShareCreateFormModel : public Wt::WFormModel
 		std::shared_ptr<Wt::WStringListModel>	_durationValidityModel;
 };
 
-const Wt::WFormModel::Field ShareCreateFormModel::DescriptionField = "desc";
-const Wt::WFormModel::Field ShareCreateFormModel::FileField = "file";
-const Wt::WFormModel::Field ShareCreateFormModel::DurationValidityField = "duration-validity";
-const Wt::WFormModel::Field ShareCreateFormModel::DurationUnitValidityField = "duration-unit-validity";
-const Wt::WFormModel::Field ShareCreateFormModel::HitsValidityLimitField = "hits-validity-limit";
-const Wt::WFormModel::Field ShareCreateFormModel::HitsValidityField = "hits-validity";
-const Wt::WFormModel::Field ShareCreateFormModel::PasswordField = "password";
-
 class ShareCreateFormView : public Wt::WTemplateFormView
 {
 	public:
 
-	Wt::Signal<ShareParameters>& validated() { return _sigValidated;}
+	Wt::Signal<>& validated() { return _sigValidated;}
+	Wt::Signal<unsigned>& progressUpdate() { return _sigProgressUpdate;}
+	Wt::Signal<ShareParameters>& complete() { return _sigComplete;}
+
+	unsigned getProgress() const
+	{
+		return (_totalReceivedSize + _currentReceivedSize ) * 100 / _totalSize;
+	}
 
 	ShareCreateFormView()
+	: _model {std::make_shared<ShareCreateFormModel>()}
 	{
-		auto model = std::make_shared<ShareCreateFormModel>();
+		setTemplateText(tr("template-share-create-form"));
 
-		setTemplateText(tr("template-form-share-create"));
-		addFunction("id", &WTemplate::Functions::id);
-		addFunction("block", &WTemplate::Functions::id);
+		bindString("max-size", Wt::WString::tr("msg-max-share-size").arg( sizeToString(ShareUtils::getMaxShareSize()) ));
+
+		_drop = bindNew<Wt::WFileDropWidget>("file-drop");
+
+		auto* filesContainer {bindNew<Wt::WContainerWidget>("files")};
+
+		_drop->drop().connect([=](const std::vector<Wt::WFileDropWidget::File*>& files)
+		{
+			for (Wt::WFileDropWidget::File* file : files)
+			{
+				auto* fileEntry {filesContainer->addNew<Wt::WTemplate>(tr("template-share-create-form-file"))};
+				fileEntry->bindString("name", file->clientFileName(), Wt::TextFormat::Plain);
+				fileEntry->bindString("size", sizeToString(file->size()), Wt::TextFormat::Plain);
+				auto* delBtn {fileEntry->bindNew<Wt::WText>("del-btn", tr("template-share-create-del-btn"))};
+
+				delBtn->clicked().connect([=]
+				{
+					_drop->cancelUpload(file);
+					_drop->remove(file); 			// may not work if current handled file is before this one
+					_deletedFiles.emplace(file);	// hence this tracking
+					filesContainer->removeWidget(fileEntry);
+					checkFiles();
+				});
+			}
+
+			checkFiles();
+		});
+
+		_drop->tooLarge().connect([=](const Wt::WFileDropWidget::File* file, std::uint64_t size)
+		{
+			FS_LOG(UI, ERROR) << "File '" << file->clientFileName() << "' is too large: " << size;
+		});
 
 		// Desc
 		setFormWidget(ShareCreateFormModel::DescriptionField, std::make_unique<Wt::WLineEdit>());
 
-		if (Share::userCanSetValidatityDuration())
+		if (ShareUtils::canValidatityDurationBeSet())
 		{
 			setCondition("if-validity-duration", true);
 			// Duration validity
@@ -307,110 +303,257 @@ class ShareCreateFormView : public Wt::WTemplateFormView
 
 			// Duration validity unit
 			auto durationUnitValidity = std::make_unique<Wt::WComboBox>();
-			durationUnitValidity->setModel(model->durationValidityModel());
+			durationUnitValidity->setModel(_model->durationValidityModel());
 
 			// each time the unit is changed, make sure to update the limits
 			durationUnitValidity->changed().connect([=]
 			{
-				updateModel(model.get());
-				model->updateDurationValidator();
+				updateModel(_model.get());
+				_model->updateDurationValidator();
 
 				// Revalidate the fields if necessary
-				if (model->isValidated(ShareCreateFormModel::DurationValidityField))
+				if (_model->isValidated(ShareCreateFormModel::DurationValidityField))
 				{
-					model->validateField(ShareCreateFormModel::DurationValidityField);
-					model->validateField(ShareCreateFormModel::DurationUnitValidityField);
+					_model->validateField(ShareCreateFormModel::DurationValidityField);
+					_model->validateField(ShareCreateFormModel::DurationUnitValidityField);
 				}
 
-				updateView(model.get());
+				updateView(_model.get());
 			});
 
 			setFormWidget(ShareCreateFormModel::DurationUnitValidityField, std::move(durationUnitValidity));
 		}
 
-		// Hits validity
-
-		if (Share::userCanSetValidatityHits())
-		{
-			setCondition("if-validity-hits", true);
-
-			auto hitsRange = computeHitsRange();
-			auto hitsValidity = std::make_unique<Wt::WSpinBox>();
-			hitsValidity->setRange(hitsRange.first, hitsRange.second);
-			setFormWidget(ShareCreateFormModel::HitsValidityField, std::move(hitsValidity));
-
-			// If the maximum number of download is unlimited, add a checkbox to enable a limit
-			if (Share::getMaxValidatityHits() == 0)
-			{
-				setCondition("if-validity-hits-limit", true);
-				auto hitsValidityLimit = std::make_unique<Wt::WCheckBox>();
-				auto hitsValidityLimitRaw = hitsValidityLimit.get();
-				setFormWidget(ShareCreateFormModel::HitsValidityLimitField, std::move(hitsValidityLimit));
-
-				hitsValidityLimit->changed().connect([=] ()
-					{
-						model->setReadOnly(ShareCreateFormModel::HitsValidityField,
-								!(hitsValidityLimitRaw->checkState() == Wt::CheckState::Checked));
-						updateModel(model.get());
-						updateViewField(model.get(), ShareCreateFormModel::HitsValidityField);
-					});
-			}
-		}
-
 		// Password
-		auto password = std::make_unique<Wt::WLineEdit>();
+		auto password {std::make_unique<Wt::WLineEdit>()};
 		password->setEchoMode(Wt::EchoMode::Password);
 		setFormWidget(ShareCreateFormModel::PasswordField, std::move(password));
 
 		// Buttons
-		Wt::WPushButton *uploadBtn = bindNew<Wt::WPushButton>("create-btn", tr("msg-upload"));
-		uploadBtn->clicked().connect([=]
+		_createBtn = bindNew<Wt::WPushButton>("create-btn", tr("msg-create"));
+		_createBtn->disable();
+		_createBtn->clicked().connect([=]
 		{
-			updateModel(model.get());
+			updateModel(_model.get());
 
-			if (model->validate())
+			if (_model->validate())
 			{
-				FS_LOG(UI, DEBUG) << "Validation OK";
-				ShareParameters params;
-
-				params.description = model->valueText(ShareCreateFormModel::DescriptionField);
-				params.maxDuration.value = Wt::asNumber(model->value(ShareCreateFormModel::DurationValidityField));
-
-				auto unit = model->valueText(ShareCreateFormModel::DurationUnitValidityField);
-				if (unit == Wt::WString::tr("msg-hours"))
-					params.maxDuration.unit = Duration::Unit::Hours;
-				else if (unit == Wt::WString::tr("msg-days"))
-					params.maxDuration.unit = Duration::Unit::Days;
-				else if (unit == Wt::WString::tr("msg-weeks"))
-					params.maxDuration.unit = Duration::Unit::Weeks;
-				else if (unit == Wt::WString::tr("msg-months"))
-					params.maxDuration.unit = Duration::Unit::Months;
-				else if (unit == Wt::WString::tr("msg-years"))
-					params.maxDuration.unit = Duration::Unit::Years;
-
-				if (Wt::asNumber(model->value(ShareCreateFormModel::HitsValidityLimitField)))
-					params.maxHits = Wt::asNumber(model->value(ShareCreateFormModel::HitsValidityField));
-				else
-					params.maxHits = 0;
-
-				params.password = model->valueText(ShareCreateFormModel::PasswordField);
-
-				_sigValidated.emit(params);
+				_createBtn->disable();
+				listenFileEvents();
+				_sigValidated.emit();
 			}
 
-			updateView(model.get());
+			updateView(_model.get());
 		});
 
-		updateView(model.get());
+		updateView(_model.get());
+	}
+
+	~ShareCreateFormView()
+	{
+/*		for (Wt::WFileDropWidget::File* file : _drop->uploads())
+		{
+			_drop->cancelUpload(file);
+			_drop->remove(file);
+			if (file->uploadFinished())
+			{
+				file->uploadedFile().stealSpoolFile();
+				std::filesystem::remove(file->uploadedFile().spoolFileName());
+			}
+		}*/
 	}
 
 	private:
-		Wt::Signal<ShareParameters> _sigValidated;
 
+		void listenFileEvents()
+		{
+			for (Wt::WFileDropWidget::File* file : _drop->uploads())
+			{
+				if (isFileDeleted(*file))
+					continue;
+
+				_totalSize += file->size();
+				if (file->uploadFinished())
+				{
+					_totalReceivedSize += file->size();
+				}
+				else
+				{
+					file->dataReceived().connect([this](std::uint64_t received, std::uint64_t total)
+					{
+						_currentReceivedSize = received;
+						_sigProgressUpdate.emit(getProgress());
+					});
+
+					file->uploaded().connect([=]
+					{
+						_currentReceivedSize = 0;
+						_totalReceivedSize += file->size();
+
+						if (_totalReceivedSize == _totalSize)
+						{
+							_progressTimer.stop();
+							emitDone();
+						}
+					});
+				}
+			}
+
+			_progressTimer.setInterval(std::chrono::milliseconds {500});
+			_progressTimer.setSingleShot(false);
+			_progressTimer.timeout().connect([this]
+			{
+				_sigProgressUpdate.emit(getProgress());
+			});
+			_progressTimer.start();
+		}
+
+		void emitDone()
+		{
+			ShareParameters params;
+
+			params.description = _model->valueText(ShareCreateFormModel::DescriptionField);
+			params.maxDuration.value = Wt::asNumber(_model->value(ShareCreateFormModel::DurationValidityField));
+
+			auto unit = _model->valueText(ShareCreateFormModel::DurationUnitValidityField);
+			if (unit == Wt::WString::tr("msg-hours"))
+				params.maxDuration.unit = Duration::Unit::Hours;
+			else if (unit == Wt::WString::tr("msg-days"))
+				params.maxDuration.unit = Duration::Unit::Days;
+			else if (unit == Wt::WString::tr("msg-weeks"))
+				params.maxDuration.unit = Duration::Unit::Weeks;
+			else if (unit == Wt::WString::tr("msg-months"))
+				params.maxDuration.unit = Duration::Unit::Months;
+			else if (unit == Wt::WString::tr("msg-years"))
+				params.maxDuration.unit = Duration::Unit::Years;
+
+			params.password = _model->valueText(ShareCreateFormModel::PasswordField);
+
+			visitUploadedFiles([&](const Wt::WFileDropWidget::File& file)
+			{
+				params.uploadedFiles.emplace_back(&file.uploadedFile());
+			});
+
+			_sigComplete.emit(params);
+		}
+
+		void visitUploadedFiles(std::function<void(Wt::WFileDropWidget::File& file)> visitor)
+		{
+			for (auto* file : _drop->uploads())
+			{
+				if (!isFileDeleted(*file))
+					visitor(*file);
+			}
+		}
+
+		std::uint64_t getTotalFileSize() const
+		{
+			const auto& files {_drop->uploads()};
+			return std::accumulate(std::cbegin(files), std::cend(files), std::uint64_t {},
+					[this](std::uint64_t sum, const Wt::WFileDropWidget::File* file)
+					{
+						return sum + (isFileDeleted(*file) ? 0 : file->size());
+					});
+		}
+
+		bool shareSizeOverflow() const
+		{
+			return getTotalFileSize() > ShareUtils::getMaxShareSize();
+		};
+
+		bool hasDuplicateNames() const
+		{
+			std::unordered_set<std::string_view> names;
+
+			for (const Wt::WFileDropWidget::File* file : _drop->uploads())
+			{
+				if (!isFileDeleted(*file))
+				{
+					auto [it, inserted] {names.emplace(file->clientFileName())};
+					if (!inserted)
+						return true;
+				}
+			}
+
+			return false;
+		};
+
+		std::size_t countNbFilesToUpload() const
+		{
+			const auto& files {_drop->uploads()};
+			return std::count_if(std::cbegin(files), std::cend(files),
+					[this](const Wt::WFileDropWidget::File* file)
+					{
+						return (!isFileDeleted(*file));
+					});
+		}
+
+		void checkFiles()
+		{
+			const bool overflow {shareSizeOverflow()};
+			setCondition("if-max-share-size", overflow);
+
+			const bool duplicateNames {hasDuplicateNames()};
+			setCondition("if-has-duplicate-names", duplicateNames);
+
+			const std::size_t nbFiles {countNbFilesToUpload()};
+
+			if (overflow || duplicateNames || nbFiles == 0)
+				_createBtn->disable();
+			else
+				_createBtn->enable();
+		};
+
+		bool uploadComplete() const
+		{
+			const auto& files {_drop->uploads()};
+			return std::all_of(std::cbegin(files), std::cend(files), [this](const Wt::WFileDropWidget::File* file)
+					{
+						return isFileDeleted(*file) || file->uploadFinished();
+					});
+		}
+
+		bool isFileDeleted(const Wt::WFileDropWidget::File& file) const
+		{
+			return _deletedFiles.find(&file) != std::cend(_deletedFiles);
+		}
+
+		Wt::Signal<>				_sigValidated;
+		Wt::Signal<unsigned>		_sigProgressUpdate;
+		Wt::Signal<ShareParameters>	_sigComplete;
+
+		Wt::WTimer					_progressTimer;
+
+		std::shared_ptr<ShareCreateFormModel> _model;
+		Wt::WPushButton*			_createBtn {};
+
+		std::unordered_set<const Wt::WFileDropWidget::File*> _deletedFiles;
+		Wt::WFileDropWidget*		_drop {};
+		std::uint64_t 				_totalReceivedSize {};
+		std::uint64_t 				_currentReceivedSize {};
+		std::uint64_t 				_totalSize {};
 };
 
+class ShareCreateProgress : public Wt::WTemplate
+{
+	public:
+		ShareCreateProgress() : Wt::WTemplate {tr("template-share-create-progress")}
+		{
+			addFunction("tr", &Wt::WTemplate::Functions::tr);
+			_progress = bindNew<ProgressBar>("progress");
+		}
+
+		void handleProgressUpdate(unsigned progress)
+		{
+			_progress->setValue(progress);
+		}
+
+	private:
+		ProgressBar*	_progress {};
+};
+
+
 ShareCreate::ShareCreate()
-: _parameters(std::make_shared<ShareParameters>())
 {
 	wApp->internalPathChanged().connect([=]
 	{
@@ -437,8 +580,6 @@ ShareCreate::refresh()
 	if (!wApp->internalPathMatches("/share-create"))
 		return;
 
-	clear();
-
 	if (isUploadPassordRequired())
 		displayPassword();
 	else
@@ -450,7 +591,7 @@ ShareCreate::displayPassword()
 {
 	clear();
 
-	auto view = addNew<ShareCreatePassword>();
+	auto* view {addNew<ShareCreatePassword>()};
 	view->success().connect([=]
 	{
 		displayCreate();
@@ -462,120 +603,84 @@ ShareCreate::displayCreate()
 {
 	clear();
 
-	Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-create"));
-	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
-
-	t->bindNew<Wt::WText>("msg-max-size", Wt::WString::tr("msg-max-file-size").arg( sizeToString(Share::getMaxFileSize() * 1024*1024) ));
-
-	Wt::WFileUpload *upload = t->bindNew<Wt::WFileUpload>("file");
-	upload->setFileTextSize(80);
-	upload->setProgressBar(std::make_unique<Wt::WProgressBar>());
-	upload->setMultiple(true);
-
-	ShareCreateFormView* form = t->bindNew<ShareCreateFormView>("form");
-
-	upload->fileTooLarge().connect([=] ()
+	enum CreateStack
 	{
-		FS_LOG(UI, WARNING) << "File too large!";
-		displayError(Wt::WString::tr("msg-share-create-too-large"));
+		Form = 0,
+		Progress = 1,
+	};
+
+	Wt::WStackedWidget* stack {addNew<Wt::WStackedWidget>()};
+
+	auto* form {stack->addNew<ShareCreateFormView>()};
+	auto* progress {stack->addNew<ShareCreateProgress>()};
+
+	form->progressUpdate().connect(progress, [=](unsigned progressPerCent) { progress->handleProgressUpdate(progressPerCent); });
+
+	form->validated().connect([=] ()
+	{
+		stack->setCurrentIndex(CreateStack::Progress);
 	});
 
-	form->validated().connect([=] (ShareParameters params)
+	form->complete().connect([this](const ShareParameters& parameters)
 	{
-		FS_LOG(UI, DEBUG) << "Starting upload...";
+		FS_LOG(UI, DEBUG) << "Upload complete!";
+		UUID editUUID {createShare(parameters)};
 
-		// Start the upload
-		form->hide();
-		upload->upload();
-		*_parameters = params;
+		FS_LOG(UI, DEBUG) << "Redirecting...";
+		wApp->setInternalPath("/share-created/" + editUUID.getAsString(), true);
+
+		// Clear the widget in order to flush the temporary uploaded files
+		FS_LOG(UI, DEBUG) << "Clearing...";
+		clear();
+		FS_LOG(UI, DEBUG) << "Clearing done";
 	});
+}
 
-	upload->uploaded().connect([=] ()
+UUID
+ShareCreate::createShare(const ShareParameters& parameters)
+{
+	std::optional<Wt::Auth::PasswordHash> passwordHash;
+	if (!parameters.password.empty())
+		passwordHash = ShareUtils::computePasswordHash(parameters.password);
+
+	const UUID editUUID {UUID::generate()};
 	{
-		auto uploadedFiles = upload->uploadedFiles();
+		Wt::Dbo::Transaction transaction {FsApp->getDboSession()};
 
-		FS_LOG(UI, DEBUG) << uploadedFiles.size() << " file" << (uploadedFiles.size() > 1 ? "s" : "") << " successfully uploaded!";
-
-		// Special case: the user did not choose a file
-		if (uploadedFiles.empty())
-		{
-			FS_LOG(UI, ERROR) << "User did not select a file";
-			displayError(Wt::WString::tr("msg-no-file-selected"));
-			return;
-		}
-
-		std::filesystem::path sharePath;
-		Wt::WString fileName;
-
-		if (uploadedFiles.size() == 1)
-		{
-			sharePath = std::filesystem::path(uploadedFiles.front().spoolFileName());
-			fileName = Wt::WString::fromUTF8(uploadedFiles.front().clientFileName());
-			uploadedFiles.front().stealSpoolFile();
-		}
-		else
-		{
-			// Generate a zip that contains all the files in it
-			// Name it using the description, fall back on the first file name otherwise
-
-			Wt::WString description = _parameters->description;
-			if (!description.empty())
-				fileName = description + ".zip";
-			else
-				fileName = uploadedFiles.front().clientFileName() + ".zip";
-
-			sharePath = Config::instance().getPath("working-dir") / "tmp" / generateUUID();
-			try
-			{
-				ZipFileWriter zip {sharePath};
-
-				std::vector<std::filesystem::path> files;
-				for (auto uploadedFile : uploadedFiles)
-				{
-					zip.add(uploadedFile.clientFileName(),
-						std::filesystem::path(uploadedFile.spoolFileName()));
-				}
-			}
-			catch (std::exception& e)
-			{
-				FS_LOG(UI, ERROR) << "Cannot create zip file: " << e.what();
-				displayError(Wt::WString::tr("msg-internal-error"));
-				return;
-			}
-		}
-
-		Wt::Dbo::Transaction transaction(FsApp->getDboSession());
-
-		Database::Share::pointer share = Database::Share::create(FsApp->getDboSession(), sharePath);
+		FS_LOG(UI, DEBUG) << "Creating share...";
+		Database::Share::pointer share {Database::Share::create(FsApp->getDboSession())};
 		if (!share)
-		{
-			displayError(Wt::WString::tr("msg-internal-error"));
-			return;
-		}
+			throw FsException {Wt::WString::tr("msg-internal-error").toUTF8()};
 
-		auto now = Wt::WLocalDateTime::currentDateTime().toUTC();
+		const auto now {Wt::WLocalDateTime::currentDateTime().toUTC()};
 
-		share.modify()->setDesc(_parameters->description.toUTF8());
-		share.modify()->setFileName(fileName.toUTF8());
-		share.modify()->setMaxHits(_parameters->maxHits);
+		share.modify()->setDesc(parameters.description.toUTF8());
+		share.modify()->setDownloadUUID(UUID::generate());
+		share.modify()->setEditUUID(editUUID);
 		share.modify()->setCreationTime(now);
 		share.modify()->setClientAddr(wApp->environment().clientAddress());
 
 		// calculate the expiry date from the duration
-		share.modify()->setExpiryTime(now + _parameters->maxDuration);
+		share.modify()->setExpiryTime(now + parameters.maxDuration);
 
-		if (!_parameters->password.empty())
-			share.modify()->setPassword(_parameters->password);
+		if (passwordHash)
+			share.modify()->setPasswordHash(*passwordHash);
 
-		transaction.commit();
+		for (auto* uploadedFile : parameters.uploadedFiles)
+		{
+			FS_LOG(UI, DEBUG) << "PROCESSING FILE '" << uploadedFile->clientFileName() << "'";
 
-		FS_LOG(UI, INFO) << "[" << share->getDownloadUUID() << "] Share created. Client = " << share->getClientAddr() << ", size = " << share->getFileSize() << ", name = '" << share->getFileName() << "', desc = '" << share->getDesc() << "', expiry " << share->getExpiryTime().toString() << ", download limit = " << share->getMaxHits() << ", password protected = " << share->hasPassword();
+			uploadedFile->stealSpoolFile();
+			const std::filesystem::path clientFileName {uploadedFile->clientFileName()};
+			ShareUtils::addFileToShare(FsApp->getDboSession(), share.id(), uploadedFile->spoolFileName(), clientFileName.filename().string());
+		}
 
-		wApp->setInternalPath("/share-created/" + share->getEditUUID(), true);
+		share.modify()->setState(Database::Share::State::Ready);
 
-		// Clear the widget in order to flush the temporary uploaded files
-		clear();
-	});
+		FS_LOG(UI, INFO) << "[" << share->getDownloadUUID().getAsString() << "] Share created. Client = " << std::string {share->getClientAddr()} << ", size = " << share->getShareSize() << "', desc = '" << std::string {share->getDesc()} << "', expiry " << share->getExpiryTime().toString() << ", password protected = " << share->hasPassword() << ", download URL = '" << getDownloadURL(share) << "'";
+
+		return editUUID;
+	}
 
 }
 

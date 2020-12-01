@@ -38,6 +38,7 @@ enum class Module
 {
 	DB,
 	DBUPDATER,
+	SHARE,
 	MAIN,
 	UI,
 };

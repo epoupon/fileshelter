@@ -8,8 +8,6 @@ AC_LANG_CPLUSPLUS
 # Checks for programs
 AC_PROG_CXX
 
-PKG_CHECK_MODULES(libzip, libzip >= 0.11)
-
 AC_ARG_VAR([WT_RESOURCES_DIR],[Specify Wt's resources directory (default are '/usr/share/Wt/resources' and '/usr/local/share/Wt/resources')'])
 
 AC_CHECK_HEADERS([Wt/WApplication.h],

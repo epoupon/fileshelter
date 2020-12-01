@@ -22,18 +22,20 @@
 #include <Wt/WSignal.h>
 #include <Wt/WTemplateFormView.h>
 
+#include "utils/UUID.hpp"
+
 namespace UserInterface
 {
 
 class ShareDownloadPassword : public Wt::WTemplateFormView
 {
 	public:
-		Wt::Signal<>& success() { return _sigSuccess;}
+		Wt::Signal<std::string>& success() { return _sigSuccess;}
 
-		ShareDownloadPassword();
+		ShareDownloadPassword(const UUID& downloadUUID);
 
 	private:
-		Wt::Signal<> _sigSuccess;
+		Wt::Signal<std::string> _sigSuccess;
 };
 
 } // namespace UserInterface

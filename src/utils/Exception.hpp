@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Emeric Poupon
+ * Copyright (C) 2020 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -19,28 +19,12 @@
 
 #pragma once
 
-#include <filesystem>
+#include <exception>
 
-#include <Wt/Dbo/Dbo.h>
-#include <Wt/Dbo/SqlConnectionPool.h>
 
-namespace Database {
-
-class Handler
+class FsException : public std::runtime_error
 {
 	public:
-
-		Handler(Wt::Dbo::SqlConnectionPool& connectionPool);
-
-		Wt::Dbo::Session& getSession() { return _session; }
-
-		static std::unique_ptr<Wt::Dbo::SqlConnectionPool> createConnectionPool(const std::filesystem::path& db);
-
-	private:
-
-		Wt::Dbo::Session		_session;
+		using std::runtime_error::runtime_error;
 };
-
-} // namespace Database
-
 

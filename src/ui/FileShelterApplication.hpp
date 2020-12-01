@@ -21,26 +21,34 @@
 
 #include <Wt/WApplication.h>
 
-#include "database/DbHandler.hpp"
-
-namespace UserInterface {
-
-class FileShelterApplication : public Wt::WApplication
+namespace Wt::Dbo
 {
-	public:
-		static std::unique_ptr<Wt::WApplication> create(const Wt::WEnvironment& env, Wt::Dbo::SqlConnectionPool& connectionPool);
-		static FileShelterApplication* instance();
+	class Session;
+}
 
-		FileShelterApplication(const Wt::WEnvironment& env, Wt::Dbo::SqlConnectionPool& connectionPool);
+namespace Database
+{
+	class Db;
+}
 
-		// Session application data
-		Database::Handler& getDbHandler() { return _db;}
-		Wt::Dbo::Session& getDboSession() {return _db.getSession(); }
+namespace UserInterface
+{
 
-	private:
+	class FileShelterApplication : public Wt::WApplication
+	{
+		public:
+			static std::unique_ptr<Wt::WApplication> create(const Wt::WEnvironment& env, Database::Db& db);
+			static FileShelterApplication* instance();
 
-		Database::Handler	_db;
-};
+			FileShelterApplication(const Wt::WEnvironment& env, Database::Db& db);
+
+			// Session application data
+			Wt::Dbo::Session& getDboSession();
+
+		private:
+
+			Database::Db&	_db;
+	};
 
 #define FsApp FileShelterApplication::instance()
 

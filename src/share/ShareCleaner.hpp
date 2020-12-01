@@ -19,20 +19,35 @@
 
 #pragma once
 
-#include <filesystem>
-#include <string>
+#include <chrono>
+#include <boost/asio/system_timer.hpp>
+#include <Wt/WIOService.h>
 
-typedef struct zip zip_t;
+namespace Database
+{
+	class Db;
+}
 
-class ZipFileWriter
+class ShareCleaner
 {
 	public:
+		ShareCleaner(Database::Db& database);
+		~ShareCleaner();
 
-		ZipFileWriter(std::filesystem::path file);
-		~ZipFileWriter();
-
-		void add(const std::string& fileName, const std::filesystem::path& file);
+		ShareCleaner(const ShareCleaner&) = delete;
+		ShareCleaner(ShareCleaner&&) = delete;
+		ShareCleaner& operator=(const ShareCleaner&) = delete;
+		ShareCleaner& operator=(ShareCleaner&&) = delete;
 
 	private:
-		zip_t *_zip;
+
+		void start();
+		void stop();
+		void schedule(std::chrono::seconds duration);
+		void process();
+
+		Wt::WIOService _ioService;
+		boost::asio::system_timer _scheduleTimer;
+		Database::Db& _db;
 };
+

@@ -27,8 +27,9 @@
 #include "utils/Config.hpp"
 #include "utils/Logger.hpp"
 
-#include "database/DbHandler.hpp"
-#include "database/DbCleaner.hpp"
+#include "database/Db.hpp"
+#include "resources/ShareResource.hpp"
+#include "share/ShareCleaner.hpp"
 
 #include "ui/FileShelterApplication.hpp"
 
@@ -76,7 +77,7 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 		pt.put("server.application-settings.behind-reverse-proxy", Config::instance().getBool("behind-reverse-proxy", false));
 		pt.put("server.application-settings.progressive-bootstrap", true);
 
-		std::ofstream oss(wtConfigPath.string().c_str(), std::ios::out);
+		std::ofstream oss {wtConfigPath.string().c_str(), std::ios::out};
 		boost::property_tree::xml_parser::write_xml(oss, pt);
 	}
 
@@ -114,7 +115,7 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 			pt.add_child("messages.message", node);
 		}
 
-		std::ofstream oss(userMsgPath.string().c_str(), std::ios::out);
+		std::ofstream oss {userMsgPath.string().c_str(), std::ios::out};
 		boost::property_tree::xml_parser::write_xml(oss, pt);
 	}
 
@@ -124,8 +125,8 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 int main(int argc, char *argv[])
 {
 
-	std::filesystem::path configFilePath = "/etc/fileshelter.conf";
-	int res = EXIT_FAILURE;
+	std::filesystem::path configFilePath {"/etc/fileshelter.conf"};
+	int res {EXIT_FAILURE};
 
 	assert(argc > 0);
 	assert(argv[0] != NULL);
@@ -142,7 +143,7 @@ int main(int argc, char *argv[])
 		std::filesystem::create_directories(Config::instance().getPath("working-dir") / "files");
 
 		// Recreate the tmp directory in order to flush it
-		auto tmpDir = Config::instance().getPath("working-dir") / "tmp";
+		const auto tmpDir {Config::instance().getPath("working-dir") / "tmp"};
 		std::filesystem::remove_all(tmpDir);
 		std::filesystem::create_directories(tmpDir);
 
@@ -150,7 +151,7 @@ int main(int argc, char *argv[])
 		setenv("WT_TMP_DIR", tmpDir.string().c_str(), 1);
 
 		// Construct WT configuration and get the argc/argv back
-		std::vector<std::string> wtServerArgs = generateWtConfig(argv[0]);
+		std::vector<std::string> wtServerArgs {generateWtConfig(argv[0])};
 
 		const char* wtArgv[wtServerArgs.size()];
 		for (std::size_t i = 0; i < wtServerArgs.size(); ++i)
@@ -159,22 +160,22 @@ int main(int argc, char *argv[])
 			wtArgv[i] = wtServerArgs[i].c_str();
 		}
 
-		Wt::WServer server(argv[0]);
-		server.setServerConfiguration (wtServerArgs.size(), const_cast<char**>(wtArgv));
+		Wt::WServer server {argv[0]};
+		server.setServerConfiguration(wtServerArgs.size(), const_cast<char**>(wtArgv));
 
-		// Initializing a connection pool to the database that will be shared along services
-		std::unique_ptr<Wt::Dbo::SqlConnectionPool>
-			connectionPool( Database::Handler::createConnectionPool(Config::instance().getPath("working-dir") / "fileshelter.db"));
+		Database::Db database {Config::instance().getPath("working-dir") / "fileshelter.db"};
 
-		Database::Cleaner dbCleaner(*connectionPool);
+		ShareCleaner shareCleaner {database};
+
+		// bind static resources
+		ShareResource shareResource {database};
+		server.addResource(&shareResource, std::string {shareResource.getDeployPath()});
 
 		// bind entry point
-		server.addEntryPoint(Wt::EntryPointType::Application,
-				std::bind(&UserInterface::FileShelterApplication::create,
-					std::placeholders::_1, std::ref(*connectionPool)));
-
-		FS_LOG(MAIN, INFO) << "Starting database cleaner...";
-		dbCleaner.start();
+		server.addEntryPoint(Wt::EntryPointType::Application, [&](const Wt::WEnvironment &env)
+		{
+		    return UserInterface::FileShelterApplication::create(env, database);
+		});
 
 		FS_LOG(MAIN, INFO) << "Starting server...";
 		server.start();
@@ -185,24 +186,21 @@ int main(int argc, char *argv[])
 		FS_LOG(MAIN, INFO) << "Stopping server...";
 		server.stop();
 
-		FS_LOG(MAIN, INFO) << "Stopping database cleaner...";
-		dbCleaner.stop();
-
 		res = EXIT_SUCCESS;
 	}
-	catch( libconfig::FileIOException& e)
+	catch (libconfig::FileIOException& e)
 	{
 		std::cerr << "Cannot open config file " << configFilePath << std::endl;
 	}
-	catch( libconfig::ParseException& e)
+	catch (libconfig::ParseException& e)
 	{
 		std::cerr << "Caught libconfig::ParseException! error='" << e.getError() << "', file = '" << e.getFile() << "', line = " << e.getLine() << std::endl;
 	}
-	catch(Wt::WServer::Exception& e)
+	catch (Wt::WServer::Exception& e)
 	{
 		std::cerr << "Caught a WServer::Exception: " << e.what() << std::endl;
 	}
-	catch(std::exception& e)
+	catch (std::exception& e)
 	{
 		std::cerr << "Caught std::exception: " << e.what() << std::endl;
 	}

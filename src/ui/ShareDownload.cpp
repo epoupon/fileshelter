@@ -19,24 +19,25 @@
 
 #include "ShareDownload.hpp"
 
-#include <Wt/WTemplate.h>
 #include <Wt/WAnchor.h>
 #include <Wt/WPushButton.h>
+#include <Wt/WTemplate.h>
 
-#include "utils/Logger.hpp"
+#include "resources/ShareResource.hpp"
+#include "database/File.hpp"
 #include "database/Share.hpp"
+#include "share/ShareUtils.hpp"
+#include "utils/Logger.hpp"
 
 #include "FileShelterApplication.hpp"
 #include "ShareDownloadPassword.hpp"
 #include "ShareCommon.hpp"
-#include "ShareResource.hpp"
-
 
 namespace UserInterface {
 
 ShareDownload::ShareDownload()
 {
-	wApp->internalPathChanged().connect([=]
+	wApp->internalPathChanged().connect([this]
 	{
 		refresh();
 	});
@@ -52,11 +53,12 @@ ShareDownload::refresh()
 
 	clear();
 
-	std::string downloadUUID = wApp->internalPathNextPart("/share-download/");
+	const std::optional<UUID> downloadUUID {UUID::fromString(wApp->internalPathNextPart("/share-download/"))};
+	if (!downloadUUID)
+		return;
 
-	Wt::Dbo::Transaction transaction(FsApp->getDboSession());
-
-	Database::Share::pointer share = Database::Share::getByDownloadUUID(FsApp->getDboSession(), downloadUUID);
+	Wt::Dbo::Transaction transaction {FsApp->getDboSession()};
+	const Database::Share::pointer share {Database::Share::getByDownloadUUID(FsApp->getDboSession(), *downloadUUID)};
 	if (!share)
 	{
 		displayNotFound();
@@ -64,51 +66,52 @@ ShareDownload::refresh()
 	}
 
 	if (share->hasPassword())
-		displayPassword();
+		displayPassword(*downloadUUID);
 	else
-		displayDownload();
+		displayDownload(*downloadUUID);
 }
 
 void
-ShareDownload::displayDownload()
+ShareDownload::displayDownload(const UUID& downloadUUID, std::optional<std::string_view> password)
 {
 	clear();
 
-	std::string downloadUUID = wApp->internalPathNextPart("/share-download/");
-
-	Wt::Dbo::Transaction transaction(FsApp->getDboSession());
-	Database::Share::pointer share = Database::Share::getByDownloadUUID(FsApp->getDboSession(), downloadUUID);
-	if (!share)
+	Wt::Dbo::Transaction transaction {FsApp->getDboSession()};
+	const Database::Share::pointer share {Database::Share::getByDownloadUUID(FsApp->getDboSession(), downloadUUID)};
+	if (!share || !ShareUtils::isShareAvailableForDownload(share))
 	{
 		displayNotFound();
 		return;
 	}
 
-	Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-download"));
+	Wt::WTemplate* t {addNew<Wt::WTemplate>(tr("template-share-download"))};
 
 	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
 	if (!share->getDesc().empty())
 	{
 		t->setCondition("if-desc", true);
-		t->bindString("file-desc", Wt::WString::fromUTF8(share->getDesc()));
+		t->bindString("file-desc", Wt::WString::fromUTF8(std::string {share->getDesc()}));
 	}
-	t->bindString("file-name", Wt::WString::fromUTF8(share->getFileName()));
-	t->bindString("file-size", sizeToString(share->getFileSize()));
+
+	t->bindString("share-size", sizeToString(share->getShareSize()));
 	t->bindString("expiry-date-time", share->getExpiryTime().toString() + " UTC");
 
-	Wt::WPushButton* downloadBtn = t->bindNew<Wt::WPushButton>("download-btn", tr("msg-download"));
-
-	if (share->hasExpired())
 	{
-		t->setCondition("if-error", true);
-		t->bindString("error", tr("msg-share-no-longer-available"));
-		downloadBtn->setEnabled(false);
+		auto* downloadBtn {t->bindNew<Wt::WPushButton>("download-as-zip-btn", tr("msg-download-as-zip"))};
+		downloadBtn->setLink(ShareResource::createLink(downloadUUID, password));
 	}
-	else
+
 	{
-		auto resource = std::make_shared<ShareResource>(downloadUUID);
-		downloadBtn->setLink(Wt::WLink(resource));
+		auto* filesContainer {t->bindNew<Wt::WContainerWidget>("files")};
+		for (const Database::File::pointer& file : share->getFiles())
+		{
+			Wt::WTemplate* fileTemplate {filesContainer->addNew<Wt::WTemplate>(tr("template-share-download-file"))};
+
+			fileTemplate->bindString("name", file->getName(), Wt::TextFormat::Plain);
+			fileTemplate->bindString("size", sizeToString(file->getSize()), Wt::TextFormat::Plain);
+			fileTemplate->bindNew<Wt::WPushButton>("download-btn", tr("msg-download"));
+		}
 	}
 }
 
@@ -122,14 +125,14 @@ ShareDownload::displayNotFound()
 
 
 void
-ShareDownload::displayPassword()
+ShareDownload::displayPassword(const UUID& downloadUUID)
 {
 	clear();
 
-	auto view = addNew<ShareDownloadPassword>();
-	view->success().connect([=]
+	auto view = addNew<ShareDownloadPassword>(downloadUUID);
+	view->success().connect([=] (std::string_view password)
 	{
-		displayDownload();
+		displayDownload(downloadUUID, password);
 	});
 }
 

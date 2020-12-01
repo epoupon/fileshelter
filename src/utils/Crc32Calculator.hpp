@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Emeric Poupon
+ * Copyright (C) 2020 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -19,33 +19,30 @@
 
 #pragma once
 
-#include <chrono>
+#include <cstddef>
+#include <boost/crc.hpp>  // for boost::crc_32_type
 
-#include <boost/asio/system_timer.hpp>
-
-#include <Wt/WIOService.h>
-
-#include "DbHandler.hpp"
-
-namespace Database {
-
-class Cleaner
+namespace Utils
 {
-	public:
-		Cleaner(Wt::Dbo::SqlConnectionPool& connectionPool);
 
-		void start();
-		void stop();
+	class Crc32Calculator
+	{
+		public:
 
-	private:
+			void processBytes(const std::byte* _data, std::size_t dataSize)
+			{
+				_result.process_bytes(_data, dataSize);
+			}
 
-		void schedule(std::chrono::seconds duration);
-		void process();
+			std::uint32_t getResult() const
+			{
+				return _result.checksum();
+			}
 
-		Wt::WIOService _ioService;
-		boost::asio::system_timer _scheduleTimer;
-		Database::Handler _db;
-};
+		private:
+			using Crc32Type = boost::crc_32_type;
+			Crc32Type _result;
+	};
 
-} // namespace Database
+}
 
