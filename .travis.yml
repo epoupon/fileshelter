@@ -11,6 +11,7 @@ addons:
         - cmake
         - libboost-all-dev
         - libconfig++-dev
+        - libgtest-dev
 compiler:
 - clang
 - gcc
