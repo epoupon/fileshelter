@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Emeric Poupon
+ * Copyright (C) 2021 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -17,37 +17,37 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "TermsOfService.hpp"
 
-#include <chrono>
-#include <boost/asio/steady_timer.hpp>
-#include <Wt/WIOService.h>
+#include <fstream>
+#include <Wt/WTemplate.h>
 
-namespace Database
+#include "utils/Config.hpp"
+
+namespace UserInterface
 {
-	class Db;
+
+	std::unique_ptr<Wt::WWidget>
+	createTermsOfService()
+	{
+		auto tos {std::make_unique<Wt::WTemplate>()};
+
+		// Override the ToS with a custom version is specified
+		if (const auto path {Config::instance().getOptPath("tos-custom")})
+		{
+			std::ifstream ifs(path->string().c_str());
+			std::stringstream buffer;
+			buffer << ifs.rdbuf();
+
+			tos->setTemplateText(buffer.str());
+		}
+		else
+		{
+			tos->setTemplateText(Wt::WString::tr("template-tos"));
+			tos->addFunction("tr", &Wt::WTemplate::Functions::tr);
+		}
+
+		return tos;
+	}
+
 }
-
-class ShareCleaner
-{
-	public:
-		ShareCleaner(Database::Db& database);
-		~ShareCleaner();
-
-		ShareCleaner(const ShareCleaner&) = delete;
-		ShareCleaner(ShareCleaner&&) = delete;
-		ShareCleaner& operator=(const ShareCleaner&) = delete;
-		ShareCleaner& operator=(ShareCleaner&&) = delete;
-
-	private:
-
-		void start();
-		void stop();
-		void schedule(std::chrono::seconds duration);
-		void process();
-
-		Wt::WIOService _ioService;
-		boost::asio::steady_timer _scheduleTimer;
-		Database::Db& _db;
-};
-

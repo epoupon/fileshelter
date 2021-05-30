@@ -19,35 +19,10 @@
 
 #pragma once
 
-#include <chrono>
-#include <boost/asio/steady_timer.hpp>
-#include <Wt/WIOService.h>
+#include <Wt/WWidget.h>
 
-namespace Database
+
+namespace UserInterface
 {
-	class Db;
+	std::unique_ptr<Wt::WWidget> createTermsOfService();
 }
-
-class ShareCleaner
-{
-	public:
-		ShareCleaner(Database::Db& database);
-		~ShareCleaner();
-
-		ShareCleaner(const ShareCleaner&) = delete;
-		ShareCleaner(ShareCleaner&&) = delete;
-		ShareCleaner& operator=(const ShareCleaner&) = delete;
-		ShareCleaner& operator=(ShareCleaner&&) = delete;
-
-	private:
-
-		void start();
-		void stop();
-		void schedule(std::chrono::seconds duration);
-		void process();
-
-		Wt::WIOService _ioService;
-		boost::asio::steady_timer _scheduleTimer;
-		Database::Db& _db;
-};
-

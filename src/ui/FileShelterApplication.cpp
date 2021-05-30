@@ -19,8 +19,6 @@
 
 #include "FileShelterApplication.hpp"
 
-#include <fstream>
-
 #include <Wt/WEnvironment.h>
 #include <Wt/WBootstrapTheme.h>
 #include <Wt/WStackedWidget.h>
@@ -38,6 +36,7 @@
 #include "ShareCreated.hpp"
 #include "ShareDownload.hpp"
 #include "ShareEdit.hpp"
+#include "TermsOfService.hpp"
 
 namespace UserInterface {
 
@@ -85,28 +84,6 @@ createHome()
 	return home;
 }
 
-static std::unique_ptr<Wt::WWebWidget> createToS()
-{
-	auto tos {std::make_unique<Wt::WTemplate>()};
-
-	// Override the ToS with a custom version is specified
-	auto path = Config::instance().getOptPath("tos-custom");
-	if (path)
-	{
-		std::ifstream ifs(path->string().c_str());
-		std::stringstream buffer;
-		buffer << ifs.rdbuf();
-
-		tos->setTemplateText(buffer.str());
-	}
-	else
-	{
-		tos->setTemplateText(Wt::WString::tr("template-tos"));
-		tos->addFunction("tr", &Wt::WTemplate::Functions::tr);
-	}
-
-	return tos;
-}
 
 static
 void
@@ -203,7 +180,7 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Data
 	mainStack->addNew<ShareCreated>();
 	mainStack->addNew<ShareDownload>();
 	mainStack->addNew<ShareEdit>();
-	mainStack->addWidget(createToS());
+	mainStack->addWidget(createTermsOfService());
 
 	internalPathChanged().connect([=]
 	{
