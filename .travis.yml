@@ -1,30 +1,44 @@
+arch:
+- amd64
+- arm64
 language: cpp
-sudo: required
-dist: bionic
-matrix:
-  include:
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-8
-      env:
-        - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
-      compiler:
-        - gcc
+os: linux
+dist: focal
+addons:
+    apt:
+        packages:
+        - build-essential
+        - cmake
+        - libboost-all-dev
+        - libconfig++-dev
+compiler:
+- clang
+- gcc
 before_install:
-- eval "${MATRIX_EVAL}"
-- sudo apt-get install build-essential autoconf automake cmake libboost-all-dev libzip-dev libconfig++-dev
-- git clone https://github.com/emweb/wt.git wt
-- pushd wt;
-- git checkout 4.1.0
-- cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr && sudo make install
-- popd
-script: autoreconf -vfi && CXXFLAGS="-Wall -Wextra -Werror" ./configure && make distcheck
+- |
+    if [ ! -d ${HOME}/wt-${WT_VERSION}/include ]; then
+        git clone https://github.com/emweb/wt.git wt
+        cd wt
+        git checkout ${WT_VERSION}
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${WT_INSTALL_PREFIX} -DBUILD_EXAMPLES=OFF -DENABLE_LIBWTTEST=OFF -DCONNECTOR_FCGI=OFF
+        make install
+        cd ..
+    fi
+script: mkdir build && cd build && cmake -DCMAKE_PREFIX_PATH=${WT_INSTALL_PREFIX} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} .. && make && make test
+cache:
+    directories:
+    - ${HOME}/wt-${WT_VERSION}
 env:
-  global:
+    global:
     - MAKEFLAGS="-j 2"
-after_failure:
-  - cat config.log
+    - WT_VERSION=4.5.0
+    - WT_INSTALL_PREFIX=${HOME}/wt-${WT_VERSION}
+    jobs:
+    - BUILD_TYPE=Release
+    - BUILD_TYPE=Debug
+
+# clang7 is not enough for full c++17 support
+jobs:
+    exclude:
+    - compiler: clang
+      arch: amd64
