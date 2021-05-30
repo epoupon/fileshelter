@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include <Wt/WContainerWidget>
-#include <Wt/WTemplate>
-#include <Wt/WText>
+#include <Wt/WContainerWidget.h>
+#include <Wt/WTemplate.h>
+#include <Wt/WText.h>
 
 namespace UserInterface
 {

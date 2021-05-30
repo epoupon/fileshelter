@@ -44,7 +44,7 @@ namespace ShareUtils
 	void destroyExpiredShares(Wt::Dbo::Session& session);
 
 	// A transaction must be active
-	bool addFileToShare(Wt::Dbo::Session& session,
+	bool moveFileToShare(Wt::Dbo::Session& session,
 								Database::IdType shareId,
 								const std::filesystem::path& filePath,
 								std::string_view fileName);

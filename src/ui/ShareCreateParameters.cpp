@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Emeric Poupon
+ * Copyright (C) 2020 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -17,33 +17,26 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "ShareCreateParameters.hpp"
 
-#include <Wt/WString.h>
-#include <Wt/WContainerWidget.h>
 
-#include "utils/UUID.hpp"
-
-namespace UserInterface {
-
-class ShareCreateParameters;
-
-class ShareCreate : public Wt::WContainerWidget
+namespace UserInterface
 {
-	public:
-		ShareCreate();
-
-	private:
-		void refresh();
-
-		void displayCreate();
-		void displayPassword();
-		void displayError(Wt::WString error);
-		static UUID createShare(const ShareCreateParameters& parameters);
-
-};
-
-
-
-} // namespace UserInterface
-
+	Wt::WDateTime operator+(const Wt::WDateTime& dateTime, const Duration& duration)
+	{
+		switch (duration.unit)
+		{
+			case Duration::Unit::Hours:
+				return dateTime.addSecs(3600 * duration.value);
+			case Duration::Unit::Days:
+				return dateTime.addDays(duration.value);
+			case Duration::Unit::Weeks:
+				return dateTime.addDays(7 * duration.value);
+			case Duration::Unit::Months:
+				return dateTime.addMonths(duration.value);
+			case Duration::Unit::Years:
+				return dateTime.addYears(duration.value);
+		}
+		return dateTime;
+	}
+}

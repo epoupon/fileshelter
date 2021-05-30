@@ -28,6 +28,7 @@
 #include "utils/Logger.hpp"
 
 #include "database/Db.hpp"
+#include "resources/FileResource.hpp"
 #include "resources/ShareResource.hpp"
 #include "share/ShareCleaner.hpp"
 
@@ -170,6 +171,9 @@ int main(int argc, char *argv[])
 		// bind static resources
 		ShareResource shareResource {database};
 		server.addResource(&shareResource, std::string {shareResource.getDeployPath()});
+
+		FileResource fileResource {database};
+		server.addResource(&fileResource, std::string {fileResource.getDeployPath()});
 
 		// bind entry point
 		server.addEntryPoint(Wt::EntryPointType::Application, [&](const Wt::WEnvironment &env)

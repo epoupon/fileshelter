@@ -89,7 +89,7 @@ namespace ShareUtils
 	}
 
 	bool
-	addFileToShare(Wt::Dbo::Session& session,
+	moveFileToShare(Wt::Dbo::Session& session,
 			IdType shareId,
 			const std::filesystem::path& path,
 			std::string_view fileName)
@@ -246,7 +246,10 @@ namespace ShareUtils
 		const auto now {Wt::WLocalDateTime::currentServerDateTime().toUTC()};
 
 		if (share->getState() != Share::State::Ready)
+		{
+			FS_LOG(SHARE, DEBUG) << "Share is not ready yet";
 			return false;
+		}
 
 		// Make also sure all files are present and have not changed (at least in size)
 		for (const auto& file : share->getFiles())
@@ -276,6 +279,7 @@ namespace ShareUtils
 			}
 		}
 
+		FS_LOG(SHARE, DEBUG) << "Share available = " << (now < share->getExpiryTime());
 		return now < share->getExpiryTime();
 	}
 }

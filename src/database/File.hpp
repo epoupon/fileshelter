@@ -55,6 +55,7 @@ class File
 				const UUID& uuid,
 				Wt::Dbo::ptr<Share>& share);			// share that owns this file
 		static pointer	getById(Wt::Dbo::Session& session, IdType fileId);
+		static pointer	getByDownloadUUID(Wt::Dbo::Session& session, const UUID& downloadUUID);
 
 		// Setters
 		void incHits()				{ _hits++; }
@@ -63,6 +64,7 @@ class File
 		const std::string&			getName() const { return _name; }
 		FileSize					getSize() const { return _size; }
 		std::filesystem::path		getPath() const { return _path; }
+		UUID						getDownloadUUID() const { return *UUID::fromString(_downloadUUID); }
 
 		template<class Action>
 		void persist(Action& a)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Emeric Poupon
+ * Copyright (C) 2020 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -19,31 +19,37 @@
 
 #pragma once
 
+#include <vector>
+
+#include <Wt/Http/Request.h>
+#include <Wt/WDateTime.h>
 #include <Wt/WString.h>
-#include <Wt/WContainerWidget.h>
 
-#include "utils/UUID.hpp"
-
-namespace UserInterface {
-
-class ShareCreateParameters;
-
-class ShareCreate : public Wt::WContainerWidget
+namespace UserInterface
 {
-	public:
-		ShareCreate();
+	struct Duration
+	{
+		enum class Unit
+		{
+			Hours,
+			Days,
+			Weeks,
+			Months,
+			Years,
+		};
 
-	private:
-		void refresh();
+		std::size_t value {};
+		Unit unit {Unit::Hours};
+	};
 
-		void displayCreate();
-		void displayPassword();
-		void displayError(Wt::WString error);
-		static UUID createShare(const ShareCreateParameters& parameters);
+	struct ShareCreateParameters
+	{
+		Wt::WString	description;
+		Duration	maxDuration;
+		Wt::WString	password;
+		std::vector<const Wt::Http::UploadedFile*> uploadedFiles;
+	};
 
-};
-
-
-
-} // namespace UserInterface
+	Wt::WDateTime operator+(const Wt::WDateTime& dateTime, const Duration& duration);
+}
 

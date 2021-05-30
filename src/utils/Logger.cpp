@@ -25,6 +25,7 @@ std::string getModuleName(Module mod)
 	{
 		case Module::DB:		return "DB";
 		case Module::DBUPDATER:		return "DB UPDATER";
+		case Module::FILE_RESOURCE:		return "FILE RESOURCE";
 		case Module::MAIN:		return "MAIN";
 		case Module::SHARE:		return "SHARE";
 		case Module::UI:		return "UI";

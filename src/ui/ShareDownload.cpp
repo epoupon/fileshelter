@@ -23,6 +23,7 @@
 #include <Wt/WPushButton.h>
 #include <Wt/WTemplate.h>
 
+#include "resources/FileResource.hpp"
 #include "resources/ShareResource.hpp"
 #include "database/File.hpp"
 #include "database/Share.hpp"
@@ -98,7 +99,7 @@ ShareDownload::displayDownload(const UUID& downloadUUID, std::optional<std::stri
 	t->bindString("expiry-date-time", share->getExpiryTime().toString() + " UTC");
 
 	{
-		auto* downloadBtn {t->bindNew<Wt::WPushButton>("download-as-zip-btn", tr("msg-download-as-zip"))};
+		Wt::WPushButton* downloadBtn {t->bindNew<Wt::WPushButton>("download-as-zip-btn", tr("msg-download-as-zip"))};
 		downloadBtn->setLink(ShareResource::createLink(downloadUUID, password));
 	}
 
@@ -110,7 +111,10 @@ ShareDownload::displayDownload(const UUID& downloadUUID, std::optional<std::stri
 
 			fileTemplate->bindString("name", file->getName(), Wt::TextFormat::Plain);
 			fileTemplate->bindString("size", sizeToString(file->getSize()), Wt::TextFormat::Plain);
-			fileTemplate->bindNew<Wt::WPushButton>("download-btn", tr("msg-download"));
+			{
+				Wt::WPushButton* downloadBtn {fileTemplate->bindNew<Wt::WPushButton>("download-btn", tr("msg-download"))};
+				downloadBtn->setLink(FileResource::createLink(file->getDownloadUUID(), password));
+			}
 		}
 	}
 }

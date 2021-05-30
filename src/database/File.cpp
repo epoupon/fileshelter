@@ -19,6 +19,7 @@
 
 #include "File.hpp"
 
+#include "utils/Logger.hpp"
 #include "Share.hpp"
 
 namespace Database
@@ -43,6 +44,8 @@ namespace Database
 			const UUID& uuid,
 			Wt::Dbo::ptr<Share>& share)
 	{
+		FS_LOG(DB, DEBUG) << "Created file '" << std::string {fileName} << "' with UUID '" << uuid.getAsString() << "' on share " << share.id();
+
 		pointer res {session.add(std::make_unique<File>(fileName, fileSize, filePath, uuid, share))};
 		session.flush();
 
@@ -53,6 +56,12 @@ namespace Database
 	File::getById(Wt::Dbo::Session& session, IdType id)
 	{
 		return session.find<File>().where("id = ?").bind(id);
+	}
+
+	File::pointer
+	File::getByDownloadUUID(Wt::Dbo::Session& session, const UUID& downloadUUID)
+	{
+		return session.find<File>().where("download_UUID = ?").bind(downloadUUID.getAsString());
 	}
 }
 

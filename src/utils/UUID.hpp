@@ -33,6 +33,11 @@ class UUID
 
 		const std::string& getAsString() const { return _value; }
 
+		bool operator==(const UUID& other) const
+		{
+			return _value == other._value;
+		}
+
 	private:
 		UUID(std::string_view value);
 		std::string _value;

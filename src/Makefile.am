@@ -8,6 +8,8 @@ fileshelter_SOURCES = \
 	$(srcdir)/database/File.hpp		\
 	$(srcdir)/database/Share.cpp		\
 	$(srcdir)/database/Share.hpp		\
+	$(srcdir)/resources/FileResource.cpp		\
+	$(srcdir)/resources/FileResource.hpp		\
 	$(srcdir)/resources/ShareResource.cpp		\
 	$(srcdir)/resources/ShareResource.hpp		\
 	$(srcdir)/share/ShareCleaner.cpp	\
@@ -24,6 +26,12 @@ fileshelter_SOURCES = \
 	$(srcdir)/ui/ShareCommon.hpp		\
 	$(srcdir)/ui/ShareCreate.cpp		\
 	$(srcdir)/ui/ShareCreate.hpp		\
+	$(srcdir)/ui/ShareCreateFormModel.cpp	\
+	$(srcdir)/ui/ShareCreateFormModel.hpp	\
+	$(srcdir)/ui/ShareCreateFormView.cpp	\
+	$(srcdir)/ui/ShareCreateFormView.hpp	\
+	$(srcdir)/ui/ShareCreateParameters.cpp	\
+	$(srcdir)/ui/ShareCreateParameters.hpp	\
 	$(srcdir)/ui/ShareCreatePassword.cpp	\
 	$(srcdir)/ui/ShareCreatePassword.hpp	\
 	$(srcdir)/ui/ShareCreated.cpp		\
