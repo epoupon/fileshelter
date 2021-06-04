@@ -34,6 +34,9 @@ namespace UserInterface
 	unsigned
 	ShareCreateFormView::getProgress() const
 	{
+		if (_totalSize == 0)
+			return 0;
+
 		return (_totalReceivedSize + _currentReceivedSize ) * 100 / _totalSize;
 	}
 

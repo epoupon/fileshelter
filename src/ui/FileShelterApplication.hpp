@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <memory>
 #include <Wt/WApplication.h>
 
 namespace Wt::Dbo

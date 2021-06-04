@@ -49,10 +49,10 @@ ShareDownload::ShareDownload()
 void
 ShareDownload::refresh()
 {
+	clear();
+
 	if (!wApp->internalPathMatches("/share-download"))
 		return;
-
-	clear();
 
 	const std::optional<UUID> downloadUUID {UUID::fromString(wApp->internalPathNextPart("/share-download/"))};
 	if (!downloadUUID)

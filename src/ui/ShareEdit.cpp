@@ -46,10 +46,10 @@ ShareEdit::ShareEdit()
 void
 ShareEdit::refresh()
 {
+	clear();
+
 	if (!wApp->internalPathMatches("/share-edit"))
 		return;
-
-	clear();
 
 	const std::optional<UUID> editUUID {UUID::fromString(wApp->internalPathNextPart("/share-edit/"))};
 
@@ -82,7 +82,7 @@ ShareEdit::refresh()
 
 	Wt::WPushButton* deleteBtn = t->bindNew<Wt::WPushButton>("delete-btn", tr("msg-delete"));
 
-	deleteBtn->clicked().connect([=] ()
+	deleteBtn->clicked().connect([=]
 	{
 		auto messageBox = deleteBtn->addChild(std::make_unique<Wt::WMessageBox>(tr("msg-share-delete"),
 			tr("msg-confirm-action"),

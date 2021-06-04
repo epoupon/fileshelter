@@ -23,10 +23,8 @@
 #include <Wt/WBootstrapTheme.h>
 #include <Wt/WStackedWidget.h>
 #include <Wt/WNavigationBar.h>
-#include <Wt/WAnchor.h>
 #include <Wt/WMenu.h>
 #include <Wt/WTemplate.h>
-#include <Wt/WPushButton.h>
 
 #include "database/Db.hpp"
 #include "utils/Config.hpp"
@@ -40,14 +38,12 @@
 
 namespace UserInterface {
 
+static const char * defaultPath{ "/share-create" };
+
 
 std::unique_ptr<Wt::WApplication>
 FileShelterApplication::create(const Wt::WEnvironment& env, Database::Db& db)
 {
-	/*
-	 * You could read information from the environment to decide whether
-	 * the user has permission to start a new application
-	 */
 	return std::make_unique<FileShelterApplication>(env, db);
 }
 
@@ -59,31 +55,12 @@ FileShelterApplication::instance()
 
 enum Idx
 {
-	IdxHome 		= 0,
-	IdxShareCreate		= 1,
-	IdxShareCreated		= 2,
-	IdxShareDownload	= 3,
-	IdxShareEdit		= 4,
-	IdxToS			= 5,
+	IdxShareCreate		= 0,
+	IdxShareCreated		= 1,
+	IdxShareDownload	= 2,
+	IdxShareEdit		= 3,
+	IdxToS				= 4,
 };
-
-
-static
-std::unique_ptr<Wt::WWebWidget>
-createHome()
-{
-	auto home = std::make_unique<Wt::WTemplate>(Wt::WString::tr("template-home"));
-	home->addFunction("tr", &Wt::WTemplate::Functions::tr);
-	home->addFunction("block", &Wt::WTemplate::Functions::block);
-
-	Wt::WPushButton* createBtn = home->bindNew<Wt::WPushButton>("share-create-btn", "<i class=\"fa fa-upload\"></i> " + Wt::WString::tr("msg-share-create"), Wt::TextFormat::XHTML);
-
-	createBtn->addStyleClass("btn-primary");
-	createBtn->setLink( Wt::WLink(Wt::LinkType::InternalPath, "/share-create") );
-
-	return home;
-}
-
 
 static
 void
@@ -91,12 +68,11 @@ handlePathChange(Wt::WStackedWidget* stack)
 {
 	static std::map<std::string, int> indexes =
 	{
-		{ "/home",		IdxHome },
-		{ "/share-create",	IdxShareCreate },
-		{ "/share-created",	IdxShareCreated },
+		{ "/share-create",		IdxShareCreate },
+		{ "/share-created",		IdxShareCreated },
 		{ "/share-download",	IdxShareDownload },
-		{ "/share-edit",	IdxShareEdit },
-		{ "/tos",		IdxToS },
+		{ "/share-edit",		IdxShareEdit },
+		{ "/tos",				IdxToS },
 	};
 
 	FS_LOG(UI, DEBUG) << "Internal path changed to '" << wApp->internalPath() << "'";
@@ -110,8 +86,7 @@ handlePathChange(Wt::WStackedWidget* stack)
 		}
 	}
 
-	// Redirect bad path to the home
-	wApp->setInternalPath("/home", false);
+	wApp->setInternalPath(defaultPath, false);
 }
 
 /*
@@ -152,17 +127,12 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Data
 
 	Wt::WNavigationBar* navbar = main->bindNew<Wt::WNavigationBar>("navbar-top");
 	navbar->setResponsive(true);
-	navbar->setTitle("<i class=\"fa fa-external-link\"></i> " + Wt::WString::tr("msg-app-name"), Wt::WLink(Wt::LinkType::InternalPath, "/home"));
+	navbar->setTitle("<i class=\"fa fa-external-link\"></i> " + Wt::WString::tr("msg-app-name"), Wt::WLink(Wt::LinkType::InternalPath, defaultPath));
 
 	Wt::WMenu* menu = navbar->addMenu(std::make_unique<Wt::WMenu>());
 	{
-		auto menuItem = menu->insertItem(0, Wt::WString::tr("msg-home"));
-		menuItem->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/home"));
-		menuItem->setSelectable(true);
-	}
-	{
-		auto menuItem = menu->insertItem(1, Wt::WString::tr("msg-share-create"));
-		menuItem->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/share-create"));
+		auto menuItem = menu->addItem(Wt::WString::tr("msg-share-create"));
+		menuItem->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/share-create"});
 		menuItem->setSelectable(true);
 	}
 	{
@@ -175,7 +145,6 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Data
 
 	// Same order as Idx enum
 	Wt::WStackedWidget* mainStack = container->addNew<Wt::WStackedWidget>();
-	mainStack->addWidget(createHome());
 	mainStack->addNew<ShareCreate>();
 	mainStack->addNew<ShareCreated>();
 	mainStack->addNew<ShareDownload>();

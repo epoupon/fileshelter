@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Emeric Poupon
+ * Copyright (C) 2021 Emeric Poupon
  *
  * This file is part of fileshelter.
  *

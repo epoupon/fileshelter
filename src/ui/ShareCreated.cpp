@@ -43,10 +43,10 @@ ShareCreated::ShareCreated()
 void
 ShareCreated::refresh()
 {
+	clear();
+
 	if (!wApp->internalPathMatches("/share-created"))
 		return;
-
-	clear();
 
 	std::optional<UUID> editUUID {UUID::fromString(wApp->internalPathNextPart("/share-created/"))};
 	if (!editUUID)

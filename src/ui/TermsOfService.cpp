@@ -26,7 +26,6 @@
 
 namespace UserInterface
 {
-
 	std::unique_ptr<Wt::WWidget>
 	createTermsOfService()
 	{
@@ -35,7 +34,7 @@ namespace UserInterface
 		// Override the ToS with a custom version is specified
 		if (const auto path {Config::instance().getOptPath("tos-custom")})
 		{
-			std::ifstream ifs(path->string().c_str());
+			std::ifstream ifs {path->string().c_str()};
 			std::stringstream buffer;
 			buffer << ifs.rdbuf();
 
@@ -49,5 +48,4 @@ namespace UserInterface
 
 		return tos;
 	}
-
 }

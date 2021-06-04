@@ -9,10 +9,15 @@
 	</div>
 </message>
 
-<message id="template-home">
-	<h1><i class="fa fa-external-link"></i> ${tr:msg-app-name}</h1>
-	${block:msg-home-desc}
-	${share-create-btn}
+<message id="Wt.WNavigationBar.template">
+	<div class="container">
+		${collapse-button}
+		<div class="navbar-header">
+			${expand-button}
+			${title-link}
+		</div>
+		${contents}
+	</div>
 </message>
 
 <message id="template-share-create-form">

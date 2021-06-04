@@ -70,7 +70,7 @@ class ShareCreateProgress : public Wt::WTemplate
 
 ShareCreate::ShareCreate()
 {
-	wApp->internalPathChanged().connect([=]
+	wApp->internalPathChanged().connect([this]
 	{
 		refresh();
 	});
@@ -92,6 +92,8 @@ ShareCreate::displayError(Wt::WString error)
 void
 ShareCreate::refresh()
 {
+	clear();
+
 	if (!wApp->internalPathMatches("/share-create"))
 		return;
 
@@ -116,8 +118,6 @@ ShareCreate::displayPassword()
 void
 ShareCreate::displayCreate()
 {
-	clear();
-
 	enum CreateStack
 	{
 		Form = 0,
@@ -131,7 +131,7 @@ ShareCreate::displayCreate()
 
 	form->progressUpdate().connect(progress, [=](unsigned progressPerCent) { progress->handleProgressUpdate(progressPerCent); });
 
-	form->validated().connect([=] ()
+	form->validated().connect([=]
 	{
 		stack->setCurrentIndex(CreateStack::Progress);
 	});
