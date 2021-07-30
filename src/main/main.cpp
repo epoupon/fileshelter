@@ -24,13 +24,13 @@
 
 #include <Wt/WServer.h>
 
-#include "utils/Config.hpp"
+#include "share/IShareManager.hpp"
+#include "utils/IConfig.hpp"
+#include "utils/Exception.hpp"
 #include "utils/Logger.hpp"
+#include "utils/Service.hpp"
 
-#include "database/Db.hpp"
-#include "resources/FileResource.hpp"
 #include "resources/ShareResource.hpp"
-#include "share/ShareCleaner.hpp"
 
 #include "ui/FileShelterApplication.hpp"
 
@@ -38,33 +38,33 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 {
 	std::vector<std::string> args;
 
-	const std::filesystem::path wtConfigPath {Config::instance().getPath("working-dir") / "wt_config.xml"};
-	const std::filesystem::path wtLogFilePath {Config::instance().getPath("log-file", "")};
-	const std::filesystem::path wtAccessLogFilePath {Config::instance().getPath("access-log-file", "")};
-	const std::filesystem::path userMsgPath {Config::instance().getPath("working-dir") / "user_messages.xml"};
+	const std::filesystem::path wtConfigPath {Service<IConfig>::get()->getPath("working-dir") / "wt_config.xml"};
+	const std::filesystem::path wtLogFilePath {Service<IConfig>::get()->getPath("log-file", "")};
+	const std::filesystem::path wtAccessLogFilePath {Service<IConfig>::get()->getPath("access-log-file", "")};
+	const std::filesystem::path userMsgPath {Service<IConfig>::get()->getPath("working-dir") / "user_messages.xml"};
 
 	args.push_back(execPath);
 	args.push_back("--config=" + wtConfigPath.string());
-	args.push_back("--docroot=" + Config::instance().getString("docroot"));
-	args.push_back("--approot=" + Config::instance().getString("approot"));
-	args.push_back("--deploy-path=" + Config::instance().getString("deploy-path", "/"));
-	args.push_back("--resources-dir=" + Config::instance().getString("wt-resources"));
+	args.push_back("--docroot=" + std::string {Service<IConfig>::get()->getString("docroot")});
+	args.push_back("--approot=" + std::string {Service<IConfig>::get()->getString("approot")});
+	args.push_back("--deploy-path=" + std::string {Service<IConfig>::get()->getString("deploy-path", "/")});
+	args.push_back("--resources-dir=" + std::string {Service<IConfig>::get()->getString("wt-resources")});
 
 	if (!wtAccessLogFilePath.empty())
 		args.push_back("--accesslog=" + wtAccessLogFilePath.string());
 
-	if (Config::instance().getBool("tls-enable", false))
+	if (Service<IConfig>::get()->getBool("tls-enable", false))
 	{
-		args.push_back("--https-port=" + std::to_string( Config::instance().getULong("listen-port", 5081)));
-		args.push_back("--https-address=" + Config::instance().getString("listen-addr", "0.0.0.0"));
-		args.push_back("--ssl-certificate=" + Config::instance().getString("tls-cert"));
-		args.push_back("--ssl-private-key=" + Config::instance().getString("tls-key"));
-		args.push_back("--ssl-tmp-dh=" + Config::instance().getString("tls-dh"));
+		args.push_back("--https-port=" + std::to_string( Service<IConfig>::get()->getULong("listen-port", 5081)));
+		args.push_back("--https-address=" + std::string {Service<IConfig>::get()->getString("listen-addr", "0.0.0.0")});
+		args.push_back("--ssl-certificate=" + std::string {Service<IConfig>::get()->getString("tls-cert")});
+		args.push_back("--ssl-private-key=" + std::string {Service<IConfig>::get()->getString("tls-key")});
+		args.push_back("--ssl-tmp-dh=" + std::string {Service<IConfig>::get()->getString("tls-dh")});
 	}
 	else
 	{
-		args.push_back("--http-port=" + std::to_string( Config::instance().getULong("listen-port", 5081)));
-		args.push_back("--http-address=" + Config::instance().getString("listen-addr", "0.0.0.0"));
+		args.push_back("--http-port=" + std::to_string( Service<IConfig>::get()->getULong("listen-port", 5081)));
+		args.push_back("--http-address=" + std::string {Service<IConfig>::get()->getString("listen-addr", "0.0.0.0")});
 	}
 
 	// Generate the wt_config.xml file
@@ -73,9 +73,9 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 
 		pt.put("server.application-settings.<xmlattr>.location", "*");
 		pt.put("server.application-settings.log-file", wtLogFilePath.string());
-		pt.put("server.application-settings.log-config", Config::instance().getString("log-config", "* -debug -info:WebRequest"));
-		pt.put("server.application-settings.max-request-size", Config::instance().getULong("max-file-size", 100) * 1024 /* kB */);
-		pt.put("server.application-settings.behind-reverse-proxy", Config::instance().getBool("behind-reverse-proxy", false));
+		pt.put("server.application-settings.log-config", Service<IConfig>::get()->getString("log-config", "* -debug -info:WebRequest"));
+		pt.put("server.application-settings.max-request-size", Service<IConfig>::get()->getULong("max-file-size", 100) * 1024 /* kB */);
+		pt.put("server.application-settings.behind-reverse-proxy", Service<IConfig>::get()->getBool("behind-reverse-proxy", false));
 		pt.put("server.application-settings.progressive-bootstrap", true);
 
 		std::ofstream oss {wtConfigPath.string().c_str(), std::ios::out};
@@ -91,28 +91,28 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 		{
 			boost::property_tree::ptree node;
 			node.put("<xmlattr>.id", "msg-tos-org");
-			node.put("", Config::instance().getString("tos-org", "**[ORG]**"));
+			node.put("", Service<IConfig>::get()->getString("tos-org", "**[ORG]**"));
 			pt.add_child("messages.message", node);
 		}
 
 		{
 			boost::property_tree::ptree node;
 			node.put("<xmlattr>.id", "msg-tos-url");
-			node.put("", Config::instance().getString("tos-url", "**[DEPLOY URL]**/tos"));
+			node.put("", Service<IConfig>::get()->getString("tos-url", "**[DEPLOY URL]**/tos"));
 			pt.add_child("messages.message", node);
 		}
 
 		{
 			boost::property_tree::ptree node;
 			node.add("<xmlattr>.id", "msg-tos-support-email");
-			node.put("", Config::instance().getString("tos-support-email", "**[SUPPORT EMAIL ADDRESS]**"));
+			node.put("", Service<IConfig>::get()->getString("tos-support-email", "**[SUPPORT EMAIL ADDRESS]**"));
 			pt.add_child("messages.message", node);
 		}
 
 		{
 			boost::property_tree::ptree node;
 			node.add("<xmlattr>.id", "msg-app-name");
-			node.put("", Config::instance().getString("app-name", "FileShelter"));
+			node.put("", Service<IConfig>::get()->getString("app-name", "FileShelter"));
 			pt.add_child("messages.message", node);
 		}
 
@@ -137,16 +137,17 @@ int main(int argc, char *argv[])
 
 	try
 	{
-		Config::instance().setFile(configFilePath);
+		Service<IConfig> config {createConfig(configFilePath)};
 
 		// Make sure the working directory exists
-		// TODO check with boost::system::error_code ec;
-		std::filesystem::create_directories(Config::instance().getPath("working-dir") / "files");
+		std::filesystem::create_directories(Service<IConfig>::get()->getPath("working-dir") / "files");
 
 		// Recreate the tmp directory in order to flush it
-		const auto tmpDir {Config::instance().getPath("working-dir") / "tmp"};
+		const auto tmpDir {Service<IConfig>::get()->getPath("working-dir") / "tmp"};
 		std::filesystem::remove_all(tmpDir);
 		std::filesystem::create_directories(tmpDir);
+
+		Service<Share::IShareManager> shareManager {Share::createShareManager(Service<IConfig>::get()->getPath("working-dir") / "fileshelter.db")};
 
 		// Set the WT_TMP_DIR inside the working dir, used to upload files
 		setenv("WT_TMP_DIR", tmpDir.string().c_str(), 1);
@@ -164,21 +165,14 @@ int main(int argc, char *argv[])
 		Wt::WServer server {argv[0]};
 		server.setServerConfiguration(wtServerArgs.size(), const_cast<char**>(wtArgv));
 
-		Database::Db database {Config::instance().getPath("working-dir") / "fileshelter.db"};
-
-		ShareCleaner shareCleaner {database};
-
 		// bind static resources
-		ShareResource shareResource {database};
-		server.addResource(&shareResource, std::string {shareResource.getDeployPath()});
-
-		FileResource fileResource {database};
-		server.addResource(&fileResource, std::string {fileResource.getDeployPath()});
+//		ShareResource shareResource {database};
+//		server.addResource(&shareResource, std::string {shareResource.getDeployPath()});
 
 		// bind entry point
-		server.addEntryPoint(Wt::EntryPointType::Application, [&](const Wt::WEnvironment &env)
+		server.addEntryPoint(Wt::EntryPointType::Application, [&](const Wt::WEnvironment& env)
 		{
-		    return UserInterface::FileShelterApplication::create(env, database);
+		    return UserInterface::FileShelterApplication::create(env);
 		});
 
 		FS_LOG(MAIN, INFO) << "Starting server...";
@@ -192,13 +186,9 @@ int main(int argc, char *argv[])
 
 		res = EXIT_SUCCESS;
 	}
-	catch (libconfig::FileIOException& e)
+	catch (const FsException& e)
 	{
-		std::cerr << "Cannot open config file " << configFilePath << std::endl;
-	}
-	catch (libconfig::ParseException& e)
-	{
-		std::cerr << "Caught libconfig::ParseException! error='" << e.getError() << "', file = '" << e.getFile() << "', line = " << e.getLine() << std::endl;
+		std::cerr << "Caught exception: " << e.what() << std::endl;
 	}
 	catch (Wt::WServer::Exception& e)
 	{

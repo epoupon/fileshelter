@@ -19,12 +19,9 @@
 
 #pragma once
 
-#include <optional>
-#include <string_view>
-
 #include <Wt/WContainerWidget.h>
 
-#include "utils/UUID.hpp"
+#include "share/Types.hpp"
 
 namespace UserInterface
 {
@@ -35,11 +32,10 @@ namespace UserInterface
 			ShareDownload();
 
 		private:
-			void refresh() override;
+			void handlePathChanged();
 
-			void displayNotFound();
-			void displayPassword(const UUID& downloadUUID);
-			void displayDownload(const UUID& downloadUUID, std::optional<std::string_view> password = std::nullopt);
+			void displayPassword(const Share::ShareUUID& shareUUID);
+			void displayDownload(const Share::ShareDesc& share, std::optional<std::string_view> password = std::nullopt);
 	};
 
 } // namespace UserInterface

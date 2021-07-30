@@ -21,13 +21,18 @@
 
 #include <numeric>
 
+#include <Wt/WApplication.h>
 #include <Wt/WComboBox.h>
+#include <Wt/WEnvironment.h>
 #include <Wt/WLineEdit.h>
 #include <Wt/WSpinBox.h>
 
-#include "share/ShareUtils.hpp"
+#include "share/CreateParameters.hpp"
+#include "share/IShareManager.hpp"
+#include "share/Types.hpp"
 #include "utils/Logger.hpp"
-#include "ShareCommon.hpp"
+#include "utils/Service.hpp"
+#include "ShareUtils.hpp"
 
 namespace UserInterface
 {
@@ -45,7 +50,7 @@ namespace UserInterface
 	{
 		setTemplateText(tr("template-share-create-form"));
 
-		bindString("max-size", Wt::WString::tr("msg-max-share-size").arg( sizeToString(ShareUtils::getMaxShareSize()) ));
+		bindString("max-size", Wt::WString::tr("msg-max-share-size").arg( ShareUtils::fileSizeToString(Service<Share::IShareManager>::get()->getMaxShareSize()) ));
 
 		_drop = bindNew<Wt::WFileDropWidget>("file-drop");
 
@@ -57,7 +62,7 @@ namespace UserInterface
 			{
 				auto* fileEntry {filesContainer->addNew<Wt::WTemplate>(tr("template-share-create-form-file"))};
 				fileEntry->bindString("name", file->clientFileName(), Wt::TextFormat::Plain);
-				fileEntry->bindString("size", sizeToString(file->size()), Wt::TextFormat::Plain);
+				fileEntry->bindString("size", ShareUtils::fileSizeToString(file->size()), Wt::TextFormat::Plain);
 
 				auto* delBtn {fileEntry->bindNew<Wt::WText>("del-btn", tr("template-share-create-del-btn"))};
 				delBtn->clicked().connect([=]
@@ -81,7 +86,7 @@ namespace UserInterface
 		// Desc
 		setFormWidget(ShareCreateFormModel::DescriptionField, std::make_unique<Wt::WLineEdit>());
 
-		if (ShareUtils::canValidatityDurationBeSet())
+		if (Service<Share::IShareManager>::get()->canValidatityDurationBeSet())
 		{
 			setCondition("if-validity-duration", true);
 			// Duration validity
@@ -183,6 +188,8 @@ namespace UserInterface
 		FS_LOG(UI, DEBUG) << "_totalReceivedSize = " << _totalReceivedSize;
 		FS_LOG(UI, DEBUG) << "_totalSize = " << _totalSize;
 
+		FS_LOG(UI, DEBUG) << "_validated = " << _validated;
+
 		if (_validated && _totalReceivedSize == _totalSize)
 		{
 			emitDone();
@@ -192,34 +199,34 @@ namespace UserInterface
 	void
 	ShareCreateFormView::emitDone()
 	{
+		using namespace Share;
+
 		ShareCreateParameters params;
 
-		params.description = _model->valueText(ShareCreateFormModel::DescriptionField);
-		params.maxDuration.value = Wt::asNumber(_model->value(ShareCreateFormModel::DurationValidityField));
+		params.description = _model->valueText(ShareCreateFormModel::DescriptionField).toUTF8();
+		params.validityDuration = _model->getDurationValidity();
+		params.password = _model->valueText(ShareCreateFormModel::PasswordField).toUTF8();
+		params.creatorAddress = wApp->environment().clientAddress();
 
-		auto unit = _model->valueText(ShareCreateFormModel::DurationUnitValidityField);
-		if (unit == Wt::WString::tr("msg-hours"))
-			params.maxDuration.unit = Duration::Unit::Hours;
-		else if (unit == Wt::WString::tr("msg-days"))
-			params.maxDuration.unit = Duration::Unit::Days;
-		else if (unit == Wt::WString::tr("msg-weeks"))
-			params.maxDuration.unit = Duration::Unit::Weeks;
-		else if (unit == Wt::WString::tr("msg-months"))
-			params.maxDuration.unit = Duration::Unit::Months;
-		else if (unit == Wt::WString::tr("msg-years"))
-			params.maxDuration.unit = Duration::Unit::Years;
-
-		FS_LOG(UI, DEBUG) << "max duration = " << params.maxDuration.value;
-		FS_LOG(UI, DEBUG) << "max duration unit = " << static_cast<int>(params.maxDuration.unit);
-
-		params.password = _model->valueText(ShareCreateFormModel::PasswordField);
+		std::vector<Share::FileCreateParameters> filesParameters;
 
 		visitUploadedFiles([&](const Wt::WFileDropWidget::File& file)
 		{
-			params.uploadedFiles.emplace_back(&file.uploadedFile());
+			Share::FileCreateParameters fileParameters;
+
+			fileParameters.path = file.uploadedFile().spoolFileName();
+			fileParameters.name = file.uploadedFile().clientFileName();
+
+			filesParameters.emplace_back(std::move(fileParameters));
 		});
 
-		_sigComplete.emit(params);
+		// two steps to minimize possibilities of throw (although we delete orphan uploaded files in the cleaner)
+		visitUploadedFiles([&](const Wt::WFileDropWidget::File& file)
+		{
+			file.uploadedFile().stealSpoolFile();
+		});
+
+		_sigComplete.emit(params, filesParameters);
 	}
 
 	void
@@ -246,7 +253,7 @@ namespace UserInterface
 	bool
 	ShareCreateFormView::isShareSizeOverflow() const
 	{
-		return getTotalFileSize() > ShareUtils::getMaxShareSize();
+		return getTotalFileSize() > Service<Share::IShareManager>::get()->getMaxShareSize();
 	}
 
 	bool

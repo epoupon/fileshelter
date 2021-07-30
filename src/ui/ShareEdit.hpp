@@ -29,9 +29,8 @@ class ShareEdit : public Wt::WContainerWidget
 		ShareEdit();
 
 	private:
-		void refresh();
+		void handlePathChanged();
 		void displayRemoved();
-		void displayNotFound();
 
 };
 

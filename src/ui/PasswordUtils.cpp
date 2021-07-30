@@ -19,32 +19,47 @@
 
 #include "PasswordUtils.hpp"
 
-#include <set>
+#include <unordered_set>
 
-#include "utils/Config.hpp"
+#include "utils/IConfig.hpp"
+#include "utils/Service.hpp"
 
-bool
-isUploadPassordRequired()
+namespace UserInterface::PasswordUtils
 {
-	return !Config::instance().getString("upload-password", "").empty()
-		|| !Config::instance().getStrings("upload-passwords").empty();
-}
 
-bool
-checkUploadPassord(const std::string& uploadPassword)
-{
-	std::set<std::string> configPasswords;
-
+	bool
+	isUploadPassordRequired()
 	{
-		std::string password {Config::instance().getString("upload-password", "")};
+		if (!Service<IConfig>::get()->getString("upload-password", "").empty())
+			return true;
 
-		if (!password.empty())
-			configPasswords.insert(std::move(password));
+		bool hasStrings {};
+		Service<IConfig>::get()->visitStrings("upload-passwords", [&](std::string_view str)
+		{
+			if (!str.empty())
+				hasStrings = true;
+		});
+
+		return hasStrings;
 	}
 
-	for (std::string& password : Config::instance().getStrings("upload-passwords"))
-		configPasswords.insert(std::move(password));
+	bool
+	checkUploadPassord(std::string_view uploadPassword)
+	{
+		{
+			const std::string password {Service<IConfig>::get()->getString("upload-password", "")};
+			if (!password.empty() && uploadPassword == password)
+				return true;
+		}
 
-	return configPasswords.find(uploadPassword) != std::cend(configPasswords);
+		bool res{};
+		Service<IConfig>::get()->visitStrings("upload-passwords", [&](std::string_view password)
+		{
+			if (password == uploadPassword)
+				res = true;
+		});
+
+		return res;
+	}
+
 }
-

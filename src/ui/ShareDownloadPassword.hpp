@@ -23,20 +23,26 @@
 #include <Wt/WTemplateFormView.h>
 
 #include "utils/UUID.hpp"
+#include "share/Types.hpp"
+
+namespace Share
+{
+	struct ShareDesc;
+}
 
 namespace UserInterface
 {
+	class ShareDownloadPassword : public Wt::WTemplateFormView
+	{
+		public:
+			using SigSuccess = Wt::Signal<const Share::ShareDesc&, std::string>;
+			SigSuccess& success() { return _sigSuccess;}
 
-class ShareDownloadPassword : public Wt::WTemplateFormView
-{
-	public:
-		Wt::Signal<std::string>& success() { return _sigSuccess;}
+			ShareDownloadPassword(const Share::ShareUUID& shareUUID);
 
-		ShareDownloadPassword(const UUID& downloadUUID);
-
-	private:
-		Wt::Signal<std::string> _sigSuccess;
-};
+		private:
+			SigSuccess _sigSuccess;
+	};
 
 } // namespace UserInterface
 

@@ -19,92 +19,19 @@
 
 #include "ShareResource.hpp"
 
-#include <iostream>
-#include <iomanip>
-
+#include <optional>
+#include <Wt/Auth/PasswordHash.h>
 #include <Wt/Http/Response.h>
 #include <Wt/Utils.h>
 #include <Wt/WLocalDateTime.h>
 
-#include "database/Db.hpp"
-#include "database/File.hpp"
-#include "database/Share.hpp"
-#include "share/ShareUtils.hpp"
+#include "share/IShareManager.hpp"
+#include "share/Exception.hpp"
 #include "utils/Logger.hpp"
+#include "utils/Service.hpp"
 #include "utils/Zipper.hpp"
 
-static
-std::unique_ptr<Zip::Zipper>
-createZipper(const std::vector<Database::File::pointer>& files)
-{
-	std::map<std::string, std::filesystem::path> zipFiles;
-
-	for (const Database::File::pointer& file : files)
-		zipFiles.emplace(file->getName(), file->getPath());
-
-	// mask creation time
-	return std::make_unique<Zip::Zipper>(zipFiles, Wt::WLocalDateTime::currentDateTime().toUTC());
-}
-
-static
-std::unique_ptr<Zip::Zipper>
-createZipper(const std::string& uuid, const std::string* password, Wt::Dbo::Session& session)
-{
-	std::optional<Wt::Auth::PasswordHash> passwordHash;
-
-	const std::optional<UUID> downloadUUID {UUID::fromString(uuid)};
-	if (!downloadUUID)
-	{
-		FS_LOG(UI, DEBUG) << "Bad parameter 'id'!";
-		return {};
-	}
-
-	{
-		Wt::Dbo::Transaction transaction {session};
-
-		const Database::Share::pointer share {Database::Share::getByDownloadUUID(session, *downloadUUID)};
-		if (!share)
-		{
-			FS_LOG(UI, DEBUG) << "Share '" << uuid << "' not found!";
-			return {};
-		}
-
-		if (share->hasPassword())
-			passwordHash = share->getPasswordHash();
-	}
-
-	if (passwordHash)
-	{
-		if (!password)
-		{
-			FS_LOG(UI, DEBUG) << "Missing parameter 'p' for share '" << uuid << "'!";
-			return {};
-		}
-
-		if (!ShareUtils::checkPassword(*passwordHash, Wt::Utils::hexDecode(*password)))
-		{
-			FS_LOG(UI, DEBUG) << "Bad password for share '" << uuid << "'!";
-			return {};
-		}
-	}
-
-	{
-		Wt::Dbo::Transaction transaction {session};
-
-		const Database::Share::pointer share {Database::Share::getByDownloadUUID(session, *downloadUUID)};
-		if (!share)
-		{
-			FS_LOG(UI, DEBUG) << "Share '" << uuid << "' not found!";
-			return {};
-		}
-
-		return createZipper(share->getFiles());
-	}
-}
-
-ShareResource::ShareResource(Database::Db& db)
-: _db {db}
-{}
+using namespace Share;
 
 ShareResource::~ShareResource()
 {
@@ -118,9 +45,25 @@ ShareResource::getDeployPath()
 }
 
 Wt::WLink
-ShareResource::createLink(const UUID& uuid, std::optional<std::string_view> password)
+ShareResource::createLink(const ShareUUID& uuid, std::optional<std::string_view> password)
 {
-	return {Wt::LinkType::Url, std::string {getDeployPath()} + "?id=" + uuid.getAsString() + (password ? ("&p=" + Wt::Utils::hexEncode(std::string {*password})) : "")};
+	return {Wt::LinkType::Url, std::string {getDeployPath()} + "?id=" + uuid.toString() + (password ? ("&p=" + Wt::Utils::hexEncode(std::string {*password})) : "")};
+}
+
+std::filesystem::path
+ShareResource::getClientFileName(const Share::ShareDesc& share)
+{
+	std::filesystem::path fileName;
+
+	for (const Share::FileDesc& file : share.files)
+	{
+		if (file.clientPath.empty())
+			fileName = file.clientPath.string() + ".zip";
+		else
+			fileName = share.uuid.toString() + ".zip";
+	}
+
+	return fileName;
 }
 
 void
@@ -147,13 +90,29 @@ ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Respons
 				return;
 			}
 
-			zipper = createZipper(*uuid, request.getParameter("p"), _db.getTLSSession());
-			if (!zipper)
+			std::optional<std::string> password;
+			if (const std::string *p {request.getParameter("p")})
+				password = Wt::Utils::hexDecode(*password);
+
+			const ShareUUID& shareUUID {*uuid};
+
+			try
+			{
+				zipper = Service<IShareManager>::get()->getShareZipper(shareUUID, password);
+				if (!zipper)
+					return;
+
+				// TODO avoid double password check
+				suggestFileName(getClientFileName(Service<Share::IShareManager>::get()->getShareDesc(shareUUID, password)).string());
+			}
+			catch (const Share::Exception& e)
+			{
+				FS_LOG(UI, ERROR) << "Caught Share::Exception while creating zipper: " << e.what();
 				return;
+			}
 
 			response.setContentLength(zipper->getTotalZipFile());
 			response.setMimeType("application/zip");
-			suggestFileName(*uuid + ".zip");
 		}
 
 		std::array<std::byte, _bufferSize> buffer;
@@ -163,19 +122,13 @@ ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Respons
 
 		if (!zipper->isComplete())
 		{
-			auto* continuation {response.createContinuation()};
+			Wt::Http::ResponseContinuation* continuation {response.createContinuation()};
 			continuation->setData(zipper);
 		}
-		else
-		{
-			const std::optional<UUID> uuid {UUID::fromString(*request.getParameter("id"))};
-			assert(uuid);
-
-			Wt::Dbo::Transaction transaction {_db.getTLSSession()};
-
-			if (Database::Share::pointer share {Database::Share::getByDownloadUUID(_db.getTLSSession(), *uuid)})
-				share.modify()->incHits();
-		}
+	}
+	catch (const UUIDException& e)
+	{
+		FS_LOG(UI, DEBUG) << "Bad parameter 'id'!";
 	}
 	catch (Zip::ZipperException& exception)
 	{

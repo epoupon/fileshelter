@@ -29,7 +29,7 @@ class ShareCreated : public Wt::WContainerWidget
 		ShareCreated();
 
 	private:
-		void refresh();
+		void handlePathChanged();
 
 };
 

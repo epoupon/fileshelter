@@ -19,39 +19,31 @@
 
 #pragma once
 
+#include <filesystem>
 #include <optional>
 #include <string_view>
-
 #include <Wt/WResource.h>
 #include <Wt/WLink.h>
 
-#include "utils/UUID.hpp"
+#include "share/Types.hpp"
 
-namespace Database
+namespace Share
 {
-	class Db;
+	class IShare;
 }
 
 class ShareResource : public Wt::WResource
 {
 	public:
-		ShareResource(Database::Db& db);
 		~ShareResource();
 
-		ShareResource(const ShareResource&) = delete;
-		ShareResource(ShareResource&&) = delete;
-		ShareResource& operator=(const ShareResource&) = delete;
-		ShareResource& operator=(ShareResource&&) = delete;
-
-		static std::string_view getDeployPath();
-		static Wt::WLink createLink(const UUID& uuid, std::optional<std::string_view> password = std::nullopt);
-
+		static std::string_view 		getDeployPath();
+		static Wt::WLink				createLink(const Share::ShareUUID& shareId, std::optional<std::string_view> password);
+		static std::filesystem::path	getClientFileName(const Share::ShareDesc& share);
 	private:
-
 		void handleRequest(const Wt::Http::Request& request, Wt::Http::Response& response) override;
 
 		static constexpr std::size_t _bufferSize {32768};
-		Database::Db& _db;
 };
 
 

@@ -25,11 +25,14 @@
 #include <Wt/WNavigationBar.h>
 #include <Wt/WMenu.h>
 #include <Wt/WTemplate.h>
+#include <Wt/WText.h>
 
-#include "database/Db.hpp"
-#include "utils/Config.hpp"
+#include "utils/IConfig.hpp"
 #include "utils/Logger.hpp"
+#include "utils/Service.hpp"
+#include "share/Exception.hpp"
 
+#include "Exception.hpp"
 #include "ShareCreate.hpp"
 #include "ShareCreated.hpp"
 #include "ShareDownload.hpp"
@@ -42,9 +45,9 @@ static const char * defaultPath{ "/share-create" };
 
 
 std::unique_ptr<Wt::WApplication>
-FileShelterApplication::create(const Wt::WEnvironment& env, Database::Db& db)
+FileShelterApplication::create(const Wt::WEnvironment& env)
 {
-	return std::make_unique<FileShelterApplication>(env, db);
+	return std::make_unique<FileShelterApplication>(env);
 }
 
 FileShelterApplication*
@@ -95,9 +98,8 @@ handlePathChange(Wt::WStackedWidget* stack)
  * constructor so it is typically also an argument for your custom
  * application constructor.
 */
-FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Database::Db& db)
-: Wt::WApplication {env},
-  _db {db}
+FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env)
+: Wt::WApplication {env}
 {
 	auto bootstrapTheme {std::make_unique<Wt::WBootstrapTheme>()};
 	bootstrapTheme->setVersion(Wt::BootstrapVersion::v3);
@@ -115,8 +117,8 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Data
 	FS_LOG(UI, INFO) << "Client address = " << env.clientAddress() << ", UserAgent = '" << env.userAgent() << "', Locale = " << env.locale().name() << ", path = '" << env.internalPath() << "'";
 
 	messageResourceBundle().use(appRoot() + "messages");
-	messageResourceBundle().use((Config::instance().getPath("working-dir") / "user_messages").string());
-	if (!Config::instance().getOptPath("tos-custom"))
+	messageResourceBundle().use((Service<IConfig>::get()->getPath("working-dir") / "user_messages").string());
+	if (!Service<IConfig>::get()->getPath("tos-custom").empty())
 		messageResourceBundle().use(appRoot() + "tos");
 
 	setTitle(Wt::WString::tr("msg-app-name"));
@@ -159,11 +161,62 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env, Data
 	handlePathChange(mainStack);
 }
 
-Wt::Dbo::Session&
-FileShelterApplication::getDboSession()
+void
+FileShelterApplication::displayError(std::string_view error)
 {
-	return _db.getTLSSession();
+	// TODO
+	root()->clear();
+	root()->addNew<Wt::WText>("error!");
+#if 0
+	clear();
+
+	Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-not-created"));
+
+	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
+	t->bindString("error", error);
+#endif
 }
 
+void
+FileShelterApplication::displayShareNotFound()
+{
+	root()->clear();
+	root()->addNew<Wt::WText>("share not found!");
+#if 0
+	root()->clear();
+	Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-not-found"));
+	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
+#endif
+}
+
+void
+FileShelterApplication::notify(const Wt::WEvent& event)
+{
+	try
+	{
+		WApplication::notify(event);
+	}
+	catch (const Exception& e)
+	{
+		FS_LOG(UI, WARNING) << "Caught an UI exception: " << e.what();
+		displayError(e.what());
+	}
+	catch (const Share::ShareNotFoundException& e)
+	{
+		FS_LOG(UI, ERROR) << "Share exception: " << e.what();
+		displayShareNotFound();
+	}
+	catch (const UUIDException& e)
+	{
+		FS_LOG(UI, ERROR) << "UUID exception: " << e.what();
+		// bad formatted UUID
+		displayShareNotFound();
+	}
+	catch (const std::exception& e)
+	{
+		FS_LOG(UI, ERROR) << "Caught exception: " << e.what();
+		throw FsException {"Internal error"}; // Do not put details here at it may appear on the user rendered html
+	}
+}
 
 } // namespace UserInterface

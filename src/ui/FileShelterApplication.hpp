@@ -20,16 +20,12 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 #include <Wt/WApplication.h>
 
 namespace Wt::Dbo
 {
 	class Session;
-}
-
-namespace Database
-{
-	class Db;
 }
 
 namespace UserInterface
@@ -38,17 +34,16 @@ namespace UserInterface
 	class FileShelterApplication : public Wt::WApplication
 	{
 		public:
-			static std::unique_ptr<Wt::WApplication> create(const Wt::WEnvironment& env, Database::Db& db);
+			FileShelterApplication(const Wt::WEnvironment& env);
+
+			static std::unique_ptr<Wt::WApplication> create(const Wt::WEnvironment& env);
 			static FileShelterApplication* instance();
 
-			FileShelterApplication(const Wt::WEnvironment& env, Database::Db& db);
-
-			// Session application data
-			Wt::Dbo::Session& getDboSession();
-
 		private:
+			void notify(const Wt::WEvent& event) override;
 
-			Database::Db&	_db;
+			void displayError(std::string_view error);
+			void displayShareNotFound();
 	};
 
 #define FsApp FileShelterApplication::instance()

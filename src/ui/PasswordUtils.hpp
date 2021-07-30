@@ -19,8 +19,11 @@
 
 #pragma once
 
-#include <string>
+#include <string_view>
 
-bool isUploadPassordRequired();
-bool checkUploadPassord(const std::string& uploadPassword);
+namespace UserInterface::PasswordUtils
+{
+	bool isUploadPassordRequired();
+	bool checkUploadPassord(std::string_view uploadPassword);
+}
 

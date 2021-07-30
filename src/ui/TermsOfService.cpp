@@ -22,7 +22,8 @@
 #include <fstream>
 #include <Wt/WTemplate.h>
 
-#include "utils/Config.hpp"
+#include "utils/IConfig.hpp"
+#include "utils/Service.hpp"
 
 namespace UserInterface
 {
@@ -32,9 +33,9 @@ namespace UserInterface
 		auto tos {std::make_unique<Wt::WTemplate>()};
 
 		// Override the ToS with a custom version is specified
-		if (const auto path {Config::instance().getOptPath("tos-custom")})
+		if (const auto path {Service<IConfig>::get()->getPath("tos-custom")}; !path.empty())
 		{
-			std::ifstream ifs {path->string().c_str()};
+			std::ifstream ifs {path.string().c_str()};
 			std::stringstream buffer;
 			buffer << ifs.rdbuf();
 

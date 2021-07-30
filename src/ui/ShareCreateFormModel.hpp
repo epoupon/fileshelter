@@ -31,7 +31,6 @@ namespace UserInterface
 	class ShareCreateFormModel : public Wt::WFormModel
 	{
 		public:
-
 			ShareCreateFormModel();
 
 			std::shared_ptr<Wt::WAbstractItemModel> durationValidityModel() { return _durationValidityModel; }
@@ -39,13 +38,14 @@ namespace UserInterface
 
 			void validateValidatityFields();
 
+			std::chrono::seconds getDurationValidity() const;
+
 			static const Field DescriptionField; // {"desc"};
+			static const Field PasswordField; // {"password"};
 			static const Field DurationValidityField; // {"duration-validity"};
 			static const Field DurationUnitValidityField; // {"duration-unit-validity"};
-			static const Field PasswordField; // {"password"};
 
 		private:
-
 			void updateValidityDuration(std::chrono::seconds duration);
 			bool validateField(Field field) override;
 			void initializeModels();

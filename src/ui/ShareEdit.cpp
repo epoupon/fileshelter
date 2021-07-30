@@ -19,111 +19,92 @@
 
 #include "ShareEdit.hpp"
 
+#include <Wt/WApplication.h>
 #include <Wt/WEnvironment.h>
 #include <Wt/WTemplate.h>
 #include <Wt/WPushButton.h>
 #include <Wt/WMessageBox.h>
 
+#include "resources/ShareResource.hpp"
 #include "utils/Logger.hpp"
-#include "database/Share.hpp"
-#include "share/ShareUtils.hpp"
+#include "utils/Service.hpp"
+#include "share/IShareManager.hpp"
+#include "share/Types.hpp"
 
-#include "FileShelterApplication.hpp"
-#include "ShareCommon.hpp"
+#include "ShareUtils.hpp"
 
-namespace UserInterface {
-
-ShareEdit::ShareEdit()
+namespace UserInterface
 {
-	wApp->internalPathChanged().connect([=]
+
+	ShareEdit::ShareEdit()
 	{
-		refresh();
-	});
-
-	refresh();
-}
-
-void
-ShareEdit::refresh()
-{
-	clear();
-
-	if (!wApp->internalPathMatches("/share-edit"))
-		return;
-
-	const std::optional<UUID> editUUID {UUID::fromString(wApp->internalPathNextPart("/share-edit/"))};
-
-	Wt::Dbo::Transaction transaction {FsApp->getDboSession()};
-
-	const Database::Share::pointer share {Database::Share::getByEditUUID(FsApp->getDboSession(), *editUUID)};
-	if (!share || !ShareUtils::isShareAvailableForDownload(share))
-	{
-		FS_LOG(UI, ERROR) << "Edit UUID '" << editUUID->getAsString() << "' not found";
-		displayNotFound();
-		return;
-	}
-	const Database::IdType shareId {share.id()};
-
-	FS_LOG(UI, INFO) << "[" << share->getDownloadUUID().getAsString() << "] Editing share from " << wApp->environment().clientAddress();
-
-	Wt::WTemplate *t {addNew<Wt::WTemplate>(tr("template-share-edit"))};
-	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
-
-	if (!share->getDesc().empty())
-	{
-		t->setCondition("if-desc", true);
-		t->bindString("file-desc", Wt::WString::fromUTF8(std::string {share->getDesc()}));
-	}
-	t->bindString("file-name", Wt::WString::fromUTF8(ShareUtils::computeFileName(share)));
-	t->bindString("file-size", sizeToString(share->getShareSize()));
-	t->bindString("expiry-date-time", share->getExpiryTime().toString() + " UTC");
-
-	t->bindWidget("download-link", createShareDownloadAnchor(share));
-
-	Wt::WPushButton* deleteBtn = t->bindNew<Wt::WPushButton>("delete-btn", tr("msg-delete"));
-
-	deleteBtn->clicked().connect([=]
-	{
-		auto messageBox = deleteBtn->addChild(std::make_unique<Wt::WMessageBox>(tr("msg-share-delete"),
-			tr("msg-confirm-action"),
-			 Wt::Icon::Question,
-			 Wt::StandardButton::Yes | Wt::StandardButton::No));
-
-		messageBox->setModal(true);
-
-		messageBox->buttonClicked().connect([=] (Wt::StandardButton btn)
+		wApp->internalPathChanged().connect([=]
 		{
-			if (btn == Wt::StandardButton::Yes)
-			{
-				ShareUtils::destroyShare(FsApp->getDboSession(), shareId);
-				displayRemoved();
-			}
-			deleteBtn->removeChild(messageBox);
+			handlePathChanged();
 		});
 
-		messageBox->show();
-	});
+		handlePathChanged();
+	}
 
-}
+	void
+	ShareEdit::handlePathChanged()
+	{
+		clear();
 
-void
-ShareEdit::displayRemoved()
-{
-	clear();
+		if (!wApp->internalPathMatches("/share-edit"))
+			return;
 
-	Wt::WTemplate *t {addNew<Wt::WTemplate>(tr("template-share-removed"))};
-	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
-}
+		const Share::ShareEditUUID editUUID {wApp->internalPathNextPart("/share-edit/")};
+		const Share::ShareDesc share {Service<Share::IShareManager>::get()->getShareDesc(editUUID)};
 
-void
-ShareEdit::displayNotFound()
-{
-	clear();
+		FS_LOG(UI, INFO) << "[" << share.uuid.toString() << "] Editing share from " << wApp->environment().clientAddress();
 
-	Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-not-found"));
-	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
-}
+		Wt::WTemplate *t {addNew<Wt::WTemplate>(tr("template-share-edit"))};
+		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
+		if (!share.description.empty())
+		{
+			t->setCondition("if-desc", true);
+			t->bindString("file-desc", Wt::WString::fromUTF8(std::string {share.description}), Wt::TextFormat::Plain);
+		}
+		t->bindString("file-name", Wt::WString::fromUTF8(ShareResource::getClientFileName(share)), Wt::TextFormat::Plain);
+		t->bindString("file-size", ShareUtils::fileSizeToString(share.size), Wt::TextFormat::Plain);
+		t->bindString("expiry-date-time", share.expiryTime.toString() + " UTC", Wt::TextFormat::Plain);
 
+		t->bindWidget("download-link", ShareUtils::createShareDownloadAnchor(share.uuid));
+
+		Wt::WPushButton* deleteBtn {t->bindNew<Wt::WPushButton>("delete-btn", tr("msg-delete"))};
+
+		deleteBtn->clicked().connect([=]
+		{
+			auto messageBox = deleteBtn->addChild(std::make_unique<Wt::WMessageBox>(tr("msg-share-delete"),
+						tr("msg-confirm-action"),
+						Wt::Icon::Question,
+						Wt::StandardButton::Yes | Wt::StandardButton::No));
+
+			messageBox->setModal(true);
+
+			messageBox->buttonClicked().connect([=] (Wt::StandardButton btn)
+			{
+				if (btn == Wt::StandardButton::Yes)
+				{
+					Service<Share::IShareManager>::get()->destroyShare(editUUID);
+					displayRemoved();
+				}
+				deleteBtn->removeChild(messageBox);
+			});
+
+			messageBox->show();
+		});
+	}
+
+	void
+	ShareEdit::displayRemoved()
+	{
+		clear();
+
+		Wt::WTemplate *t {addNew<Wt::WTemplate>(tr("template-share-removed"))};
+		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
+	}
 } // namespace UserInterface
 

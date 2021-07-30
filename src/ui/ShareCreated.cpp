@@ -22,10 +22,11 @@
 #include <Wt/WTemplate.h>
 
 #include "utils/Logger.hpp"
-#include "database/Share.hpp"
+#include "utils/Service.hpp"
+#include "share/IShareManager.hpp"
+#include "share/Types.hpp"
 
-#include "FileShelterApplication.hpp"
-#include "ShareCommon.hpp"
+#include "ShareUtils.hpp"
 
 
 namespace UserInterface {
@@ -34,40 +35,31 @@ ShareCreated::ShareCreated()
 {
 	wApp->internalPathChanged().connect([this]
 	{
-		refresh();
+		handlePathChanged();
 	});
 
-	refresh();
+	handlePathChanged();
 }
 
 void
-ShareCreated::refresh()
+ShareCreated::handlePathChanged()
 {
 	clear();
 
 	if (!wApp->internalPathMatches("/share-created"))
 		return;
 
-	std::optional<UUID> editUUID {UUID::fromString(wApp->internalPathNextPart("/share-created/"))};
-	if (!editUUID)
-		return;
+	const Share::ShareEditUUID shareEditUUID {wApp->internalPathNextPart("/share-created/")};
 
-	Wt::Dbo::Transaction transaction {FsApp->getDboSession()};
+	FS_LOG(UI, DEBUG) << "Editing ShareEditUUID = " << shareEditUUID.toString();
 
-	const Database::Share::pointer share {Database::Share::getByEditUUID(FsApp->getDboSession(), *editUUID)};
-	if (!share)
-	{
-		FS_LOG(UI, ERROR) << "Edit UUID '" << editUUID->getAsString() << "' not found";
-		Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-not-found"));
-		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
-		return;
-	}
+	Share::ShareDesc share {Service<Share::IShareManager>::get()->getShareDesc(shareEditUUID)};
 
 	Wt::WTemplate *t {addNew<Wt::WTemplate>(tr("template-share-created"))};
 	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
-	t->bindWidget("download-link", createShareDownloadAnchor(share));
-	t->bindWidget("edit-link", createShareEditAnchor(share));
+	t->bindWidget("download-link", ShareUtils::createShareDownloadAnchor(share.uuid));
+	t->bindWidget("edit-link", ShareUtils::createShareEditAnchor(shareEditUUID));
 }
 
 } // namespace UserInterface

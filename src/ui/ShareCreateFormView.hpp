@@ -27,7 +27,12 @@
 #include <Wt/WTemplateFormView.h>
 
 #include "ShareCreateFormModel.hpp"
-#include "ShareCreateParameters.hpp"
+
+namespace Share
+{
+	struct ShareCreateParameters;
+	struct FileCreateParameters;
+}
 
 namespace UserInterface
 {
@@ -41,7 +46,9 @@ namespace UserInterface
 			Wt::Signal<>& validated() { return _sigValidated;}
 			Wt::Signal<unsigned>& progressUpdate() { return _sigProgressUpdate;}
 
-			Wt::Signal<ShareCreateParameters>& complete() { return _sigComplete;}
+			using ShareCreateCompleteSignal = Wt::Signal<const Share::ShareCreateParameters&, std::vector<Share::FileCreateParameters>&>;
+
+			ShareCreateCompleteSignal& complete() { return _sigComplete;}
 
 		private:
 
@@ -62,7 +69,7 @@ namespace UserInterface
 
 			Wt::Signal<>						_sigValidated;
 			Wt::Signal<unsigned>				_sigProgressUpdate;
-			Wt::Signal<ShareCreateParameters>	_sigComplete;
+			ShareCreateCompleteSignal			_sigComplete;
 
 			std::shared_ptr<ShareCreateFormModel> _model;
 			Wt::WPushButton*			_createBtn {};

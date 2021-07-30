@@ -24,26 +24,20 @@
 
 #include "utils/UUID.hpp"
 
-namespace UserInterface {
-
-class ShareCreateParameters;
-
-class ShareCreate : public Wt::WContainerWidget
+namespace UserInterface
 {
-	public:
-		ShareCreate();
 
-	private:
-		void refresh();
+	class ShareCreate : public Wt::WContainerWidget
+	{
+		public:
+			ShareCreate();
 
-		void displayCreate();
-		void displayPassword();
-		void displayError(Wt::WString error);
-		static UUID createShare(const ShareCreateParameters& parameters);
+		private:
+			void handlePathChanged();
 
-};
-
-
+			void displayCreate();
+			void displayPassword();
+	};
 
 } // namespace UserInterface
 

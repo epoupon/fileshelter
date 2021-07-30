@@ -33,6 +33,7 @@ if (NOT TARGET Wt::HTTP)
 	message(FATAL_ERROR "Cannot find Wt::HTTP!")
 endif ()
 
+add_subdirectory(libs)
 add_subdirectory(src)
 
 install(DIRECTORY approot DESTINATION share/fileshelter)
