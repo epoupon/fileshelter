@@ -30,6 +30,7 @@
 <message id="msg-optional">Optional</message>
 <message id="msg-hits">Downloads</message>
 <message id="msg-share-delete">Delete share</message>
+<message id="msg-share-size">Share size</message>
 <message id="msg-confirm-action">Are you sure?</message>
 <message id="msg-bad-password">Bad password</message>
 <message id="msg-internal-error">Internal error!</message>

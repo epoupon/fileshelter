@@ -75,8 +75,16 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 		pt.put("server.application-settings.log-file", wtLogFilePath.string());
 		pt.put("server.application-settings.log-config", Service<IConfig>::get()->getString("log-config", "* -debug -info:WebRequest"));
 		pt.put("server.application-settings.max-request-size", Service<IConfig>::get()->getULong("max-file-size", 100) * 1024 /* kB */);
-		pt.put("server.application-settings.behind-reverse-proxy", Service<IConfig>::get()->getBool("behind-reverse-proxy", false));
 		pt.put("server.application-settings.progressive-bootstrap", true);
+
+		if (Service<IConfig>::get()->getBool("behind-reverse-proxy", false))
+		{
+			pt.put("server.application-settings.trusted-proxy-config.original-ip-header", Service<IConfig>::get()->getString("original-ip-header", "X-Forwared-For"));
+			Service<IConfig>::get()->visitStrings("trusted-proxies", [&](std::string_view trustedProxy)
+			{
+				pt.add("server.application-settings.trusted-proxy-config.trusted-proxies.proxy", std::string {trustedProxy});
+			}, {"127.0.0.1", "::1"});
+		}
 
 		std::ofstream oss {wtConfigPath.string().c_str(), std::ios::out};
 		boost::property_tree::xml_parser::write_xml(oss, pt);
@@ -140,17 +148,15 @@ int main(int argc, char *argv[])
 		Service<IConfig> config {createConfig(configFilePath)};
 
 		// Make sure the working directory exists
-		std::filesystem::create_directories(Service<IConfig>::get()->getPath("working-dir") / "files");
+		std::filesystem::create_directories(Service<IConfig>::get()->getPath("working-dir"));
 
-		// Recreate the tmp directory in order to flush it
-		const auto tmpDir {Service<IConfig>::get()->getPath("working-dir") / "tmp"};
-		std::filesystem::remove_all(tmpDir);
-		std::filesystem::create_directories(tmpDir);
+		const auto uploadedFilesPath {Service<IConfig>::get()->getPath("working-dir") / "uploaded-files"};
+		std::filesystem::create_directories(uploadedFilesPath);
 
 		Service<Share::IShareManager> shareManager {Share::createShareManager(Service<IConfig>::get()->getPath("working-dir") / "fileshelter.db")};
 
 		// Set the WT_TMP_DIR inside the working dir, used to upload files
-		setenv("WT_TMP_DIR", tmpDir.string().c_str(), 1);
+		setenv("WT_TMP_DIR", uploadedFilesPath.string().c_str(), 1);
 
 		// Construct WT configuration and get the argc/argv back
 		std::vector<std::string> wtServerArgs {generateWtConfig(argv[0])};
@@ -165,9 +171,12 @@ int main(int argc, char *argv[])
 		Wt::WServer server {argv[0]};
 		server.setServerConfiguration(wtServerArgs.size(), const_cast<char**>(wtArgv));
 
+		const std::string deployPath {Service<IConfig>::get()->getString("deploy-path", "/")};
+
 		// bind static resources
-//		ShareResource shareResource {database};
-//		server.addResource(&shareResource, std::string {shareResource.getDeployPath()});
+		ShareResource shareResource;
+		//server.addResource(&shareResource, std::string {Service<IConfig>::get()->getString("deploy-path", "/")} + "/" + std::string {shareResource.getDeployPath()});
+		server.addResource(&shareResource, std::string {shareResource.getDeployPath()});
 
 		// bind entry point
 		server.addEntryPoint(Wt::EntryPointType::Application, [&](const Wt::WEnvironment& env)

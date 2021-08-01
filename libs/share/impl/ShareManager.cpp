@@ -67,44 +67,24 @@ namespace Share
 
 	ShareManager::ShareManager(const std::filesystem::path& dbFile)
 	: _db {dbFile}
+	, _shareMaxSize {Service<IConfig>::get()->getULong("max-share-size", 100) * 1024 * 1024}
+	, _fileMaxSize {Service<IConfig>::get()->getULong("max-file-size", 100) * 1024 * 1024}
+	, _maxValidityDuration {std::chrono::hours {24} * Service<IConfig>::get()->getULong("max-validity-days", 100)}
+	, _defaultValidityDuration {std::chrono::hours {24} * Service<IConfig>::get()->getULong("default-validity-days", 100)}
+	, _canValidatityDurationBeSet {Service<IConfig>::get()->getBool("user-defined-validy-days", true)}
 	{
+		// config validation
+		if (_shareMaxSize == 0)
+			throw Exception {"max-share-size must be greater than 0"};
+		if (_fileMaxSize == 0)
+			throw Exception {"max-file-size must be greater than 0"};
+		if (_maxValidityDuration.count() == 0)
+			throw Exception {"max-validity-days must be greater than 0"};
+		if (_defaultValidityDuration.count() == 0)
+			throw Exception {"default-validity-days must be greater than 0"};
 
-	}
-
-	FileSize
-	ShareManager::getMaxShareSize() const
-	{
-		return Service<IConfig>::get()->getULong("max-share-size", 100) * 1024 * 1024;
-	}
-
-	FileSize
-	ShareManager::getMaxFileSize() const
-	{
-		return Service<IConfig>::get()->getULong("max-file-size", 100) * 1024 * 1024;
-	}
-
-	std::chrono::seconds
-	ShareManager::getMaxValidatityDuration() const
-	{
-		return std::chrono::hours {24} * Service<IConfig>::get()->getULong("max-validity-days", 100);
-	}
-
-	std::chrono::seconds
-	ShareManager::getDefaultValidatityDuration() const
-	{
-		return {};
-	}
-
-	std::size_t
-	ShareManager::getMaxValidatityHits() const
-	{
-		return 0;
-	}
-
-	bool
-	ShareManager::canValidatityDurationBeSet() const
-	{
-		return true;
+		if (_maxValidityDuration < _defaultValidityDuration)
+			throw Exception {"max-validity-days must be greater than default-validity-days"};
 	}
 
 	ShareEditUUID
@@ -137,30 +117,56 @@ namespace Share
 	}
 
 	void
-	ShareManager::destroyShare(const ShareEditUUID& shareId)
+	ShareManager::destroyShare(const ShareEditUUID& shareUUID)
 	{
 		throw Exception {"Not implemented"};
 	}
 
-	ShareDesc
-	ShareManager::getShareDesc(const ShareUUID& shareId, std::optional<std::string_view> password)
+	bool
+	ShareManager::shareHasPassword(const ShareUUID& shareUUID)
 	{
 		Wt::Dbo::Session& session {_db.getTLSSession()};
 		Wt::Dbo::Transaction transaction {session};
 
-		const Share::pointer share {getShareByUUIDAndPassword(session, shareId, password)};
+		const Share::pointer share {Share::getByUUID(session, shareUUID)};
+		if (!share)
+			throw ShareNotFoundException {};
+
+		return share->hasPassword();
+	}
+
+	ShareDesc
+	ShareManager::getShareDesc(const ShareUUID& shareUUID, std::optional<std::string_view> password)
+	{
+		Wt::Dbo::Session& session {_db.getTLSSession()};
+		Wt::Dbo::Transaction transaction {session};
+
+		const Share::pointer share {getShareByUUIDAndPassword(session, shareUUID, password)};
+		return shareToDesc(*share.get());
+	}
+
+	ShareDesc
+	ShareManager::getShareDesc(const ShareEditUUID& shareEditUUID)
+	{
+		Wt::Dbo::Session& session {_db.getTLSSession()};
+		Wt::Dbo::Transaction transaction {session};
+
+		const Share::pointer share {Share::getByEditUUID(session, shareEditUUID)};
+		if (!share)
+			throw ShareNotFoundException {};
+
 		return shareToDesc(*share.get());
 	}
 
 	std::unique_ptr<Zip::Zipper>
-	ShareManager::getShareZipper(const ShareUUID& shareId, std::optional<std::string_view> password)
+	ShareManager::getShareZipper(const ShareUUID& shareUUID, std::optional<std::string_view> password)
 	{
 		try
 		{
 			Wt::Dbo::Session& session {_db.getTLSSession()};
 			Wt::Dbo::Transaction transaction {session};
 
-			Share::pointer share {getShareByUUIDAndPassword(session, shareId, password)};
+			Share::pointer share {getShareByUUIDAndPassword(session, shareUUID, password)};
 
 			std::map<std::string, std::filesystem::path> zipFiles;
 			share->visitFiles([&](const File::pointer& file)

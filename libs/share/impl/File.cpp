@@ -32,6 +32,7 @@ namespace Share
 
 		res.modify()->_path = parameters.path;
 		res.modify()->_name = parameters.name;
+		res.modify()->_size = std::filesystem::file_size(parameters.path); // may throw
 		res.modify()->_share = share;
 
 		session.flush();

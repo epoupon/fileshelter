@@ -38,12 +38,6 @@ ShareResource::~ShareResource()
 	beingDeleted();
 }
 
-std::string_view
-ShareResource::getDeployPath()
-{
-	return "/share";
-}
-
 Wt::WLink
 ShareResource::createLink(const ShareUUID& uuid, std::optional<std::string_view> password)
 {
@@ -69,6 +63,13 @@ ShareResource::getClientFileName(const Share::ShareDesc& share)
 void
 ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Response& response)
 {
+
+	for (const auto& header : request.headers())
+	{
+		FS_LOG(UI, DEBUG) << "Header = '" << header.name() << "', value = '" << header.value() << "'";
+	}
+	FS_LOG(UI, DEBUG) << "request.clientAddr = " << request.clientAddress();
+
 	try
 	{
 		std::shared_ptr<Zip::Zipper> zipper;

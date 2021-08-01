@@ -30,9 +30,6 @@ namespace UserInterface::PasswordUtils
 	bool
 	isUploadPassordRequired()
 	{
-		if (!Service<IConfig>::get()->getString("upload-password", "").empty())
-			return true;
-
 		bool hasStrings {};
 		Service<IConfig>::get()->visitStrings("upload-passwords", [&](std::string_view str)
 		{
@@ -46,12 +43,6 @@ namespace UserInterface::PasswordUtils
 	bool
 	checkUploadPassord(std::string_view uploadPassword)
 	{
-		{
-			const std::string password {Service<IConfig>::get()->getString("upload-password", "")};
-			if (!password.empty() && uploadPassword == password)
-				return true;
-		}
-
 		bool res{};
 		Service<IConfig>::get()->visitStrings("upload-passwords", [&](std::string_view password)
 		{

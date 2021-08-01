@@ -61,7 +61,7 @@ Config::getString(std::string_view setting, std::string_view def)
 }
 
 void
-Config::visitStrings(std::string_view setting, std::function<void(std::string_view)> _func)
+Config::visitStrings(std::string_view setting, std::function<void(std::string_view)> _func, std::initializer_list<std::string_view> defs)
 {
 	try
 	{
@@ -69,7 +69,12 @@ Config::visitStrings(std::string_view setting, std::function<void(std::string_vi
 		for (int i {}; i < values.getLength(); ++i)
 			_func(static_cast<const char*>(values[i]));
 	}
-	catch (const libconfig::ConfigException&)
+	catch (const libconfig::SettingNotFoundException&)
+	{
+		for (std::string_view def : defs)
+			_func(def);
+	}
+	catch (libconfig::ConfigException&)
 	{
 	}
 }

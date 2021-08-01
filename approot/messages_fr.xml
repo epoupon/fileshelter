@@ -28,6 +28,7 @@
 <message id="msg-optional">Optionnel</message>
 <message id="msg-hits">Téléchargements</message>
 <message id="msg-share-delete">Supprimer le partage</message>
+<message id="msg-share-size">Taille</message>
 <message id="msg-confirm-action">Etes vous sûr ?</message>
 <message id="msg-bad-password">Mot de passe invalide</message>
 <message id="msg-internal-error">Erreur interne !</message>

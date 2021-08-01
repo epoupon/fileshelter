@@ -40,7 +40,7 @@ namespace UserInterface::ShareUtils
 	{
 		const std::string downloadPath {"/share-download/" + shareUUID.toString()};
 
-		return std::make_unique<Wt::WAnchor>(Wt::WLink(Wt::LinkType::InternalPath, downloadPath), wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + wApp->environment().deploymentPath() + downloadPath);
+		return std::make_unique<Wt::WAnchor>(Wt::WLink {Wt::LinkType::InternalPath, downloadPath}, wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + wApp->environment().deploymentPath() + downloadPath);
 	}
 
 	std::unique_ptr<Wt::WAnchor>
