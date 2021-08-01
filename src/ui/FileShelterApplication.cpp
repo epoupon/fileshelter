@@ -118,7 +118,7 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env)
 
 	messageResourceBundle().use(appRoot() + "messages");
 	messageResourceBundle().use((Service<IConfig>::get()->getPath("working-dir") / "user_messages").string());
-	if (!Service<IConfig>::get()->getPath("tos-custom").empty())
+	if (Service<IConfig>::get()->getPath("tos-custom").empty())
 		messageResourceBundle().use(appRoot() + "tos");
 
 	setTitle(Wt::WString::tr("msg-app-name"));

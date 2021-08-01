@@ -223,15 +223,15 @@
 		</div>
 		<div class="panel panel-default">
 			<div class="panel-heading"><h3>${tr:msg-files}</h3> ${download-as-zip-btn class="btn btn-primary"}</div>
-			<div class="panel-body">${files class="table table-striped table-hover"}</div>
+			<div class="panel-body">${files}</div>
 		</div>
 	</div>
 </message>
 
 <message id="template-share-download-file">
 	<div  class="row">
-		<div class="col-xs-8">${name}</div>
-		<div class="col-xs-2">${size}</div>
+		<div class="col-xs-9">${name}</div>
+		<div class="col-xs-3 text-right">${size}</div>
 	</div>
 </message>
 

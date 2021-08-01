@@ -64,15 +64,15 @@ namespace UserInterface::ShareUtils
 	{
 		if (size >= 1024 * 1024 * 1024)
 		{
-			return Wt::WString::tr("msg-size-gb").arg(to_string_with_precision(size / 1024 / 1024 / 1024., 1));
+			return Wt::WString::tr("msg-size-gb").arg(to_string_with_precision(size / 1024 / 1024 / 1024., 0));
 		}
 		if (size >= 1024 * 1024)
 		{
-			return Wt::WString::tr("msg-size-mb").arg(to_string_with_precision(size / 1024 / 1024., 1));
+			return Wt::WString::tr("msg-size-mb").arg(to_string_with_precision(size / 1024 / 1024., 0));
 		}
 		else if (size >= 1024)
 		{
-			return Wt::WString::tr("msg-size-kb").arg(to_string_with_precision(size / 1024., 1));
+			return Wt::WString::tr("msg-size-kb").arg(to_string_with_precision(size / 1024., 0));
 		}
 		else
 			return Wt::WString::tr("msg-size-b").arg(size);
