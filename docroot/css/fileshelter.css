@@ -5,9 +5,6 @@ summary {
 
 .Wt-filedropzone {
 	cursor: pointer;
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
 	width: 200px;
 	height: 200px;
 	background-color: lightgrey;
@@ -20,9 +17,15 @@ summary {
 	background-color: darkgrey;
 }
 
-.fs-vertical-align {
+.fs-vertical-center {
 	display: flex;
 	align-items: center;
+}
+
+.fs-horizontal-center {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .fs-nav {
@@ -35,8 +38,19 @@ summary {
 }
 
 .fs-file-entry-btn-remove {
-	text-align: middle;
 	cursor: pointer;
+	margin-right: 8px;
+}
+
+.fs-file-entry-btn-remove:hover {
+	color: red;
+	transition: color .20s cubic-bezier(.43,-.1,.16,1.1);
+}
+
+.fs-file-entry-size {
+	margin-right: 8px;
+	min-width: 50px;
+	color: darkgrey;
 }
 
 .fs-collapsible-panel-header {

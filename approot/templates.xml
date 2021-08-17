@@ -22,12 +22,7 @@
 
 <message id="template-share-create-form">
 	<h1><i class="fa fa-upload"></i> ${tr:msg-share-create}</h1>
-	<div class="row">
-		<div class="col-xs-12">
-			${file-drop}
-		</div>
-	</div>
-
+	${file-drop class="fs-horizontal-center"}
 	<div class="panel panel-default">
 		<div class="panel-heading">${tr:msg-files}</div>
 		<div class="panel-body">
@@ -87,26 +82,23 @@
 		</div>
 	</div>
 	${<if-max-share-size>}
-		<div class="alert alert-danger">
-			<i class="fa fa-warning" aria-hidden="true"></i> ${max-size}
-		</div>
-		${</if-max-share-size>}
-	${<if-has-duplicate-names>}
-		<div class="alert alert-danger">
-			<i class="fa fa-warning" aria-hidden="true"></i> ${tr:msg-has-duplicate-names}
-		</div>
-		${</if-has-duplicate-names>}
-	<div class="form-group">
-		<div class="col-sm-offset-2 col-sm-10">
-			${create-btn class="btn-primary"}
-		</div>
+	<div class="alert alert-danger">
+		<i class="fa fa-warning" aria-hidden="true"></i> ${max-size}
 	</div>
+	${</if-max-share-size>}
+	${<if-has-duplicate-names>}
+	<div class="alert alert-danger">
+		<i class="fa fa-warning" aria-hidden="true"></i> ${tr:msg-has-duplicate-names}
+	</div>
+	${</if-has-duplicate-names>}
+	${create-btn class="btn-primary fs-horizontal-center"}
 </message>
 
 <message id="template-share-create-form-file">
-	<div class="row fs-file-entry fs-vertical-align">
-		<div class="col-xs-9">${name}</div>
-		<div class="col-xs-3 text-right"><span class="hidden-xs"><small>${size}</small></span> ${del-btn}</div>
+	<div class="fs-file-entry fs-vertical-center">
+		${del-btn}
+		<div class="fs-file-entry-size hidden-xs">${size}</div>
+		<div>${name}</div>
 	</div>
 </message>
 
@@ -254,7 +246,7 @@
 </message>
 
 <message id="template-share-download-file">
-	<div  class="row fs-file-entry fs-vertical-align">
+	<div  class="row fs-file-entry fs-vertical-center">
 		<div class="col-xs-9">${name}</div>
 		<div class="col-xs-3 text-right"><small>${size}</small></div>
 	</div>
