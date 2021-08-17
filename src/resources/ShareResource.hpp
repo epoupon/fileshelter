@@ -38,12 +38,9 @@ class ShareResource : public Wt::WResource
 		~ShareResource();
 
 		static constexpr std::string_view 		getDeployPath() { return "/share"; }
-		static Wt::WLink				createLink(const Share::ShareUUID& shareId, std::optional<std::string_view> password);
-		static std::filesystem::path	getClientFileName(const Share::ShareDesc& share);
+		static Wt::WLink						createLink(const Share::ShareUUID& shareId, std::optional<std::string_view> password);
 	private:
 		void handleRequest(const Wt::Http::Request& request, Wt::Http::Response& response) override;
-
-		static constexpr std::size_t _bufferSize {32768};
 };
 
 

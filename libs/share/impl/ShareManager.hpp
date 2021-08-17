@@ -25,7 +25,6 @@ namespace Share
 			bool			shareHasPassword(const ShareUUID& shareUUID) override;
 			ShareDesc		getShareDesc(const ShareUUID& shareUUID, std::optional<std::string_view> password) override;
 			ShareDesc		getShareDesc(const ShareEditUUID& shareUUID) override;
-			std::unique_ptr<Zip::Zipper> getShareZipper(const ShareUUID& shareUUID, std::optional<std::string_view> password) override;
 
 			Db _db;
 

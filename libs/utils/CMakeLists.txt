@@ -1,10 +1,12 @@
 
 add_library(fileshelterutils SHARED
 	impl/Config.cpp
+	impl/FileResourceHandler.cpp
 	impl/Logger.cpp
 	impl/String.cpp
 	impl/UUID.cpp
 	impl/Zipper.cpp
+	impl/ZipperResourceHandler.cpp
 	)
 
 target_include_directories(fileshelterutils INTERFACE

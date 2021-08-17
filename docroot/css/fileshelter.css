@@ -3,7 +3,37 @@ summary {
 	font-weight: bold;
 }
 
+.Wt-filedropzone {
+	cursor: pointer;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 200px;
+	height: 200px;
+	background-color: lightgrey;
+	border-radius: 15px;
+    transition: background-color 0.5s ease;
+}
+
+.Wt-filedropzone:hover {
+	background-color: darkgrey;
+}
+
+.fs-vertical-align {
+	display: flex;
+	align-items: center;
+}
+
 .fs-nav {
 	line-height: 32px;
 }
 
+.fs-file-entry {
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+.fs-file-entry-btn-remove {
+	text-align: middle;
+	cursor: pointer;
+}

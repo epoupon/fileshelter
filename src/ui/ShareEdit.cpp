@@ -62,13 +62,7 @@ namespace UserInterface
 		Wt::WTemplate *t {addNew<Wt::WTemplate>(tr("template-share-edit"))};
 		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
-		if (!share.description.empty())
-		{
-			t->setCondition("if-desc", true);
-			t->bindString("file-desc", Wt::WString::fromUTF8(std::string {share.description}), Wt::TextFormat::Plain);
-		}
-		t->bindString("file-name", Wt::WString::fromUTF8(ShareResource::getClientFileName(share)), Wt::TextFormat::Plain);
-		t->bindString("file-size", ShareUtils::fileSizeToString(share.size), Wt::TextFormat::Plain);
+		t->bindInt("download-count", share.readCount);
 		t->bindString("expiry-date-time", share.expiryTime.toString() + " UTC", Wt::TextFormat::Plain);
 
 		t->bindWidget("download-link", ShareUtils::createShareDownloadAnchor(share.uuid));

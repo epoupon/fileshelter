@@ -19,6 +19,7 @@
 
 #include "ShareResource.hpp"
 
+#include <memory>
 #include <optional>
 #include <Wt/Auth/PasswordHash.h>
 #include <Wt/Http/Response.h>
@@ -27,11 +28,37 @@
 
 #include "share/IShareManager.hpp"
 #include "share/Exception.hpp"
+#include "utils/FileResourceHandlerCreator.hpp"
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
 #include "utils/Zipper.hpp"
+#include "utils/ZipperResourceHandlerCreator.hpp"
 
 using namespace Share;
+
+namespace
+{
+	std::filesystem::path
+	getClientFileName(const ShareDesc& share)
+	{
+		if (share.files.size() == 1)
+			return share.files.front().clientPath;
+
+		return share.uuid.toString() + ".zip";
+	}
+
+	std::unique_ptr<Zip::Zipper>
+	createZipper(const ShareDesc& share)
+	{
+
+		std::map<std::string, std::filesystem::path> zipFiles;
+		for (const FileDesc& file : share.files)
+			zipFiles.emplace(file.clientPath, file.path);
+
+		// mask creation time
+		return std::make_unique<Zip::Zipper>(zipFiles, Wt::WLocalDateTime::currentDateTime().toUTC());
+	}
+}
 
 ShareResource::~ShareResource()
 {
@@ -44,92 +71,61 @@ ShareResource::createLink(const ShareUUID& uuid, std::optional<std::string_view>
 	return {Wt::LinkType::Url, std::string {getDeployPath()} + "?id=" + uuid.toString() + (password ? ("&p=" + Wt::Utils::hexEncode(std::string {*password})) : "")};
 }
 
-std::filesystem::path
-ShareResource::getClientFileName(const Share::ShareDesc& share)
-{
-	std::filesystem::path fileName;
-
-	for (const Share::FileDesc& file : share.files)
-	{
-		if (file.clientPath.empty())
-			fileName = file.clientPath.string() + ".zip";
-		else
-			fileName = share.uuid.toString() + ".zip";
-	}
-
-	return fileName;
-}
 
 void
 ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Response& response)
 {
-
-	for (const auto& header : request.headers())
-	{
-		FS_LOG(UI, DEBUG) << "Header = '" << header.name() << "', value = '" << header.value() << "'";
-	}
-	FS_LOG(UI, DEBUG) << "request.clientAddr = " << request.clientAddress();
-
 	try
 	{
-		std::shared_ptr<Zip::Zipper> zipper;
-
-		// First, see if this request is for a continuation
-		Wt::Http::ResponseContinuation *continuation {request.continuation()};
-		if (continuation)
+		std::shared_ptr<IResourceHandler> resourceHandler;
+		Wt::Http::ResponseContinuation* continuation {request.continuation()};
+		if (!continuation)
 		{
-			zipper = Wt::cpp17::any_cast<std::shared_ptr<Zip::Zipper>>(continuation->data());
-			if (!zipper)
-				return;
-		}
-		else
-		{
+			// parse parameters
 			const std::string* uuid {request.getParameter("id")};
 			if (!uuid)
 			{
 				FS_LOG(UI, DEBUG) << "Missing parameter 'id'!";
 				return;
 			}
+			const ShareUUID& shareUUID {*uuid};
 
 			std::optional<std::string> password;
 			if (const std::string *p {request.getParameter("p")})
 				password = Wt::Utils::hexDecode(*password);
 
-			const ShareUUID& shareUUID {*uuid};
-
-			try
+			const ShareDesc share {Service<IShareManager>::get()->getShareDesc(shareUUID, password)};
+			if (share.files.size() > 1)
 			{
-				zipper = Service<IShareManager>::get()->getShareZipper(shareUUID, password);
-				if (!zipper)
-					return;
-
-				// TODO avoid double password check
-				suggestFileName(getClientFileName(Service<Share::IShareManager>::get()->getShareDesc(shareUUID, password)).string());
+				std::unique_ptr<Zip::Zipper> zipper {createZipper(share)};
+				response.setContentLength(zipper->getTotalZipFile());
+				response.setMimeType("application/zip");
+				resourceHandler = createZipperResourceHandler(std::move(zipper));
 			}
-			catch (const Share::Exception& e)
+			else
 			{
-				FS_LOG(UI, ERROR) << "Caught Share::Exception while creating zipper: " << e.what();
-				return;
+				response.setMimeType("application/octet-stream");
+				resourceHandler = createFileResourceHandler(share.files.front().path);
 			}
 
-			response.setContentLength(zipper->getTotalZipFile());
-			response.setMimeType("application/zip");
+			suggestFileName(getClientFileName(share).string());
 		}
-
-		std::array<std::byte, _bufferSize> buffer;
-		const std::size_t nbWrittenBytes {zipper->writeSome(buffer.data(), buffer.size())};
-
-		response.out().write(reinterpret_cast<const char *>(buffer.data()), nbWrittenBytes);
-
-		if (!zipper->isComplete())
+		else
 		{
-			Wt::Http::ResponseContinuation* continuation {response.createContinuation()};
-			continuation->setData(zipper);
+			resourceHandler = Wt::cpp17::any_cast<std::shared_ptr<IResourceHandler>>(continuation->data());
 		}
+
+		continuation = resourceHandler->processRequest(request, response);
+		if (continuation)
+			continuation->setData(resourceHandler);
 	}
 	catch (const UUIDException& e)
 	{
 		FS_LOG(UI, DEBUG) << "Bad parameter 'id'!";
+	}
+	catch (const Share::Exception& e)
+	{
+		FS_LOG(UI, ERROR) << "Caught Share::Exception: " << e.what();
 	}
 	catch (Zip::ZipperException& exception)
 	{

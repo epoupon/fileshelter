@@ -50,6 +50,7 @@ namespace Share
 	struct FileDesc
 	{
 		FileUUID				uuid;
+		std::filesystem::path	path;
 		std::filesystem::path	clientPath;
 		FileSize				size {};
 	};

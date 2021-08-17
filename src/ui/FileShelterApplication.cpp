@@ -121,6 +121,9 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env)
 	if (Service<IConfig>::get()->getPath("tos-custom").empty())
 		messageResourceBundle().use(appRoot() + "tos");
 
+	// Extra javascript
+	require("js/collapse.js");
+
 	setTitle(Wt::WString::tr("msg-app-name"));
 
 	enableInternalPaths();

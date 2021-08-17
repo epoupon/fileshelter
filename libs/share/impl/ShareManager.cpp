@@ -35,6 +35,7 @@ namespace
 		{
 			Share::FileDesc fileDesc;
 			fileDesc.uuid = file->getUUID();
+			fileDesc.path = file->getPath();
 			fileDesc.clientPath = file->getClientPath();
 			fileDesc.size = file->getSize();
 
@@ -157,33 +158,4 @@ namespace Share
 
 		return shareToDesc(*share.get());
 	}
-
-	std::unique_ptr<Zip::Zipper>
-	ShareManager::getShareZipper(const ShareUUID& shareUUID, std::optional<std::string_view> password)
-	{
-		try
-		{
-			Wt::Dbo::Session& session {_db.getTLSSession()};
-			Wt::Dbo::Transaction transaction {session};
-
-			Share::pointer share {getShareByUUIDAndPassword(session, shareUUID, password)};
-
-			std::map<std::string, std::filesystem::path> zipFiles;
-			share->visitFiles([&](const File::pointer& file)
-			{
-				zipFiles.emplace(file->getClientPath(), file->getPath());
-			});
-
-			share.modify()->incReadCount();
-
-			// mask creation time
-			return std::make_unique<Zip::Zipper>(zipFiles, Wt::WLocalDateTime::currentDateTime().toUTC());
-		}
-		catch (const Zip::ZipperException& e)
-		{
-			FS_LOG(UI, DEBUG) << "Zip exception: " << e.what();
-			throw Exception {"zip exception: " + std::string {e.what()}};
-		}
-	}
-
 } // namespace Share

@@ -78,7 +78,7 @@ ShareDownload::displayDownload(const Share::ShareDesc& share, std::optional<std:
 	t->bindString("expiry-date-time", share.expiryTime.toString() + " UTC", Wt::TextFormat::Plain);
 
 	{
-		Wt::WPushButton* downloadBtn {t->bindNew<Wt::WPushButton>("download-as-zip-btn", tr("msg-download-as-zip"))};
+		Wt::WPushButton* downloadBtn {t->bindNew<Wt::WPushButton>("download-btn", tr("msg-download"))};
 		downloadBtn->setLink(ShareResource::createLink(share.uuid, password));
 	}
 

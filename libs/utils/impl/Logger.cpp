@@ -29,6 +29,7 @@ std::string getModuleName(Module mod)
 		case Module::SHARE:				return "SHARE";
 		case Module::SHARE_CLEANER:		return "SHARE_CLEANER";
 		case Module::UI:				return "UI";
+		case Module::UTILS:				return "UTILS";
 	}
 	return "";
 }

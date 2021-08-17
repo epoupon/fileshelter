@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Emeric Poupon
+ * Copyright (C) 2020 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -17,36 +17,19 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <memory>
+#include "utils/Zipper.hpp"
+#include "utils/IResourceHandler.hpp"
 
-#include <string>
-
-#include <Wt/WServer.h>
-#include <Wt/WApplication.h>
-#include <Wt/WLogger.h>
-
-enum class Severity
+class ZipperResourceHandler final : public IResourceHandler
 {
-	FATAL,
-	ERROR,
-	WARNING,
-	INFO,
-	DEBUG,
+	public:
+		ZipperResourceHandler(std::unique_ptr<Zip::Zipper> zipper);
+
+	private:
+
+		Wt::Http::ResponseContinuation* processRequest(const Wt::Http::Request& request, Wt::Http::Response& response) override;
+
+		static constexpr std::size_t _bufferSize {32768};
+		std::shared_ptr<Zip::Zipper> _zipper;
 };
-
-enum class Module
-{
-	DB,
-	FILE_RESOURCE,
-	MAIN,
-	SHARE,
-	SHARE_CLEANER,
-	UI,
-	UTILS,
-};
-
-std::string getModuleName(Module mod);
-std::string getSeverityName(Severity sev);
-
-#define FS_LOG(module, level)	Wt::log(getSeverityName(Severity::level)) << Wt::WLogger::sep << "[" << getModuleName(Module::module) << "]" <<  Wt::WLogger::sep
-
