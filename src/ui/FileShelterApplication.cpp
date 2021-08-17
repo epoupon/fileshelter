@@ -101,34 +101,34 @@ handlePathChange(Wt::WStackedWidget* stack)
 FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env)
 : Wt::WApplication {env}
 {
-	auto bootstrapTheme {std::make_unique<Wt::WBootstrapTheme>()};
-	bootstrapTheme->setVersion(Wt::BootstrapVersion::v3);
-	bootstrapTheme->setResponsive(true);
-	setTheme(std::move(bootstrapTheme));
-
 	useStyleSheet("css/fileshelter.css");
 	useStyleSheet("resources/font-awesome/css/font-awesome.min.css");
+
+	// Extra javascript
+	requireJQuery("js/jquery-1.10.2.min.js");
+	require("js/bootstrap.min.js");
 
 	addMetaHeader(Wt::MetaHeaderType::Meta, "viewport", "width=device-width, user-scalable=no");
 
 	// Resouce bundles
 	messageResourceBundle().use(appRoot() + "templates");
-
-	FS_LOG(UI, INFO) << "Client address = " << env.clientAddress() << ", UserAgent = '" << env.userAgent() << "', Locale = " << env.locale().name() << ", path = '" << env.internalPath() << "'";
-
 	messageResourceBundle().use(appRoot() + "messages");
 	messageResourceBundle().use((Service<IConfig>::get()->getPath("working-dir") / "user_messages").string());
 	if (Service<IConfig>::get()->getPath("tos-custom").empty())
 		messageResourceBundle().use(appRoot() + "tos");
 
-	// Extra javascript
-	require("js/collapse.js");
+	auto bootstrapTheme {std::make_unique<Wt::WBootstrapTheme>()};
+	bootstrapTheme->setVersion(Wt::BootstrapVersion::v3);
+	bootstrapTheme->setResponsive(true);
+	setTheme(std::move(bootstrapTheme));
+
+	FS_LOG(UI, INFO) << "Client address = " << env.clientAddress() << ", UserAgent = '" << env.userAgent() << "', Locale = " << env.locale().name() << ", path = '" << env.internalPath() << "'";
 
 	setTitle(Wt::WString::tr("msg-app-name"));
 
 	enableInternalPaths();
 
-	Wt::WTemplate* main = root()->addNew<Wt::WTemplate>(Wt::WString::tr("template-main"));
+	Wt::WTemplate* main {root()->addNew<Wt::WTemplate>(Wt::WString::tr("template-main"))};
 
 	Wt::WNavigationBar* navbar = main->bindNew<Wt::WNavigationBar>("navbar-top");
 	navbar->setResponsive(true);

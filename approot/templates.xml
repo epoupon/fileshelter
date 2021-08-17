@@ -22,85 +22,83 @@
 
 <message id="template-share-create-form">
 	<h1><i class="fa fa-upload"></i> ${tr:msg-share-create}</h1>
-	<div class="form-horizontal">
-		<div class="form-group">
-			<div class="col-sm-5 col-sm-offset-2">
-				${file-drop}
-			</div>
+	<div class="row">
+		<div class="col-xs-12">
+			${file-drop}
 		</div>
-		<div class="form-group">
-			<label class="control-label col-sm-2">
-				${tr:msg-files}
-			</label>
-			<div class="col-sm-10">
-				<div class="well well-sm">
-					${files}
-				</div>
-			</div>
+	</div>
+
+	<div class="panel panel-default">
+		<div class="panel-heading">${tr:msg-files}</div>
+		<div class="panel-body">
+			${files}
 		</div>
-		<div class="panel panel-default">
-			<div class="panel-heading">${tr:msg-advanced-options}</div>
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-heading fs-collapsible-panel-header" data-toggle="collapse" data-target="#collapsiblePanel">${tr:msg-advanced-options}</div>
+		<div id="collapsiblePanel" class="panel-collapse collapse">
 			<div class="panel-body">
-				<div class="form-group">
-					<label class="control-label col-sm-2"  for="${id:desc}">
-						${tr:msg-description}
-					</label>
-					<div class="col-sm-5">
-						${desc}
-					</div>
-					<div class="help-block col-sm-5">
-						${desc-info}
-					</div>
-				</div>
-				${<if-validity-duration>}
-				<div class="form-group">
-					<label class="control-label col-sm-2"  for="${id:duration-validity}">
-						${tr:msg-validity-period}
-					</label>
-					<div class="col-sm-5">
-						<div  class="row">
-							<div class="col-sm-6">
-								${duration-validity}
-							</div>
-							<div class="col-sm-6">
-								${duration-unit-validity}
-							</div>
+				<div class="form-horizontal">
+					<div class="form-group">
+						<label class="control-label col-sm-2"  for="${id:desc}">
+							${tr:msg-description}
+						</label>
+						<div class="col-sm-5">
+							${desc}
+						</div>
+						<div class="help-block col-sm-5">
+							${desc-info}
 						</div>
 					</div>
-					<div class="help-block col-sm-5">
-						${duration-validity-info}
-					</div>
-				</div>
-				${</if-validity-duration>}
+					${<if-validity-duration>}
+						<div class="form-group">
+							<label class="control-label col-sm-2"  for="${id:duration-validity}">
+								${tr:msg-validity-period}
+							</label>
+							<div class="col-sm-5">
+								<div  class="row">
+									<div class="col-sm-6">
+										${duration-validity}
+									</div>
+									<div class="col-sm-6">
+										${duration-unit-validity}
+									</div>
+								</div>
+							</div>
+							<div class="help-block col-sm-5">
+								${duration-validity-info}
+							</div>
+						</div>
+						${</if-validity-duration>}
 
-				<div class="form-group">
-					<label class="control-label col-sm-2"  for="${id:password}">
-						${tr:msg-password}
-					</label>
-					<div class="col-sm-5">
-						${password}
-					</div>
-					<div class="help-block col-sm-5">
-						${password-info}
+					<div class="form-group">
+						<label class="control-label col-sm-2"  for="${id:password}">
+							${tr:msg-password}
+						</label>
+						<div class="col-sm-5">
+							${password}
+						</div>
+						<div class="help-block col-sm-5">
+							${password-info}
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-
-		${<if-max-share-size>}
+	</div>
+	${<if-max-share-size>}
 		<div class="alert alert-danger">
 			<i class="fa fa-warning" aria-hidden="true"></i> ${max-size}
 		</div>
 		${</if-max-share-size>}
-		${<if-has-duplicate-names>}
+	${<if-has-duplicate-names>}
 		<div class="alert alert-danger">
 			<i class="fa fa-warning" aria-hidden="true"></i> ${tr:msg-has-duplicate-names}
 		</div>
 		${</if-has-duplicate-names>}
-		<div class="form-group">
-			<div class="col-sm-offset-2 col-sm-10">
-				${create-btn class="btn-primary"}
-			</div>
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			${create-btn class="btn-primary"}
 		</div>
 	</div>
 </message>
@@ -200,23 +198,23 @@
 <message id="template-share-download">
 	<h1><i class="fa fa-download"></i> ${tr:msg-share-download}</h1>
 	${<if-error>}
-	<div class="alert alert-danger">
-		${error}
-	</div>
-	${</if-error>}
+		<div class="alert alert-danger">
+			${error}
+		</div>
+		${</if-error>}
 	<div class="form-horizontal">
 		${<if-desc>}
-		<div class="form-group">
-			<label class="control-label col-sm-2">
-				${tr:msg-description}
-			</label>
-			<div class="col-sm-10">
-				<div class="well well-sm">
-					${file-desc}
+			<div class="form-group">
+				<label class="control-label col-sm-2">
+					${tr:msg-description}
+				</label>
+				<div class="col-sm-10">
+					<div class="well well-sm">
+						${file-desc}
+					</div>
 				</div>
 			</div>
-		</div>
-		${</if-desc>}
+			${</if-desc>}
 		<div class="form-group">
 			<label class="control-label col-sm-2">
 				${tr:msg-share-size}

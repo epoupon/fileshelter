@@ -13,6 +13,7 @@ summary {
 	background-color: lightgrey;
 	border-radius: 15px;
     transition: background-color 0.5s ease;
+	margin-bottom: 20px;
 }
 
 .Wt-filedropzone:hover {
@@ -35,5 +36,9 @@ summary {
 
 .fs-file-entry-btn-remove {
 	text-align: middle;
+	cursor: pointer;
+}
+
+.fs-collapsible-panel-header {
 	cursor: pointer;
 }
