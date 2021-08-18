@@ -1,7 +1,8 @@
 #pragma once
 
-#include "share/IShareManager.hpp"
+#include <Wt/Auth/PasswordVerifier.h>
 
+#include "share/IShareManager.hpp"
 #include "Db.hpp"
 
 namespace Share
@@ -27,6 +28,8 @@ namespace Share
 			ShareDesc		getShareDesc(const ShareEditUUID& shareUUID) override;
 
 			Db _db;
+
+			Wt::Auth::PasswordVerifier	_passwordVerifier;
 
 			const FileSize 				_shareMaxSize {};
 			const FileSize 				_fileMaxSize {};

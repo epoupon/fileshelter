@@ -69,6 +69,7 @@ namespace Share
 			void setState(State state) { _state = state; }
 			void setUUID(const ShareUUID& uuid) { _uuid = uuid; }
 			void setEditUUID(const ShareEditUUID& uuid) { _editUuid = uuid; }
+			void setPasswordHash(const Wt::Auth::PasswordHash& passwordHash);
 
 		public:
 			template<class Action>

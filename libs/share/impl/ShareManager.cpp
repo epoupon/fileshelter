@@ -1,5 +1,6 @@
 #include "ShareManager.hpp"
 
+#include <Wt/Auth/HashFunction.h>
 #include <Wt/WLocalDateTime.h>
 #include "share/Exception.hpp"
 #include "utils/IConfig.hpp"
@@ -44,18 +45,6 @@ namespace
 
 		return desc;
 	}
-
-	Share::Share::pointer
-	getShareByUUIDAndPassword(Wt::Dbo::Session& session, const ShareUUID& shareUUID, std::optional<std::string_view> password)
-	{
-		const Share::Share::pointer share {Share::Share::getByUUID(session, shareUUID)};
-		if (!share)
-			throw ShareNotFoundException {};
-
-		// TODO check password
-
-		return share;
-	}
 }
 
 namespace Share
@@ -74,6 +63,9 @@ namespace Share
 	, _defaultValidityDuration {std::chrono::hours {24} * Service<IConfig>::get()->getULong("default-validity-days", 100)}
 	, _canValidatityDurationBeSet {Service<IConfig>::get()->getBool("user-defined-validy-days", true)}
 	{
+		auto hashFunc {std::make_unique<Wt::Auth::BCryptHashFunction>(static_cast<int>(Service<IConfig>::get()->getULong("bcrypt-count", 12)))};
+		_passwordVerifier.addHashFunction(std::move(hashFunc));
+
 		// config validation
 		if (_shareMaxSize == 0)
 			throw Exception {"max-share-size must be greater than 0"};
@@ -95,7 +87,9 @@ namespace Share
 
 		// TODO validate file sizes
 
-		// TODO hash password
+		std::optional<Wt::Auth::PasswordHash> passwordHash;
+		if (!shareParameters.password.empty())
+			passwordHash = _passwordVerifier.hashPassword(shareParameters.password);
 
 		{
 			Wt::Dbo::Session& session {_db.getTLSSession()};
@@ -104,6 +98,8 @@ namespace Share
 			Share::pointer share {Share::create(session, shareParameters)};
 			share.modify()->setUUID(UUID::Generate {});
 			share.modify()->setEditUUID(UUID::Generate {});
+			if (passwordHash)
+				share.modify()->setPasswordHash(*passwordHash);
 
 			for (const FileCreateParameters& fileParameters : filesParameters)
 			{
@@ -140,10 +136,33 @@ namespace Share
 	ShareManager::getShareDesc(const ShareUUID& shareUUID, std::optional<std::string_view> password)
 	{
 		Wt::Dbo::Session& session {_db.getTLSSession()};
-		Wt::Dbo::Transaction transaction {session};
 
-		const Share::pointer share {getShareByUUIDAndPassword(session, shareUUID, password)};
-		return shareToDesc(*share.get());
+		ShareDesc shareDesc;
+		std::optional<Wt::Auth::PasswordHash> passwordHash;
+
+		{
+			Wt::Dbo::Transaction transaction {session};
+
+			const Share::Share::pointer share {Share::Share::getByUUID(session, shareUUID)};
+			if (!share)
+				throw ShareNotFoundException {};
+
+			if ((!share->hasPassword() && password) || (share->hasPassword() && !password))
+				throw ShareNotFoundException {};
+
+			if (share->hasPassword())
+				passwordHash = share->getPasswordHash();
+
+			shareDesc = shareToDesc(*share.get());
+		}
+
+		if (passwordHash)
+		{
+			if (!_passwordVerifier.verify(std::string {*password}, *passwordHash))
+				throw ShareNotFoundException {};
+		}
+
+		return shareDesc;
 	}
 
 	ShareDesc

@@ -101,5 +101,13 @@ namespace Share
 			visitor(share);
 	}
 
+	void
+	Share::setPasswordHash(const Wt::Auth::PasswordHash& passwordHash)
+	{
+		_passwordHash = passwordHash.value();
+		_passwordSalt = passwordHash.salt();
+		_passwordHashFunc = passwordHash.function();
+	}
+
 } // namespace Database
 
