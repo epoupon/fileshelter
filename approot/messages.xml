@@ -10,6 +10,7 @@
 
 <message id="msg-tos">Terms of Service</message>
 
+<message id="msg-create">Create</message>
 <message id="msg-home">Home</message>
 <message id="msg-share-create">New share</message>
 <message id="msg-share-edit">Edit</message>

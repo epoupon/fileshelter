@@ -135,6 +135,7 @@ namespace UserInterface
 		});
 
 		updateView(_model.get());
+		checkFiles();
 	}
 
 	void
@@ -288,6 +289,8 @@ namespace UserInterface
 	void
 	ShareCreateFormView::checkFiles()
 	{
+		bindString("share-size", ShareUtils::fileSizeToString(getTotalFileSize()));
+
 		const bool overflow {isShareSizeOverflow()};
 		setCondition("if-max-share-size", overflow);
 
