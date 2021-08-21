@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Emeric Poupon
+ * Copyright (C) 2021 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -17,12 +17,21 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "ShareCleaner.hpp"
 
-#include <memory>
+#include "utils/Logger.hpp"
 
-#include "utils/IResourceHandler.hpp"
-#include "utils/Zipper.hpp"
+namespace Share
+{
+	ShareCleaner::ShareCleaner(Db& db) : _db {db}
+	{
+		FS_LOG(SHARE, DEBUG) << "Created cleaner";
+	}
 
-std::unique_ptr<IResourceHandler> createZipperResourceHandler(std::unique_ptr<Zip::Zipper> zipper);
+	void
+	ShareCleaner::checkExpiredShares()
+	{
 
+	}
+
+} // namespace Share

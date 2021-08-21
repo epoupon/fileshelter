@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Emeric Poupon
+ * Copyright (C) 2021 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -19,10 +19,28 @@
 
 #pragma once
 
-#include <memory>
+#include <chrono>
 
-#include "utils/IResourceHandler.hpp"
-#include "utils/Zipper.hpp"
+namespace Share
+{
+	class Db;
+	class ShareCleaner
+	{
+		public:
+			ShareCleaner(Db& _db);
+			~ShareCleaner() = default;
 
-std::unique_ptr<IResourceHandler> createZipperResourceHandler(std::unique_ptr<Zip::Zipper> zipper);
+			ShareCleaner(const ShareCleaner&) = delete;
+			ShareCleaner(ShareCleaner&&) = delete;
+			ShareCleaner& operator=(const ShareCleaner&) = delete;
+			ShareCleaner& operator=(ShareCleaner&&) = delete;
 
+		private:
+			void	checkExpiredShares();
+
+			Db& _db;
+
+			const std::chrono::seconds	_checkPeriod {};
+	};
+
+} // namespace Share

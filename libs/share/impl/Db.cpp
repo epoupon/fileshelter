@@ -132,8 +132,6 @@ namespace Share
 			}
 		}
 
-		FS_LOG(DB, ERROR) << "OK here";
-
 		// Indexes
 		{
 			Wt::Dbo::Transaction transaction {*session};

@@ -60,6 +60,6 @@ namespace Share
 			virtual ShareDesc				getShareDesc(const ShareEditUUID& shareId) = 0;
 	};
 
-	std::unique_ptr<IShareManager> createShareManager(const std::filesystem::path& dbFile);
+	std::unique_ptr<IShareManager> createShareManager(const std::filesystem::path& dbFile, bool enableCleaner);
 
 } // namespace Share

@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
 		const auto uploadedFilesPath {Service<IConfig>::get()->getPath("working-dir") / "uploaded-files"};
 		std::filesystem::create_directories(uploadedFilesPath);
 
-		Service<Share::IShareManager> shareManager {Share::createShareManager(Service<IConfig>::get()->getPath("working-dir") / "fileshelter.db")};
+		Service<Share::IShareManager> shareManager {Share::createShareManager(Service<IConfig>::get()->getPath("working-dir") / "fileshelter.db", true /* enableCleaner */)};
 
 		// Set the WT_TMP_DIR inside the working dir, used to upload files
 		setenv("WT_TMP_DIR", uploadedFilesPath.string().c_str(), 1);

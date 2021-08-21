@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2021 Emeric Poupon
+ *
+ * This file is part of fileshelter.
+ *
+ * fileshelter is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * fileshelter is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "Share.hpp"
+
 #include "ShareManager.hpp"
 
 #include <Wt/Auth/HashFunction.h>
@@ -9,6 +30,7 @@
 #include "utils/Zipper.hpp"
 #include "File.hpp"
 #include "Share.hpp"
+#include "ShareCleaner.hpp"
 
 namespace
 {
@@ -50,13 +72,14 @@ namespace
 namespace Share
 {
 	std::unique_ptr<IShareManager>
-	createShareManager(const std::filesystem::path& dbFile)
+	createShareManager(const std::filesystem::path& dbFile, bool enableCleaner)
 	{
-		return std::make_unique<ShareManager>(dbFile);
+		return std::make_unique<ShareManager>(dbFile, enableCleaner);
 	}
 
-	ShareManager::ShareManager(const std::filesystem::path& dbFile)
+	ShareManager::ShareManager(const std::filesystem::path& dbFile, bool enableCleaner)
 	: _db {dbFile}
+	, _shareCleaner {enableCleaner ? std::make_unique<ShareCleaner>(_db) : nullptr}
 	, _shareMaxSize {Service<IConfig>::get()->getULong("max-share-size", 100) * 1024 * 1024}
 	, _fileMaxSize {Service<IConfig>::get()->getULong("max-file-size", 100) * 1024 * 1024}
 	, _maxValidityDuration {std::chrono::hours {24} * Service<IConfig>::get()->getULong("max-validity-days", 100)}
@@ -78,6 +101,13 @@ namespace Share
 
 		if (_maxValidityDuration < _defaultValidityDuration)
 			throw Exception {"max-validity-days must be greater than default-validity-days"};
+
+		FS_LOG(SHARE, DEBUG) << "Started share manager";
+	}
+
+	ShareManager::~ShareManager()
+	{
+		FS_LOG(SHARE, DEBUG) << "Stopped share manager";
 	}
 
 	ShareEditUUID
