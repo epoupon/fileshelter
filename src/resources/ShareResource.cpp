@@ -85,14 +85,14 @@ ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Respons
 			const std::string* uuid {request.getParameter("id")};
 			if (!uuid)
 			{
-				FS_LOG(UI, DEBUG) << "Missing parameter 'id'!";
+				FS_LOG(RESOURCE, DEBUG) << "Missing parameter 'id'!";
 				return;
 			}
 			const ShareUUID& shareUUID {*uuid};
 
 			std::optional<std::string> password;
 			if (const std::string *p {request.getParameter("p")})
-				password = Wt::Utils::hexDecode(*password);
+				password = Wt::Utils::hexDecode(*p);
 
 			const ShareDesc share {Service<IShareManager>::get()->getShareDesc(shareUUID, password)};
 			if (share.files.size() > 1)
@@ -121,15 +121,15 @@ ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Respons
 	}
 	catch (const UUIDException& e)
 	{
-		FS_LOG(UI, DEBUG) << "Bad parameter 'id'!";
+		FS_LOG(RESOURCE, DEBUG) << "Bad parameter 'id'!";
 	}
 	catch (const Share::Exception& e)
 	{
-		FS_LOG(UI, ERROR) << "Caught Share::Exception: " << e.what();
+		FS_LOG(RESOURCE, ERROR) << "Caught Share::Exception: " << e.what();
 	}
 	catch (Zip::ZipperException& exception)
 	{
-		FS_LOG(UI, ERROR) << "Zipper exception: " << exception.what();
+		FS_LOG(RESOURCE, ERROR) << "Zipper exception: " << exception.what();
 	}
 }
 

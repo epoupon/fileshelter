@@ -152,8 +152,6 @@ int main(int argc, char *argv[])
 		const auto uploadedFilesPath {Service<IConfig>::get()->getPath("working-dir") / "uploaded-files"};
 		std::filesystem::create_directories(uploadedFilesPath);
 
-		Service<Share::IShareManager> shareManager {Share::createShareManager(Service<IConfig>::get()->getPath("working-dir") / "fileshelter.db", true /* enableCleaner */)};
-
 		// Set the WT_TMP_DIR inside the working dir, used to upload files
 		setenv("WT_TMP_DIR", uploadedFilesPath.string().c_str(), 1);
 
@@ -167,17 +165,16 @@ int main(int argc, char *argv[])
 			wtArgv[i] = wtServerArgs[i].c_str();
 		}
 
+		// Create server first to handle log config etc.
 		Wt::WServer server {argv[0]};
 		server.setServerConfiguration(wtServerArgs.size(), const_cast<char**>(wtArgv));
 
 		const std::string deployPath {Service<IConfig>::get()->getString("deploy-path", "/")};
 
-		// bind static resources
-		ShareResource shareResource;
-		//server.addResource(&shareResource, std::string {Service<IConfig>::get()->getString("deploy-path", "/")} + "/" + std::string {shareResource.getDeployPath()});
-		server.addResource(&shareResource, std::string {shareResource.getDeployPath()});
+		Service<Share::IShareManager> shareManager {Share::createShareManager(Service<IConfig>::get()->getPath("working-dir") / "fileshelter.db", true /* enableCleaner */)};
 
-		// bind entry point
+		ShareResource shareResource;
+		server.addResource(&shareResource, std::string {shareResource.getDeployPath()});
 		server.addEntryPoint(Wt::EntryPointType::Application, [&](const Wt::WEnvironment& env)
 		{
 		    return UserInterface::FileShelterApplication::create(env);

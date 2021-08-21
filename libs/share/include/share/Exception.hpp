@@ -29,6 +29,7 @@ namespace Share
 	};
 	class ShareNotFoundException : public Exception
 	{
-		using Exception::Exception;
+		public:
+			ShareNotFoundException() : Exception {"Share not found!"} {}
 	};
 }

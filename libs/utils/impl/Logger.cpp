@@ -24,7 +24,7 @@ std::string getModuleName(Module mod)
 	switch (mod)
 	{
 		case Module::DB:				return "DB";
-		case Module::FILE_RESOURCE:		return "FILE RESOURCE";
+		case Module::RESOURCE:			return "RESOURCE";
 		case Module::MAIN:				return "MAIN";
 		case Module::SHARE:				return "SHARE";
 		case Module::SHARE_CLEANER:		return "SHARE_CLEANER";

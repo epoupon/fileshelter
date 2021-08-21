@@ -37,7 +37,7 @@ enum class Severity
 enum class Module
 {
 	DB,
-	FILE_RESOURCE,
+	RESOURCE,
 	MAIN,
 	SHARE,
 	SHARE_CLEANER,
