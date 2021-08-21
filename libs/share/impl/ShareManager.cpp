@@ -114,9 +114,27 @@ namespace Share
 	}
 
 	void
-	ShareManager::destroyShare(const ShareEditUUID& shareUUID)
+	ShareManager::destroyShare(const ShareEditUUID& shareEditUUID)
 	{
-		throw Exception {"Not implemented"};
+		Wt::Dbo::Session& session {_db.getTLSSession()};
+		Wt::Dbo::Transaction transaction {session};
+
+		Share::pointer share {Share::getByEditUUID(session, shareEditUUID)};
+		if (!share)
+			throw ShareNotFoundException {};
+
+		share->visitFiles([&](const File::pointer& file)
+		{
+			if (file->isOwned())
+			{
+				std::error_code ec;
+				std::filesystem::remove(file->getPath(), ec);
+				if (!ec)
+					FS_LOG(SHARE, ERROR) << "Cannot remove file '" << file->getPath().string() << "' from share '" << share->getUUID().toString() << "'";
+			}
+		});
+
+		share.remove();
 	}
 
 	bool

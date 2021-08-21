@@ -25,9 +25,9 @@
 #include <Wt/WPushButton.h>
 #include <Wt/WMessageBox.h>
 
-#include "resources/ShareResource.hpp"
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
+#include "share/Exception.hpp"
 #include "share/IShareManager.hpp"
 #include "share/Types.hpp"
 
@@ -38,7 +38,7 @@ namespace UserInterface
 
 	ShareEdit::ShareEdit()
 	{
-		wApp->internalPathChanged().connect([=]
+		wApp->internalPathChanged().connect(this, [this]
 		{
 			handlePathChanged();
 		});
@@ -54,7 +54,24 @@ namespace UserInterface
 		if (!wApp->internalPathMatches("/share-edit"))
 			return;
 
-		const Share::ShareEditUUID editUUID {wApp->internalPathNextPart("/share-edit/")};
+		try
+		{
+			const Share::ShareEditUUID editUUID {wApp->internalPathNextPart("/share-edit/")};
+			displayEdit(editUUID);
+		}
+		catch (const Share::ShareNotFoundException& e)
+		{
+			displayShareNotFound();
+		}
+		catch (const UUIDException& e)
+		{
+			displayShareNotFound();
+		}
+	}
+
+	void
+	ShareEdit::displayEdit(const Share::ShareEditUUID& editUUID)
+	{
 		const Share::ShareDesc share {Service<Share::IShareManager>::get()->getShareDesc(editUUID)};
 
 		FS_LOG(UI, INFO) << "[" << share.uuid.toString() << "] Editing share from " << wApp->environment().clientAddress();
@@ -96,9 +113,15 @@ namespace UserInterface
 	ShareEdit::displayRemoved()
 	{
 		clear();
-
-		Wt::WTemplate *t {addNew<Wt::WTemplate>(tr("template-share-removed"))};
-		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
+		addNew<Wt::WTemplate>(tr("template-share-removed"))->addFunction("tr", &Wt::WTemplate::Functions::tr);
 	}
+
+	void
+	ShareEdit::displayShareNotFound()
+	{
+		clear();
+		addNew<Wt::WTemplate>(tr("template-share-not-found"))->addFunction("tr", &Wt::WTemplate::Functions::tr);
+	}
+
 } // namespace UserInterface
 

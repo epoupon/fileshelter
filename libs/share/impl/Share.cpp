@@ -76,20 +76,13 @@ namespace Share
 	Share::pointer
 	Share::getByEditUUID(Wt::Dbo::Session& session, const ShareEditUUID& uuid)
 	{
-		FS_LOG(DB, DEBUG) << "Get by edit UUID " << uuid.toString();
-		auto res = session.find<Share>().where("edit_UUID = ?").bind(uuid);
-		FS_LOG(DB, DEBUG) << "Get by edit UUID DONE";
-		return res;
+		return session.find<Share>().where("edit_UUID = ?").bind(uuid);
 	}
 
 	Share::pointer
 	Share::getByUUID(Wt::Dbo::Session& session, const ShareUUID& uuid)
 	{
-		FS_LOG(DB, DEBUG) << "Get by UUID " << uuid.toString();
-		auto res = session.find<Share>().where("uuid = ?").bind(uuid);
-		FS_LOG(DB, DEBUG) << "Get by UUID DONE";
-
-		return res;
+		return session.find<Share>().where("uuid = ?").bind(uuid);
 	}
 
 	void

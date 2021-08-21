@@ -40,10 +40,10 @@ namespace UserInterface
 			static FileShelterApplication* instance();
 
 		private:
+			void initialize() override;
 			void notify(const Wt::WEvent& event) override;
 
 			void displayError(std::string_view error);
-			void displayShareNotFound();
 	};
 
 #define FsApp FileShelterApplication::instance()

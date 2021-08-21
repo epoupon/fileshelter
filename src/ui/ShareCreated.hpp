@@ -30,7 +30,7 @@ class ShareCreated : public Wt::WContainerWidget
 
 	private:
 		void handlePathChanged();
-
+		void displayShareNotFound();
 };
 
 } // namespace UserInterface

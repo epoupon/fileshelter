@@ -30,7 +30,6 @@
 #include "utils/IConfig.hpp"
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
-#include "share/Exception.hpp"
 
 #include "Exception.hpp"
 #include "ShareCreate.hpp"
@@ -89,15 +88,9 @@ handlePathChange(Wt::WStackedWidget* stack)
 		}
 	}
 
-	wApp->setInternalPath(defaultPath, false);
+	wApp->setInternalPath(defaultPath, true);
 }
 
-/*
- * The env argument contains information about the new session, and
- * the initial request. It must be passed to the Wt::WApplication
- * constructor so it is typically also an argument for your custom
- * application constructor.
-*/
 FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env)
 : Wt::WApplication {env}
 {
@@ -127,14 +120,18 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env)
 	setTitle(Wt::WString::tr("msg-app-name"));
 
 	enableInternalPaths();
+}
 
+void
+FileShelterApplication::initialize()
+{
 	Wt::WTemplate* main {root()->addNew<Wt::WTemplate>(Wt::WString::tr("template-main"))};
 
-	Wt::WNavigationBar* navbar = main->bindNew<Wt::WNavigationBar>("navbar-top");
+	Wt::WNavigationBar* navbar {main->bindNew<Wt::WNavigationBar>("navbar-top")};
 	navbar->setResponsive(true);
 	navbar->setTitle("<i class=\"fa fa-external-link\"></i> " + Wt::WString::tr("msg-app-name"), Wt::WLink(Wt::LinkType::InternalPath, defaultPath));
 
-	Wt::WMenu* menu = navbar->addMenu(std::make_unique<Wt::WMenu>());
+	Wt::WMenu* menu {navbar->addMenu(std::make_unique<Wt::WMenu>())};
 	{
 		auto menuItem = menu->addItem(Wt::WString::tr("msg-share-create"));
 		menuItem->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/share-create"});
@@ -145,18 +142,17 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env)
 		menuItem->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/tos"});
 		menuItem->setSelectable(true);
 	}
-
 	Wt::WContainerWidget* container {main->bindNew<Wt::WContainerWidget>("contents")};
 
 	// Same order as Idx enum
-	Wt::WStackedWidget* mainStack = container->addNew<Wt::WStackedWidget>();
+	Wt::WStackedWidget* mainStack {container->addNew<Wt::WStackedWidget>()};
 	mainStack->addNew<ShareCreate>();
 	mainStack->addNew<ShareCreated>();
 	mainStack->addNew<ShareDownload>();
 	mainStack->addNew<ShareEdit>();
 	mainStack->addWidget(createTermsOfService());
 
-	internalPathChanged().connect([=]
+	internalPathChanged().connect(mainStack, [mainStack]
 	{
 		handlePathChange(mainStack);
 	});
@@ -167,29 +163,11 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env)
 void
 FileShelterApplication::displayError(std::string_view error)
 {
-	// TODO
 	root()->clear();
-	root()->addNew<Wt::WText>("error!");
-#if 0
-	clear();
 
-	Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-not-created"));
-
+	Wt::WTemplate *t {root()->addNew<Wt::WTemplate>(Wt::WString::tr("template-error"))};
 	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
-	t->bindString("error", error);
-#endif
-}
-
-void
-FileShelterApplication::displayShareNotFound()
-{
-	root()->clear();
-	root()->addNew<Wt::WText>("share not found!");
-#if 0
-	root()->clear();
-	Wt::WTemplate *t = addNew<Wt::WTemplate>(tr("template-share-not-found"));
-	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
-#endif
+	t->bindString("error", std::string {error});
 }
 
 void
@@ -204,21 +182,12 @@ FileShelterApplication::notify(const Wt::WEvent& event)
 		FS_LOG(UI, WARNING) << "Caught an UI exception: " << e.what();
 		displayError(e.what());
 	}
-	catch (const Share::ShareNotFoundException& e)
-	{
-		FS_LOG(UI, ERROR) << "Share exception: " << e.what();
-		displayShareNotFound();
-	}
-	catch (const UUIDException& e)
-	{
-		FS_LOG(UI, ERROR) << "UUID exception: " << e.what();
-		// bad formatted UUID
-		displayShareNotFound();
-	}
 	catch (const std::exception& e)
 	{
 		FS_LOG(UI, ERROR) << "Caught exception: " << e.what();
-		throw FsException {"Internal error"}; // Do not put details here at it may appear on the user rendered html
+
+		 // Do not put details or rethrow the exception here at it may appear on the user rendered html
+		throw FsException {"Internal error"};
 	}
 }
 

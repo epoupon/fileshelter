@@ -54,7 +54,7 @@ namespace UserInterface
 
 	ShareCreate::ShareCreate()
 	{
-		wApp->internalPathChanged().connect([this]
+		wApp->internalPathChanged().connect(this, [this]
 		{
 			handlePathChanged();
 		});

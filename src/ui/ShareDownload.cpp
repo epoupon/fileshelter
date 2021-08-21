@@ -25,6 +25,7 @@
 
 #include "resources/ShareResource.hpp"
 #include "share/IShareManager.hpp"
+#include "share/Exception.hpp"
 #include "share/Types.hpp"
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
@@ -37,7 +38,7 @@ namespace UserInterface {
 
 ShareDownload::ShareDownload()
 {
-	wApp->internalPathChanged().connect([this]
+	wApp->internalPathChanged().connect(this, [this]
 	{
 		handlePathChanged();
 	});
@@ -53,12 +54,23 @@ ShareDownload::handlePathChanged()
 	if (!wApp->internalPathMatches("/share-download"))
 		return;
 
-	const Share::ShareUUID shareUUID {wApp->internalPathNextPart("/share-download/")};
+	try
+	{
+		const Share::ShareUUID shareUUID {wApp->internalPathNextPart("/share-download/")};
 
-	if (Service<Share::IShareManager>::get()->shareHasPassword(shareUUID))
-		displayPassword(shareUUID);
-	else
-		displayDownload(Service<Share::IShareManager>::get()->getShareDesc(shareUUID));
+		if (Service<Share::IShareManager>::get()->shareHasPassword(shareUUID))
+			displayPassword(shareUUID);
+		else
+			displayDownload(Service<Share::IShareManager>::get()->getShareDesc(shareUUID));
+	}
+	catch (const Share::ShareNotFoundException& e)
+	{
+		displayShareNotFound();
+	}
+	catch (const UUIDException& e)
+	{
+		displayShareNotFound();
+	}
 }
 
 void
@@ -105,6 +117,12 @@ ShareDownload::displayPassword(const Share::ShareUUID& shareUUID)
 	});
 }
 
+void
+ShareDownload::displayShareNotFound()
+{
+	clear();
+	addNew<Wt::WTemplate>(tr("template-share-not-found"))->addFunction("tr", &Wt::WTemplate::Functions::tr);
+}
 
 } // namespace UserInterface
 

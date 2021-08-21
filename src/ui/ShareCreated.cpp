@@ -23,6 +23,7 @@
 
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
+#include "share/Exception.hpp"
 #include "share/IShareManager.hpp"
 #include "share/Types.hpp"
 
@@ -33,7 +34,7 @@ namespace UserInterface {
 
 ShareCreated::ShareCreated()
 {
-	wApp->internalPathChanged().connect([this]
+	wApp->internalPathChanged().connect(this, [this]
 	{
 		handlePathChanged();
 	});
@@ -49,17 +50,33 @@ ShareCreated::handlePathChanged()
 	if (!wApp->internalPathMatches("/share-created"))
 		return;
 
-	const Share::ShareEditUUID shareEditUUID {wApp->internalPathNextPart("/share-created/")};
+	try
+	{
+		const Share::ShareEditUUID shareEditUUID {wApp->internalPathNextPart("/share-created/")};
 
-	FS_LOG(UI, DEBUG) << "Editing ShareEditUUID = " << shareEditUUID.toString();
+		const Share::ShareDesc share {Service<Share::IShareManager>::get()->getShareDesc(shareEditUUID)};
 
-	Share::ShareDesc share {Service<Share::IShareManager>::get()->getShareDesc(shareEditUUID)};
+		Wt::WTemplate *t {addNew<Wt::WTemplate>(tr("template-share-created"))};
+		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
-	Wt::WTemplate *t {addNew<Wt::WTemplate>(tr("template-share-created"))};
-	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
+		t->bindWidget("download-link", ShareUtils::createShareDownloadAnchor(share.uuid));
+		t->bindWidget("edit-link", ShareUtils::createShareEditAnchor(shareEditUUID));
+	}
+	catch (const Share::ShareNotFoundException& e)
+	{
+		displayShareNotFound();
+	}
+	catch (const UUIDException& e)
+	{
+		displayShareNotFound();
+	}
+}
 
-	t->bindWidget("download-link", ShareUtils::createShareDownloadAnchor(share.uuid));
-	t->bindWidget("edit-link", ShareUtils::createShareEditAnchor(shareEditUUID));
+void
+ShareCreated::displayShareNotFound()
+{
+	clear();
+	addNew<Wt::WTemplate>(tr("template-share-not-found"))->addFunction("tr", &Wt::WTemplate::Functions::tr);
 }
 
 } // namespace UserInterface
