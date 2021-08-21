@@ -34,14 +34,7 @@ namespace Share
 		public:
 			using pointer = Wt::Dbo::ptr<Share>;
 
-			enum class State
-			{
-				Ready,		// can be downloaded, can't be modified
-				Deleting,	// can't be downloaded, being deleted
-			};
-
 			// getters
-			State					getState() const { return _state; }
 			const ShareUUID&		getUUID() const { return _uuid; }
 			const ShareEditUUID&	getEditUUID() const { return _editUuid; }
 			FileSize				getShareSize() const;
@@ -50,6 +43,7 @@ namespace Share
 			std::string_view		getDescription() const { return _desc; }
 
 			Wt::WDateTime			getCreationTime() const { return _creationTime; }
+			bool					isExpired() const;
 			Wt::WDateTime			getExpiryTime() const { return _expiryTime; }
 			std::string_view		getCreatorAddr() const { return _creatorAddress; }
 			std::size_t				getReadCount() const { return _readCount; }
@@ -64,9 +58,9 @@ namespace Share
 			static pointer	getByEditUUID(Wt::Dbo::Session& session, const ShareEditUUID& uuid);
 
 			static void		visitAll(Wt::Dbo::Session& session, std::function<void(pointer& share)> visitor);
+			static void		destroy(pointer& share);
 
 			// Setters
-			void setState(State state) { _state = state; }
 			void setUUID(const ShareUUID& uuid) { _uuid = uuid; }
 			void setEditUUID(const ShareEditUUID& uuid) { _editUuid = uuid; }
 			void setPasswordHash(const Wt::Auth::PasswordHash& passwordHash);
@@ -75,7 +69,6 @@ namespace Share
 			template<class Action>
 				void persist(Action& a)
 				{
-					Wt::Dbo::field(a, _state,				"state");
 					Wt::Dbo::field(a, _shareName,			"share_name");
 					Wt::Dbo::field(a, _creatorAddress,		"creator_addr");
 					Wt::Dbo::field(a, _passwordHash,		"password_hash");
@@ -92,7 +85,6 @@ namespace Share
 				}
 
 		private:
-			State		_state {State::Ready};
 			std::string	_shareName;
 			std::string	_creatorAddress;		// Client IP address that uploaded the file
 			std::string	_passwordHash;			// optional

@@ -20,6 +20,7 @@
 #pragma once
 
 #include <chrono>
+#include <Wt/WIOService.h>
 
 namespace Share
 {
@@ -28,7 +29,7 @@ namespace Share
 	{
 		public:
 			ShareCleaner(Db& _db);
-			~ShareCleaner() = default;
+			~ShareCleaner();
 
 			ShareCleaner(const ShareCleaner&) = delete;
 			ShareCleaner(ShareCleaner&&) = delete;
@@ -38,9 +39,9 @@ namespace Share
 		private:
 			void	checkExpiredShares();
 
-			Db& _db;
-
-			const std::chrono::seconds	_checkPeriod {};
+			Db&							_db;
+			const std::chrono::seconds	_checkPeriod {std::chrono::hours {1}};
+			Wt::WIOService				_ioService;
 	};
 
 } // namespace Share

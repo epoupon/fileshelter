@@ -20,18 +20,40 @@
 #include "ShareCleaner.hpp"
 
 #include "utils/Logger.hpp"
+#include "utils/Service.hpp"
+#include "Db.hpp"
+#include "Share.hpp"
 
 namespace Share
 {
-	ShareCleaner::ShareCleaner(Db& db) : _db {db}
+	ShareCleaner::ShareCleaner(Db& db)
+	: _db {db}
 	{
-		FS_LOG(SHARE, DEBUG) << "Created cleaner";
+		FS_LOG(SHARE, DEBUG) << "Started cleaner";
+		checkExpiredShares();
+
+		_ioService.start();
+	}
+
+	ShareCleaner::~ShareCleaner()
+	{
+		_ioService.stop();
+		FS_LOG(SHARE, DEBUG) << "Stopped cleaner";
 	}
 
 	void
 	ShareCleaner::checkExpiredShares()
 	{
+		Wt::Dbo::Session& session {_db.getTLSSession()};
+		Wt::Dbo::Transaction transaction {session};
 
+		Share::visitAll(session, [](Share::pointer& share)
+		{
+			if (share->isExpired())
+			{
+				FS_LOG(SHARE, INFO) << "Removing expired share '" << share->getUUID().toString() << "'";
+				Share::destroy(share);
+			}
+		});
 	}
-
 } // namespace Share

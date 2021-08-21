@@ -27,7 +27,6 @@
 #include "utils/IConfig.hpp"
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
-#include "utils/Zipper.hpp"
 #include "File.hpp"
 #include "Share.hpp"
 #include "ShareCleaner.hpp"
@@ -153,18 +152,7 @@ namespace Share
 		if (!share)
 			throw ShareNotFoundException {};
 
-		share->visitFiles([&](const File::pointer& file)
-		{
-			if (file->isOwned())
-			{
-				std::error_code ec;
-				std::filesystem::remove(file->getPath(), ec);
-				if (!ec)
-					FS_LOG(SHARE, ERROR) << "Cannot remove file '" << file->getPath().string() << "' from share '" << share->getUUID().toString() << "'";
-			}
-		});
-
-		share.remove();
+		Share::destroy(share);
 	}
 
 	bool

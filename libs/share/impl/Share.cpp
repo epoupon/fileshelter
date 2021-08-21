@@ -44,6 +44,13 @@ namespace Share
 		return {_passwordHashFunc, _passwordSalt, _passwordHash};
 	}
 
+	bool
+	Share::isExpired() const
+	{
+		const auto now {Wt::WLocalDateTime::currentServerDateTime().toUTC()};
+		return _expiryTime < now;
+	}
+
 	void
 	Share::visitFiles(std::function<void(const File::pointer&)> visitor) const
 	{
@@ -92,6 +99,23 @@ namespace Share
 
 		for (pointer& share : res)
 			visitor(share);
+	}
+
+	void
+	Share::destroy(pointer& share)
+	{
+		share->visitFiles([&](const File::pointer& file)
+		{
+			if (file->isOwned())
+			{
+				std::error_code ec;
+				std::filesystem::remove(file->getPath(), ec);
+				if (!ec)
+					FS_LOG(SHARE, ERROR) << "Cannot remove file '" << file->getPath().string() << "' from share '" << share->getUUID().toString() << "': " << ec.message();
+			}
+		});
+
+		share.remove();
 	}
 
 	void
