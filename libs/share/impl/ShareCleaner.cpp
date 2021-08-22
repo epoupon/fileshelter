@@ -28,22 +28,42 @@ namespace Share
 {
 	ShareCleaner::ShareCleaner(Db& db)
 	: _db {db}
+	, _timer {_ioService}
 	{
 		FS_LOG(SHARE, DEBUG) << "Started cleaner";
 		checkExpiredShares();
 
 		_ioService.start();
+
+		scheduleNextCheck();
 	}
 
 	ShareCleaner::~ShareCleaner()
 	{
+		_timer.cancel();
 		_ioService.stop();
 		FS_LOG(SHARE, DEBUG) << "Stopped cleaner";
 	}
 
 	void
+	ShareCleaner::scheduleNextCheck()
+	{
+		_timer.expires_after(_checkPeriod);
+
+		_timer.async_wait([this](const boost::system::error_code& ec)
+		{
+			if (ec == boost::asio::error::operation_aborted)
+				return;
+
+			checkExpiredShares();
+		});
+	}
+
+	void
 	ShareCleaner::checkExpiredShares()
 	{
+		FS_LOG(SHARE, DEBUG) << "Checking expired shares...";
+
 		Wt::Dbo::Session& session {_db.getTLSSession()};
 		Wt::Dbo::Transaction transaction {session};
 

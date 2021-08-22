@@ -20,6 +20,7 @@
 #pragma once
 
 #include <chrono>
+#include <boost/asio/steady_timer.hpp>
 #include <Wt/WIOService.h>
 
 namespace Share
@@ -37,11 +38,13 @@ namespace Share
 			ShareCleaner& operator=(ShareCleaner&&) = delete;
 
 		private:
+			void	scheduleNextCheck();
 			void	checkExpiredShares();
 
 			Db&							_db;
 			const std::chrono::seconds	_checkPeriod {std::chrono::hours {1}};
 			Wt::WIOService				_ioService;
+			boost::asio::steady_timer	_timer;
 	};
 
 } // namespace Share
