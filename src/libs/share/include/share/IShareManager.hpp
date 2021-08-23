@@ -44,10 +44,10 @@ namespace Share
 			virtual FileSize				getMaxShareSize() const = 0;
 			virtual FileSize				getMaxFileSize() const = 0;
 
-			virtual std::chrono::seconds	getMaxValidatityDuration() const = 0;
-			virtual std::chrono::seconds	getDefaultValidatityDuration() const = 0;
+			virtual std::chrono::seconds	getMaxValidityPeriod() const = 0;
+			virtual std::chrono::seconds	getDefaultValidityPeriod() const = 0;
 			virtual std::size_t				getMaxValidatityHits() const = 0;
-			virtual bool					canValidatityDurationBeSet() const = 0;
+			virtual bool					canValidityPeriodBeSet() const = 0;
 
 			virtual ShareEditUUID			createShare(const ShareCreateParameters& params, const std::vector<FileCreateParameters>& files, bool tranferFilesOwnership) = 0;
 			virtual void					destroyShare(const ShareEditUUID& shareId) = 0;

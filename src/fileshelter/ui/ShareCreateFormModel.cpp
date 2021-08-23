@@ -28,67 +28,67 @@ namespace UserInterface
 {
 
 	const ShareCreateFormModel::Field ShareCreateFormModel::DescriptionField {"desc"};
-	const ShareCreateFormModel::Field ShareCreateFormModel::DurationValidityField {"duration-validity"};
-	const ShareCreateFormModel::Field ShareCreateFormModel::DurationUnitValidityField {"duration-unit-validity"};
+	const ShareCreateFormModel::Field ShareCreateFormModel::ValidityPeriodField {"validity-period"};
+	const ShareCreateFormModel::Field ShareCreateFormModel::ValidityPeriodUnitField {"validity-period-unit"};
 	const ShareCreateFormModel::Field ShareCreateFormModel::PasswordField {"password"};
 
 	ShareCreateFormModel::ShareCreateFormModel()
 	{
 		addField(DescriptionField, Wt::WString::tr("msg-optional"));
-		addField(DurationValidityField);
-		addField(DurationUnitValidityField);
+		addField(ValidityPeriodField);
+		addField(ValidityPeriodUnitField);
 		addField(PasswordField, Wt::WString::tr("msg-optional"));
 
 		initializeModels();
 
-		// Duration Validity Unit
-		setValidator(DurationUnitValidityField, std::make_unique<Wt::WValidator>(true));  // mandatory
+		// Period Validity Unit
+		setValidator(ValidityPeriodUnitField, std::make_unique<Wt::WValidator>(true));  // mandatory
 
-		// Duration Validity
+		// Period Validity
 		auto durationValidator = std::make_unique<Wt::WIntValidator>();
 		durationValidator->setMandatory(true);
 		durationValidator->setBottom(1);
-		setValidator(DurationValidityField, std::move(durationValidator));
+		setValidator(ValidityPeriodField, std::move(durationValidator));
 
-		updateValidityDuration( Service<Share::IShareManager>::get()->getDefaultValidatityDuration() );
-		updateDurationValidator();
+		updateValidityPeriod( Service<Share::IShareManager>::get()->getDefaultValidityPeriod() );
+		updatePeriodValidator();
 	}
 
 	void
-	ShareCreateFormModel::updateDurationValidator()
+	ShareCreateFormModel::updatePeriodValidator()
 	{
-		const auto maxValidityDuration {Service<Share::IShareManager>::get()->getMaxValidatityDuration()};
-		auto durationValidator {std::dynamic_pointer_cast<Wt::WIntValidator>(validator(DurationValidityField))};
+		const auto maxValidityPeriod {Service<Share::IShareManager>::get()->getMaxValidityPeriod()};
+		auto durationValidator {std::dynamic_pointer_cast<Wt::WIntValidator>(validator(ValidityPeriodField))};
 
-		const auto maxValidityDurationHours {std::chrono::duration_cast<std::chrono::hours>(maxValidityDuration).count()};
+		const auto maxValidityPeriodHours {std::chrono::duration_cast<std::chrono::hours>(maxValidityPeriod).count()};
 
 		int maxValue {1};
-		auto unit {valueText(DurationUnitValidityField)};
+		auto unit {valueText(ValidityPeriodUnitField)};
 		if (unit == Wt::WString::tr("msg-hours"))
-			maxValue = maxValidityDurationHours;
+			maxValue = maxValidityPeriodHours;
 		else if (unit == Wt::WString::tr("msg-days"))
-			maxValue = maxValidityDurationHours / 24;
+			maxValue = maxValidityPeriodHours / 24;
 		else if (unit == Wt::WString::tr("msg-weeks"))
-			maxValue = maxValidityDurationHours / 24 / 7;
+			maxValue = maxValidityPeriodHours / 24 / 7;
 		else if (unit == Wt::WString::tr("msg-months"))
-			maxValue = maxValidityDurationHours / 24 / 31;
+			maxValue = maxValidityPeriodHours / 24 / 31;
 		else if (unit == Wt::WString::tr("msg-years"))
-			maxValue = maxValidityDurationHours / 24 / 365;
+			maxValue = maxValidityPeriodHours / 24 / 365;
 
 		durationValidator->setTop(maxValue);
 
 		// If the current value is too high, change it to the max
-		if (Wt::asNumber(value(DurationValidityField)) > maxValue)
-			setValue(DurationValidityField, maxValue);
+		if (Wt::asNumber(value(ValidityPeriodField)) > maxValue)
+			setValue(ValidityPeriodField, maxValue);
 	}
 
 	void
 	ShareCreateFormModel::validateValidatityFields()
 	{
-		if (isValidated(DurationValidityField))
+		if (isValidated(ValidityPeriodField))
 		{
-			validateField(DurationValidityField);
-			validateField(DurationUnitValidityField);
+			validateField(ValidityPeriodField);
+			validateField(ValidityPeriodUnitField);
 		}
 	}
 
@@ -97,12 +97,12 @@ namespace UserInterface
 	{
 		Wt::WString error; // empty means validated
 
-		if (field == DurationUnitValidityField)
+		if (field == ValidityPeriodUnitField)
 		{
 			// Since they are grouped together,
-			// make it share the same state as DurationValidityField
-			validateField(DurationValidityField);
-			setValidation(field, validation(DurationValidityField));
+			// make it share the same state as ValidityPeriodField
+			validateField(ValidityPeriodField);
+			setValidation(field, validation(ValidityPeriodField));
 			return validation(field).state() == Wt::ValidationState::Valid;
 		}
 		else
@@ -116,11 +116,11 @@ namespace UserInterface
 	}
 
 	void
-	ShareCreateFormModel::updateValidityDuration(std::chrono::seconds duration)
+	ShareCreateFormModel::updateValidityPeriod(std::chrono::seconds duration)
 	{
-		auto maxValidityDuration = Service<Share::IShareManager>::get()->getMaxValidatityDuration();
-		if (duration > maxValidityDuration)
-			duration = maxValidityDuration;
+		auto maxValidityPeriod = Service<Share::IShareManager>::get()->getMaxValidityPeriod();
+		if (duration > maxValidityPeriod)
+			duration = maxValidityPeriod;
 
 		const auto durationHours {std::chrono::duration_cast<std::chrono::hours>(duration).count()};
 
@@ -152,31 +152,32 @@ namespace UserInterface
 			unit = Wt::WString::tr("msg-days");
 		}
 
-		setValue(DurationValidityField, value);
-		setValue(DurationUnitValidityField, unit);
+		setValue(ValidityPeriodField, value);
+		setValue(ValidityPeriodUnitField, unit);
 	}
 
 	void
 	ShareCreateFormModel::initializeModels()
 	{
-		const auto maxDuration {std::chrono::duration_cast<std::chrono::hours>(Service<Share::IShareManager>::get()->getMaxValidatityDuration())};
+		const auto maxPeriod {std::chrono::duration_cast<std::chrono::hours>(Service<Share::IShareManager>::get()->getMaxValidityPeriod())};
 
-		_durationValidityModel = std::make_shared<Wt::WStringListModel>();
+		_validityPeriodModel = std::make_shared<Wt::WStringListModel>();
 
-		_durationValidityModel->addString( Wt::WString::tr("msg-hours") );
-		_durationValidityModel->addString( Wt::WString::tr("msg-days") );
+		_validityPeriodModel->addString( Wt::WString::tr("msg-hours") );
+		_validityPeriodModel->addString( Wt::WString::tr("msg-days") );
 
-		if (maxDuration >= std::chrono::hours(7*24))
-			_durationValidityModel->addString( Wt::WString::tr("msg-weeks") );
-		if (maxDuration >= std::chrono::hours(31*24))
-			_durationValidityModel->addString( Wt::WString::tr("msg-months") );
-		if (maxDuration >= std::chrono::hours(365*24))
-			_durationValidityModel->addString( Wt::WString::tr("msg-years") );
+		if (maxPeriod >= std::chrono::hours {7*24})
+			_validityPeriodModel->addString( Wt::WString::tr("msg-weeks") );
+		if (maxPeriod >= std::chrono::hours {31*24})
+			_validityPeriodModel->addString( Wt::WString::tr("msg-months") );
+		if (maxPeriod >= std::chrono::hours {365*24})
+			_validityPeriodModel->addString( Wt::WString::tr("msg-years") );
 	}
 
 	std::chrono::seconds
-	ShareCreateFormModel::getDurationValidity() const
+	ShareCreateFormModel::getValidityPeriod() const
 	{
+		// TODO
 		return std::chrono::hours {48};
 	}
 

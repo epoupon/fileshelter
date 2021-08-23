@@ -86,27 +86,27 @@ namespace UserInterface
 		// Desc
 		setFormWidget(ShareCreateFormModel::DescriptionField, std::make_unique<Wt::WLineEdit>());
 
-		if (Service<Share::IShareManager>::get()->canValidatityDurationBeSet())
+		if (Service<Share::IShareManager>::get()->canValidityPeriodBeSet())
 		{
-			setCondition("if-validity-duration", true);
-			// Duration validity
-			setFormWidget(ShareCreateFormModel::DurationValidityField, std::make_unique<Wt::WSpinBox>());
+			setCondition("if-validity-period", true);
+			// Validity period
+			setFormWidget(ShareCreateFormModel::ValidityPeriodField, std::make_unique<Wt::WSpinBox>());
 
-			// Duration validity unit
-			auto durationUnitValidity = std::make_unique<Wt::WComboBox>();
-			durationUnitValidity->setModel(_model->durationValidityModel());
+			// Validity period unit
+			auto validityPeriodUnit = std::make_unique<Wt::WComboBox>();
+			validityPeriodUnit->setModel(_model->validityPeriodModel());
 
 			// each time the unit is changed, make sure to update the limits
-			durationUnitValidity->changed().connect([=]
+			validityPeriodUnit->changed().connect([=]
 			{
 				updateModel(_model.get());
-				_model->updateDurationValidator();
+				_model->updatePeriodValidator();
 				_model->validateValidatityFields();
 
 				updateView(_model.get());
 			});
 
-			setFormWidget(ShareCreateFormModel::DurationUnitValidityField, std::move(durationUnitValidity));
+			setFormWidget(ShareCreateFormModel::ValidityPeriodUnitField, std::move(validityPeriodUnit));
 		}
 
 		// Password
@@ -205,7 +205,7 @@ namespace UserInterface
 		ShareCreateParameters params;
 
 		params.description = _model->valueText(ShareCreateFormModel::DescriptionField).toUTF8();
-		params.validityDuration = _model->getDurationValidity();
+		params.validityPeriod = _model->getValidityPeriod();
 		params.password = _model->valueText(ShareCreateFormModel::PasswordField).toUTF8();
 		params.creatorAddress = wApp->environment().clientAddress();
 

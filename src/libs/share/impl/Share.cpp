@@ -66,7 +66,7 @@ namespace Share
 		const auto now {Wt::WLocalDateTime::currentServerDateTime().toUTC()};
 
 		res.modify()->_creationTime = now;
-		res.modify()->_expiryTime = now.addSecs(std::chrono::duration_cast<std::chrono::seconds>(parameters.validityDuration).count());
+		res.modify()->_expiryTime = now.addSecs(std::chrono::duration_cast<std::chrono::seconds>(parameters.validityPeriod).count());
 		res.modify()->_desc = parameters.description;
 		res.modify()->_creatorAddress = parameters.creatorAddress;
 		if (passwordHash)

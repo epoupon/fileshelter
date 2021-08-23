@@ -60,6 +60,7 @@ namespace
 			fileDesc.path = file->getPath();
 			fileDesc.clientPath = file->getClientPath();
 			fileDesc.size = file->getSize();
+			fileDesc.isOwned = file->isOwned();
 
 			desc.files.emplace_back(std::move(fileDesc));
 		});
@@ -81,9 +82,9 @@ namespace Share
 	, _shareCleaner {enableCleaner ? std::make_unique<ShareCleaner>(_db) : nullptr}
 	, _shareMaxSize {Service<IConfig>::get()->getULong("max-share-size", 100) * 1024 * 1024}
 	, _fileMaxSize {Service<IConfig>::get()->getULong("max-file-size", 100) * 1024 * 1024}
-	, _maxValidityDuration {std::chrono::hours {24} * Service<IConfig>::get()->getULong("max-validity-days", 100)}
-	, _defaultValidityDuration {std::chrono::hours {24} * Service<IConfig>::get()->getULong("default-validity-days", 100)}
-	, _canValidatityDurationBeSet {Service<IConfig>::get()->getBool("user-defined-validy-days", true)}
+	, _maxValidityPeriod {std::chrono::hours {24} * Service<IConfig>::get()->getULong("max-validity-days", 100)}
+	, _defaultValidityPeriod {std::chrono::hours {24} * Service<IConfig>::get()->getULong("default-validity-days", 100)}
+	, _canValidityPeriodBeSet {Service<IConfig>::get()->getBool("user-defined-validy-days", true)}
 	{
 		auto hashFunc {std::make_unique<Wt::Auth::BCryptHashFunction>(static_cast<int>(Service<IConfig>::get()->getULong("bcrypt-count", 12)))};
 		_passwordVerifier.addHashFunction(std::move(hashFunc));
@@ -93,12 +94,12 @@ namespace Share
 			throw Exception {"max-share-size must be greater than 0"};
 		if (_fileMaxSize == 0)
 			throw Exception {"max-file-size must be greater than 0"};
-		if (_maxValidityDuration.count() == 0)
+		if (_maxValidityPeriod.count() == 0)
 			throw Exception {"max-validity-days must be greater than 0"};
-		if (_defaultValidityDuration.count() == 0)
+		if (_defaultValidityPeriod.count() == 0)
 			throw Exception {"default-validity-days must be greater than 0"};
 
-		if (_maxValidityDuration < _defaultValidityDuration)
+		if (_maxValidityPeriod < _defaultValidityPeriod)
 			throw Exception {"max-validity-days must be greater than default-validity-days"};
 
 		FS_LOG(SHARE, DEBUG) << "Started share manager";
@@ -115,6 +116,8 @@ namespace Share
 		FS_LOG(SHARE, DEBUG) << "Creating share! nb files = " << filesParameters.size();
 
 		// TODO validate file sizes
+
+		// TODO validity period!!
 
 		std::optional<Wt::Auth::PasswordHash> passwordHash;
 		if (!shareParameters.password.empty())

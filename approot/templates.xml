@@ -45,26 +45,26 @@
 							${desc-info}
 						</div>
 					</div>
-					${<if-validity-duration>}
+					${<if-validity-period>}
 						<div class="form-group">
-							<label class="control-label col-sm-2"  for="${id:duration-validity}">
+							<label class="control-label col-sm-2"  for="${id:validity-period}">
 								${tr:msg-validity-period}
 							</label>
 							<div class="col-sm-5">
 								<div  class="row">
 									<div class="col-sm-6">
-										${duration-validity}
+										${validity-period}
 									</div>
 									<div class="col-sm-6">
-										${duration-unit-validity}
+										${validity-period-unit}
 									</div>
 								</div>
 							</div>
 							<div class="help-block col-sm-5">
-								${duration-validity-info}
+								${validity-period-info}
 							</div>
 						</div>
-						${</if-validity-duration>}
+						${</if-validity-period>}
 
 					<div class="form-group">
 						<label class="control-label col-sm-2"  for="${id:password}">

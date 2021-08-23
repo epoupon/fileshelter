@@ -33,7 +33,7 @@ namespace Share
 
 	struct ShareCreateParameters
 	{
-		std::chrono::seconds validityDuration; // 0 if infinite
+		std::chrono::seconds validityPeriod; // 0 if infinite
 		std::string description;
 		std::string creatorAddress;
 		std::string password;

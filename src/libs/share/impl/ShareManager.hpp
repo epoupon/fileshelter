@@ -42,10 +42,10 @@ namespace Share
 		private:
 			FileSize				getMaxShareSize() const override { return _shareMaxSize; }
 			FileSize				getMaxFileSize() const override { return _fileMaxSize; }
-			std::chrono::seconds	getMaxValidatityDuration() const override { return _maxValidityDuration; }
-			std::chrono::seconds	getDefaultValidatityDuration() const override { return _defaultValidityDuration; }
+			std::chrono::seconds	getMaxValidityPeriod() const override { return _maxValidityPeriod; }
+			std::chrono::seconds	getDefaultValidityPeriod() const override { return _defaultValidityPeriod; }
 			std::size_t				getMaxValidatityHits() const override { return _maxValidityHits; }
-			bool					canValidatityDurationBeSet() const override { return _canValidatityDurationBeSet; }
+			bool					canValidityPeriodBeSet() const override { return _canValidityPeriodBeSet; }
 
 			ShareEditUUID	createShare(const ShareCreateParameters& share, const std::vector<FileCreateParameters>& files, bool transferFileOwnership) override;
 			void			destroyShare(const ShareEditUUID& shareUUID) override;
@@ -61,10 +61,10 @@ namespace Share
 
 			const FileSize 				_shareMaxSize {};
 			const FileSize 				_fileMaxSize {};
-			const std::chrono::seconds	_maxValidityDuration {};
-			const std::chrono::seconds	_defaultValidityDuration {};
+			const std::chrono::seconds	_maxValidityPeriod {};
+			const std::chrono::seconds	_defaultValidityPeriod {};
 			const std::size_t			_maxValidityHits {};
-			const bool					_canValidatityDurationBeSet {};
+			const bool					_canValidityPeriodBeSet {};
 	};
 
 } // namespace Share

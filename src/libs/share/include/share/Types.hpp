@@ -53,6 +53,7 @@ namespace Share
 		std::filesystem::path	path;
 		std::filesystem::path	clientPath;
 		FileSize				size {};
+		bool					isOwned {};
 	};
 
 	struct ShareDesc
