@@ -213,4 +213,24 @@ namespace Share
 
 		return shareToDesc(*share.get());
 	}
+
+	void
+	ShareManager::visitShares(std::function<void(const ShareDesc&)> visitor)
+	{
+		std::vector<ShareDesc> shares;
+
+		{
+			Wt::Dbo::Session& session {_db.getTLSSession()};
+			Wt::Dbo::Transaction transaction {session};
+
+			Share::visitAll(session, [&](const Share::pointer& share)
+			{
+				shares.push_back(shareToDesc(*share.get()));
+			});
+		}
+
+		for (const ShareDesc& share : shares)
+			visitor(share);
+	}
+
 } // namespace Share

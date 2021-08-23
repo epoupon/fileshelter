@@ -67,7 +67,7 @@ namespace Share
 
 	Db::Db(const std::filesystem::path& db)
 	{
-		FS_LOG(DB, INFO) << "Creating connection pool on file '" << db.string() << "'";
+		FS_LOG(DB, DEBUG) << "Creating connection pool on file '" << db.string() << "'";
 
 		auto connection {std::make_unique<Wt::Dbo::backend::Sqlite3>(db.string())};
 		// Caution: must have only 1 connection to create implicit locking on the database accesses

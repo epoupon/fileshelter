@@ -21,17 +21,13 @@
 
 #include <chrono>
 #include <filesystem>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string_view>
 #include <utility>
 
 #include "share/Types.hpp"
-
-namespace Zip
-{
-	class Zipper;
-}
 
 namespace Share
 {
@@ -58,6 +54,7 @@ namespace Share
 			virtual bool					shareHasPassword(const ShareUUID& shareId) = 0;
 			virtual ShareDesc				getShareDesc(const ShareUUID& shareId, std::optional<std::string_view> password = std::nullopt) = 0;
 			virtual ShareDesc				getShareDesc(const ShareEditUUID& shareId) = 0;
+			virtual	void					visitShares(std::function<void(const ShareDesc&)>) = 0;
 	};
 
 	std::unique_ptr<IShareManager> createShareManager(const std::filesystem::path& dbFile, bool enableCleaner);

@@ -52,6 +52,7 @@ namespace Share
 			bool			shareHasPassword(const ShareUUID& shareUUID) override;
 			ShareDesc		getShareDesc(const ShareUUID& shareUUID, std::optional<std::string_view> password) override;
 			ShareDesc		getShareDesc(const ShareEditUUID& shareUUID) override;
+			void			visitShares(std::function<void(const ShareDesc&)>) override;
 
 			Db _db;
 
