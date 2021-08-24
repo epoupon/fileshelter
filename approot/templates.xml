@@ -296,6 +296,10 @@
 	<h1><i class="fa fa-exclamation-triangle"></i> ${tr:msg-share-not-found}</h1>
 </message>
 
+<message id="template-share-removed">
+	<h1><i class="fa fa-remove"></i> ${tr:msg-share-deleted}</h1>
+</message>
+
 <message id="template-progress-bar">
 	<div class="progress">
 		${progress}

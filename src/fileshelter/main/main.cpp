@@ -85,6 +85,13 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 			}, {"127.0.0.1", "::1"});
 		}
 
+		{
+			boost::property_tree::ptree viewport;
+			viewport.put("<xmlattr>.name", "viewport");
+			viewport.put("<xmlattr>.content", "width=device-width, initial-scale=1, user-scalable=no");
+			pt.add_child("server.application-settings.head-matter.meta", viewport);
+		}
+
 		std::ofstream oss {wtConfigPath.string().c_str(), std::ios::out};
 		boost::property_tree::xml_parser::write_xml(oss, pt);
 	}
