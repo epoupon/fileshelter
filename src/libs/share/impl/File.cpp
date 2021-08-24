@@ -32,25 +32,11 @@ namespace Share
 
 		res.modify()->_path = parameters.path;
 		res.modify()->_name = parameters.name;
-		res.modify()->_size = std::filesystem::file_size(parameters.path); // may throw
 		res.modify()->_share = share;
 
 		session.flush();
 		return res;
 
 	}
-
-/*	File::pointer
-	File::getByUUID(Wt::Dbo::Session& session, const FileUUID& uuid)
-	{
-		return session.find<File>().where("uuid = ?").bind(uuid);
-	}
-
-	File::pointer
-	File::getByDownloadUUID(Wt::Dbo::Session& session, const UUID& downloadUUID)
-	{
-		return session.find<File>().where("download_UUID = ?").bind(downloadUUID.getAsString());
-	}
-	*/
 }
 

@@ -21,8 +21,9 @@
 #include <stdlib.h>
 #include <filesystem>
 #include <iostream>
-#include <boost/program_options.hpp>
 #include <stdexcept>
+#include <vector>
+#include <boost/program_options.hpp>
 
 #include "share/CreateParameters.hpp"
 #include "share/IShareManager.hpp"
@@ -50,18 +51,23 @@ processCreateCommand(Share::IShareManager& shareManager,
 		std::chrono::seconds validityPeriod,
 		std::string_view password)
 {
+	using namespace Share;
+
 	std::cout.imbue(std::locale(""));
 
-	std::cout << "desc = '" << desc << std::endl;
-	std::cout << "password = '" << password << "'" << std::endl;
+	Share::ShareCreateParameters shareParameters;
+	shareParameters.validityPeriod = validityPeriod;
+	shareParameters.description = desc;
+	shareParameters.creatorAddress = "local";
+	shareParameters.password = password;
 
+	std::vector<FileCreateParameters> fileParameters;
+	fileParameters.reserve(files.size());
 	for (const std::filesystem::path& p : files)
-		std::cout << "file = '" << p.string() << std::endl;
+		fileParameters.emplace_back(FileCreateParameters {p, p.filename()});
 
-	Share::ShareCreateParameters createParameters;
-	createParameters.validityPeriod = validityPeriod;
-
-
+	const ShareEditUUID shareEditUUID {shareManager.createShare(shareParameters, fileParameters, false /* keep ownership */)};
+	std::cout << "Successfuly created share. Edit UUID = '" << shareEditUUID.toString() << "'" << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -130,6 +136,8 @@ int main(int argc, char* argv[])
 			validityPeriod = std::chrono::seconds {vm["validity-hours"].as<unsigned>()};
 		else if (vm.count("validity-days"))
 			validityPeriod = std::chrono::hours {vm["validity-days"].as<unsigned>()} * 24;
+		else
+			validityPeriod = shareManager.get()->getDefaultValidityPeriod();
 
 		processCreateCommand(*shareManager.get(), vm["file"].as<std::vector<std::filesystem::path>>(), vm["desc"].as<std::string>(), validityPeriod, vm["password"].as<std::string>());
 	}

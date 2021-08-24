@@ -32,4 +32,20 @@ namespace Share
 		public:
 			ShareNotFoundException() : Exception {"Share not found!"} {}
 	};
+	class FileException : public Exception
+	{
+		public:
+			FileException(std::string_view message) : Exception {message} {}
+	};
+
+	class FileTooLargeException : public Exception
+	{
+		public:
+			FileTooLargeException() : Exception {"File too large"} {}
+	};
+	class ShareTooLargeException : public Exception
+	{
+		public:
+			ShareTooLargeException() : Exception {"Share too large"} {}
+	};
 }

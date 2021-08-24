@@ -54,6 +54,8 @@ namespace Share
 			ShareDesc		getShareDesc(const ShareEditUUID& shareUUID) override;
 			void			visitShares(std::function<void(const ShareDesc&)>) override;
 
+			void			validateFileSizes(const std::vector<FileCreateParameters>& files, const std::vector<FileSize>& fileSizes);
+
 			Db _db;
 
 			std::unique_ptr<ShareCleaner>	_shareCleaner;

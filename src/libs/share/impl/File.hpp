@@ -50,6 +50,7 @@ namespace Share
 			// Setters
 			void setUUID(const FileUUID& uuid) { _uuid = uuid; }
 			void setIsOwned(bool value) { _isOwned = value; }
+			void setSize(FileSize size) { _size = size; }
 
 			template<class Action>
 			void persist(Action& a)

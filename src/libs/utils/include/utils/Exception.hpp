@@ -21,10 +21,11 @@
 
 #include <stdexcept>
 #include <string>
+#include <string_view>
 
 class FsException : public std::runtime_error
 {
 	public:
-		FsException(const std::string& error = "") : std::runtime_error {error} {}
+		FsException(std::string_view error = "") : std::runtime_error {std::string {error}} {}
 };
 

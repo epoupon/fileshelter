@@ -67,6 +67,23 @@ namespace
 
 		return desc;
 	}
+
+	std::vector<FileSize>
+	computeFileSizes(const std::vector<FileCreateParameters>& files)
+	{
+		std::vector<FileSize> sizes(files.size(), 0);
+		std::transform(std::cbegin(files), std::cend(files), std::begin(sizes),
+				[](const FileCreateParameters& file)
+				{
+					std::error_code ec;
+					const std::uintmax_t fileSize {std::filesystem::file_size(file.path, ec)};
+					if (ec)
+						throw FileException {ec.message()};
+					return fileSize;
+				});
+
+		return sizes;
+	}
 }
 
 namespace Share
@@ -115,7 +132,8 @@ namespace Share
 	{
 		FS_LOG(SHARE, DEBUG) << "Creating share! nb files = " << filesParameters.size();
 
-		// TODO validate file sizes
+		const std::vector<FileSize> fileSizes {computeFileSizes(filesParameters)};
+		validateFileSizes(filesParameters, fileSizes);
 
 		// TODO validity period!!
 
@@ -133,12 +151,13 @@ namespace Share
 			if (passwordHash)
 				share.modify()->setPasswordHash(*passwordHash);
 
-			for (const FileCreateParameters& fileParameters : filesParameters)
+			for (std::size_t i {}; i < filesParameters.size(); ++i)
 			{
-				File::pointer file {File::create(session, fileParameters, share)};
+				File::pointer file {File::create(session, filesParameters[i], share)};
 
 				file.modify()->setIsOwned (transferFileOwnership);
 				file.modify()->setUUID(UUID::Generate {});
+				file.modify()->setSize(fileSizes[i]);
 			}
 
 			return share->getEditUUID();
@@ -235,5 +254,23 @@ namespace Share
 		for (const ShareDesc& share : shares)
 			visitor(share);
 	}
+
+	void
+	ShareManager::validateFileSizes(const std::vector<FileCreateParameters>& files, const std::vector<FileSize>& fileSizes)
+	{
+		FileSize shareSize {};
+
+		for (std::size_t i {}; i < files.size(); ++i)
+		{
+			if (fileSizes[i] > _fileMaxSize)
+				throw FileTooLargeException {};
+
+			shareSize += fileSizes[i];
+		}
+
+		if (shareSize >= _shareMaxSize)
+			throw ShareTooLargeException {};
+	}
+
 
 } // namespace Share
