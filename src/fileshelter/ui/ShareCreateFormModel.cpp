@@ -64,15 +64,15 @@ namespace UserInterface
 
 		int maxValue {1};
 		auto unit {valueText(ValidityPeriodUnitField)};
-		if (unit == Wt::WString::tr("msg-hours"))
+		if (unit == Wt::WString::tr("msg-duration-hours"))
 			maxValue = maxValidityPeriodHours;
-		else if (unit == Wt::WString::tr("msg-days"))
+		else if (unit == Wt::WString::tr("msg-duration-days"))
 			maxValue = maxValidityPeriodHours / 24;
-		else if (unit == Wt::WString::tr("msg-weeks"))
+		else if (unit == Wt::WString::tr("msg-duration-weeks"))
 			maxValue = maxValidityPeriodHours / 24 / 7;
-		else if (unit == Wt::WString::tr("msg-months"))
+		else if (unit == Wt::WString::tr("msg-duration-months"))
 			maxValue = maxValidityPeriodHours / 24 / 31;
-		else if (unit == Wt::WString::tr("msg-years"))
+		else if (unit == Wt::WString::tr("msg-duration-years"))
 			maxValue = maxValidityPeriodHours / 24 / 365;
 
 		durationValidator->setTop(maxValue);
@@ -129,27 +129,27 @@ namespace UserInterface
 		if (durationHours % 24)
 		{
 			value = durationHours;
-			unit = Wt::WString::tr("msg-hours");
+			unit = Wt::WString::tr("msg-duration-hours");
 		}
 		if ((durationHours / 24 % 365) == 0)
 		{
 			value = durationHours / 24 / 365;
-			unit = Wt::WString::tr("msg-years");
+			unit = Wt::WString::tr("msg-duration-years");
 		}
 		else if ((durationHours / 24 % 31) == 0)
 		{
 			value = durationHours / 24 / 31;
-			unit = Wt::WString::tr("msg-months");
+			unit = Wt::WString::tr("msg-duration-months");
 		}
 		else if ((durationHours / 24 % 7) == 0)
 		{
 			value = durationHours / 24 / 7;
-			unit = Wt::WString::tr("msg-weeks");
+			unit = Wt::WString::tr("msg-duration-weeks");
 		}
 		else
 		{
 			value = durationHours / 24;
-			unit = Wt::WString::tr("msg-days");
+			unit = Wt::WString::tr("msg-duration-days");
 		}
 
 		setValue(ValidityPeriodField, value);
@@ -163,15 +163,15 @@ namespace UserInterface
 
 		_validityPeriodModel = std::make_shared<Wt::WStringListModel>();
 
-		_validityPeriodModel->addString( Wt::WString::tr("msg-hours") );
-		_validityPeriodModel->addString( Wt::WString::tr("msg-days") );
+		_validityPeriodModel->addString( Wt::WString::tr("msg-duration-hours") );
+		_validityPeriodModel->addString( Wt::WString::tr("msg-duration-days") );
 
 		if (maxPeriod >= std::chrono::hours {7*24})
-			_validityPeriodModel->addString( Wt::WString::tr("msg-weeks") );
+			_validityPeriodModel->addString( Wt::WString::tr("msg-duration-weeks") );
 		if (maxPeriod >= std::chrono::hours {31*24})
-			_validityPeriodModel->addString( Wt::WString::tr("msg-months") );
+			_validityPeriodModel->addString( Wt::WString::tr("msg-duration-months") );
 		if (maxPeriod >= std::chrono::hours {365*24})
-			_validityPeriodModel->addString( Wt::WString::tr("msg-years") );
+			_validityPeriodModel->addString( Wt::WString::tr("msg-duration-years") );
 	}
 
 	std::chrono::seconds

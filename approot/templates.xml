@@ -81,18 +81,15 @@
 			</div>
 		</div>
 	</div>
-	${<if-max-share-size>}
-	<div class="alert alert-danger">
-		<i class="fa fa-warning" aria-hidden="true"></i> ${max-size}
-	</div>
-	${</if-max-share-size>}
-	${<if-has-duplicate-names>}
-	<div class="alert alert-danger">
-		<i class="fa fa-warning" aria-hidden="true"></i> ${tr:msg-has-duplicate-names}
-	</div>
-	${</if-has-duplicate-names>}
+	${error}
 	<div class="form-group">
 		${create-btn class="btn-primary fs-horizontal-center"}
+	</div>
+</message>
+
+<message id="template-share-create-error">
+	<div class="alert alert-danger">
+		<i class="fa fa-warning" aria-hidden="true"></i> ${error}
 	</div>
 </message>
 
@@ -295,19 +292,8 @@
 	</div>
 </message>
 
-<message id="template-share-not-created">
-	<h1><i class="fa fa-remove"></i> ${tr:msg-share-create-failed}</h1>
-	<div class="alert alert-danger">
-		${error}
-	</div>
-</message>
-
 <message id="template-share-not-found">
 	<h1><i class="fa fa-exclamation-triangle"></i> ${tr:msg-share-not-found}</h1>
-</message>
-
-<message id="template-share-removed">
-	<h1><i class="fa fa-remove"></i> ${tr:msg-share-deleted}</h1>
 </message>
 
 <message id="template-progress-bar">

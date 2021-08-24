@@ -65,6 +65,9 @@ namespace UserInterface
 			bool isFileDeleted(const Wt::WFileDropWidget::File& file) const;
 			void onFileUploaded(const Wt::WFileDropWidget::File& file);
 
+			void showError(const Wt::WString& error);
+			void hideError();
+
 			bool								_validated {};
 
 			Wt::Signal<>						_sigValidated;
@@ -73,6 +76,8 @@ namespace UserInterface
 
 			std::shared_ptr<ShareCreateFormModel> _model;
 			Wt::WPushButton*			_createBtn {};
+			Wt::WTemplate*				_error {};
+			Wt::WText*					_shareSize {};
 
 			std::unordered_set<const Wt::WFileDropWidget::File*> _deletedFiles;
 			Wt::WFileDropWidget*		_drop {};

@@ -1,69 +1,43 @@
-
 <?xml version="1.0" encoding="UTF-8" ?>
 <messages xmlns:if="Wt.WTemplate.conditions">
-<!--FORMS message blocks-->
-
-<message id="msg-home-desc">
-	<p>${tr:msg-app-name} allows you to easily share files over the Internet.</p>
-	<p>Just upload a file and get an URL back!</p>
-</message>
-
-<message id="msg-tos">Terms of Service</message>
-
-<message id="msg-create">Create</message>
-<message id="msg-home">Home</message>
-<message id="msg-share-create">New share</message>
-<message id="msg-share-edit">Edit</message>
-<message id="msg-share-download">Download</message>
-<message id="msg-share-not-found">Share not found!</message>
-<message id="msg-share-deleted">Share successfully removed!</message>
-<message id="msg-share-create-success">Share successfully created!</message>
-<message id="msg-upload">Upload</message>
-<message id="msg-download">Download</message>
-<message id="msg-download-count">Download count</message>
-<message id="msg-delete">Delete</message>
-<message id="msg-unlock">Unlock</message>
-<message id="msg-description">Description</message>
-<message id="msg-file-name">File name</message>
-<message id="msg-file-size">File size</message>
-<message id="msg-file">File</message>
-<message id="msg-files">Files</message>
-<message id="msg-optional">Optional</message>
-<message id="msg-hits">Downloads</message>
-<message id="msg-share-delete">Delete share</message>
-<message id="msg-share-size">Share size</message>
-<message id="msg-confirm-action">Are you sure?</message>
-<message id="msg-bad-password">Bad password</message>
-<message id="msg-internal-error">Internal error!</message>
-<message id="msg-share-protected-by-password">This share is protected by a password</message>
-<message id="msg-share-create-protected-by-password">A password is required to create a share</message>
-<message id="msg-no-file-selected">No file has been selected!</message>
-<message id="msg-max-share-size">The total size of the files must not exceed {1}</message>
-<message id="msg-advanced-options">Advanced options</message>
-<message id="msg-upload-in-progress">Upload in progress...</message>
-
-<message id="msg-validity-period">Validity period</message>
-<message id="msg-hours">Hours</message>
-<message id="msg-days">Days</message>
-<message id="msg-weeks">Weeks</message>
-<message id="msg-months">Months</message>
-<message id="msg-years">Years</message>
-<message id="msg-expires">Expires</message>
-
-<message id="msg-max-hits-limit">Limit downloads</message>
-<message id="msg-max-hits">Max downloads</message>
-<message id="msg-password">Password</message>
-
-<message id="msg-download-link">Public download link</message>
-<message id="msg-edit-link">Private edit link</message>
-
-<message id="msg-share-create-too-large">Files too large!</message>
-<message id="msg-share-create-failed">Failed to create share!</message>
-<message id="msg-share-no-longer-available">This share is no longer available!</message>
-
-<message id="msg-size-gb">{1} GB</message>
-<message id="msg-size-mb">{1} MB</message>
-<message id="msg-size-kb">{1} KB</message>
-<message id="msg-size-b">{1} B</message>
-
+	<message id="msg-advanced-options">Advanced options</message>
+	<message id="msg-bad-password">Bad password</message>
+	<message id="msg-confirm-action">Are you sure?</message>
+	<message id="msg-create">Create</message>
+	<message id="msg-delete">Delete</message>
+	<message id="msg-description">Description</message>
+	<message id="msg-download-count">Download count</message>
+	<message id="msg-download">Download</message>
+	<message id="msg-download-link">Public download link</message>
+	<message id="msg-duration-days">Days</message>
+	<message id="msg-duration-hours">Hours</message>
+	<message id="msg-duration-months">Months</message>
+	<message id="msg-duration-weeks">Weeks</message>
+	<message id="msg-duration-years">Years</message>
+	<message id="msg-edit-link">Private edit link</message>
+	<message id="msg-expires">Expires</message>
+	<message id="msg-files">Files</message>
+	<message id="msg-max-share-size">The total size of the files must not exceed {1}</message>
+	<message id="msg-optional">Optional</message>
+	<message id="msg-password">Password</message>
+	<message id="msg-share-create">New share</message>
+	<message id="msg-share-create-protected-by-password">A password is required to create a share</message>
+	<message id="msg-share-create-success">Share successfully created!</message>
+	<message id="msg-share-delete">Delete share</message>
+	<message id="msg-share-deleted">Share successfully removed!</message>
+	<message id="msg-share-download">Download</message>
+	<message id="msg-duplicate-file-names">Some files have duplicate names!</message>
+	<message id="msg-share-edit">Edit</message>
+	<message id="msg-share-not-found">Share not found!</message>
+	<message id="msg-share-protected-by-password">This share is protected by a password</message>
+	<message id="msg-share-size">Share size</message>
+	<message id="msg-size-b">{1} B</message>
+	<message id="msg-size-gb">{1} GB</message>
+	<message id="msg-size-kb">{1} KB</message>
+	<message id="msg-size-mb">{1} MB</message>
+	<message id="msg-tos">Terms of Service</message>
+	<message id="msg-unlock">Unlock</message>
+	<message id="msg-upload-in-progress">Upload in progress...</message>
+	<message id="msg-upload">Upload</message>
+	<message id="msg-validity-period">Validity period</message>
 </messages>

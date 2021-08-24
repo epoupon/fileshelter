@@ -50,8 +50,6 @@ namespace UserInterface
 	{
 		setTemplateText(tr("template-share-create-form"));
 
-		bindString("max-size", Wt::WString::tr("msg-max-share-size").arg( ShareUtils::fileSizeToString(Service<Share::IShareManager>::get()->getMaxShareSize()) ));
-
 		_drop = bindNew<Wt::WFileDropWidget>("file-drop");
 
 		auto* filesContainer {bindNew<Wt::WContainerWidget>("files")};
@@ -82,6 +80,10 @@ namespace UserInterface
 		{
 			FS_LOG(UI, ERROR) << "File '" << file->clientFileName() << "' is too large: " << size;
 		});
+
+		_shareSize = bindNew<Wt::WText>("share-size");
+
+		_error = bindNew<Wt::WTemplate>("error", Wt::WString::tr("template-share-create-error"));
 
 		// Desc
 		setFormWidget(ShareCreateFormModel::DescriptionField, std::make_unique<Wt::WLineEdit>());
@@ -289,17 +291,24 @@ namespace UserInterface
 	void
 	ShareCreateFormView::checkFiles()
 	{
-		bindString("share-size", ShareUtils::fileSizeToString(getTotalFileSize()));
+		_shareSize->setText(ShareUtils::fileSizeToString(getTotalFileSize()));
+
+		Wt::WString errorMsg;
 
 		const bool overflow {isShareSizeOverflow()};
-		setCondition("if-max-share-size", overflow);
+		if (overflow)
+			errorMsg = Wt::WString::tr("msg-max-share-size").arg( ShareUtils::fileSizeToString(Service<Share::IShareManager>::get()->getMaxShareSize()) );
 
 		const bool duplicateNames {hasDuplicateNames()};
-		setCondition("if-has-duplicate-names", duplicateNames);
+		if (duplicateNames)
+			errorMsg = Wt::WString::tr("msg-duplicate-file-names");
 
-		const std::size_t nbFiles {countNbFilesToUpload()};
+		if (errorMsg.empty())
+			hideError();
+		else
+			showError(errorMsg);
 
-		if (overflow || duplicateNames || nbFiles == 0)
+		if (overflow || duplicateNames || countNbFilesToUpload() == 0)
 			_createBtn->disable();
 		else
 			_createBtn->enable();
@@ -321,5 +330,17 @@ namespace UserInterface
 		return _deletedFiles.find(&file) != std::cend(_deletedFiles);
 	}
 
+	void
+	ShareCreateFormView::showError(const Wt::WString& error)
+	{
+		_error->setHidden(false);
+		_error->bindString("error", error);
+	}
+
+	void
+	ShareCreateFormView::hideError()
+	{
+		_error->setHidden(true);
+	}
 } // namespace UiserInterface
 
