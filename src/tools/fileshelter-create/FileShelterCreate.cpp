@@ -46,7 +46,7 @@ conflictingOptions(const boost::program_options::variables_map& vm, const char* 
 static
 void
 processCreateCommand(Share::IShareManager& shareManager,
-		const std::vector<std::filesystem::path>& files,
+		const std::vector<std::string>& files,
 		std::string_view desc,
 		std::chrono::seconds validityPeriod,
 		std::string_view password)
@@ -63,8 +63,11 @@ processCreateCommand(Share::IShareManager& shareManager,
 
 	std::vector<FileCreateParameters> fileParameters;
 	fileParameters.reserve(files.size());
-	for (const std::filesystem::path& p : files)
+	for (const std::string& strPath : files)
+	{
+		const std::filesystem::path p {strPath};
 		fileParameters.emplace_back(FileCreateParameters {p, p.filename()});
+	}
 
 	const ShareEditUUID shareEditUUID {shareManager.createShare(shareParameters, fileParameters, false /* keep ownership */)};
 	std::cout << "Successfuly created share. Edit UUID = '" << shareEditUUID.toString() << "'" << std::endl;
@@ -90,7 +93,7 @@ int main(int argc, char* argv[])
 
 			po::options_description hiddenOptions{"Hidden options"};
 			hiddenOptions.add_options()
-				("file,f", po::value<std::vector<std::filesystem::path>>()->composing(), "file");
+				("file,f", po::value<std::vector<std::string>>()->composing(), "file");
 
 			allOptions.add(options).add(hiddenOptions);
 			visibleOptions.add(options);
@@ -139,7 +142,7 @@ int main(int argc, char* argv[])
 		else
 			validityPeriod = shareManager.get()->getDefaultValidityPeriod();
 
-		processCreateCommand(*shareManager.get(), vm["file"].as<std::vector<std::filesystem::path>>(), vm["desc"].as<std::string>(), validityPeriod, vm["password"].as<std::string>());
+		processCreateCommand(*shareManager.get(), vm["file"].as<std::vector<std::string>>(), vm["desc"].as<std::string>(), validityPeriod, vm["password"].as<std::string>());
 	}
 	catch (const std::exception& e)
 	{
