@@ -1,73 +1,54 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <messages xmlns:if="Wt.WTemplate.conditions">
-<!--FORMS message blocks-->
-
-<message id="msg-home-desc">
-	<p>${tr:msg-app-name} vous permet de partager facilement des fichiers par Internet.</p>
-	<p>Uploadez un fichier et obtenez en retour un lien permettant de le télécharger !</p>
-</message>
-
-<message id="msg-tos">Conditions d'utilisation</message>
-
-<message id="msg-home">Accueil</message>
-
-<message id="msg-create">Créer</message>
-<message id="msg-share-create">Nouveau partage</message>
-<message id="msg-share-edit">Edition</message>
-<message id="msg-share-download">Téléchargement</message>
-<message id="msg-share-not-found">Partage non trouvé !</message>
-<message id="msg-share-deleted">Partage supprimé !</message>
-<message id="msg-share-create-success">Partage créé !</message>
-<message id="msg-upload">Envoyer</message>
-<message id="msg-download">Télécharger</message>
-<message id="msg-delete">Supprimer</message>
-<message id="msg-unlock">Dévérouiller</message>
-<message id="msg-description">Description</message>
-<message id="msg-file-name">Nom</message>
-<message id="msg-file-size">Taille</message>
-<message id="msg-file">Fichier</message>
-<message id="msg-optional">Optionnel</message>
-<message id="msg-hits">Téléchargements</message>
-<message id="msg-share-delete">Supprimer le partage</message>
-<message id="msg-share-size">Taille</message>
-<message id="msg-confirm-action">Etes vous sûr ?</message>
-<message id="msg-bad-password">Mot de passe invalide</message>
-<message id="msg-internal-error">Erreur interne !</message>
-<message id="msg-share-protected-by-password">Ce partage est protégé par un mot de passe</message>
-<message id="msg-share-create-protected-by-password">La création d'un partage est protégée par un mot de passe</message>
-<message id="msg-no-file-selected">Aucun fichier selectionné !</message>
-<message id="msg-max-share-size">La taille totale des fichiers ne doit pas dépasser {1}</message>
-<message id="msg-advanced-options">Options avancées</message>
-
-<message id="msg-validity-period">Durée de validité</message>
-<message id="msg-hours">Heures</message>
-<message id="msg-days">Jours</message>
-<message id="msg-weeks">Semaines</message>
-<message id="msg-months">Mois</message>
-<message id="msg-years">Années</message>
-<message id="msg-expires">Expire le</message>
-
-<message id="msg-max-hits-limit">Limiter les téléchargements</message>
-<message id="msg-max-hits">Limite de téléchargements</message>
-<message id="msg-password">Mot de passe</message>
-
-<message id="msg-download-link">Lien de téléchargement public</message>
-<message id="msg-edit-link">Lien d'édition privé</message>
-
-<message id="msg-share-create-too-large">Fichiers trop volumineux !</message>
-<message id="msg-share-create-failed">Impossible de créer le partage !</message>
-<message id="msg-share-no-longer-available">Ce partage n'est plus disponible !</message>
-
-<message id="Wt.WMessageBox.Yes">Oui</message>
-<message id="Wt.WMessageBox.No">Non</message>
-<message id="Wt.WValidator.Invalid">Ce champ ne peut pas être vide</message>
-<message id="Wt.WDateValidator.DateTooEarly">La date doit être après {1}</message>
-<message id="Wt.WDateValidator.DateTooLate">La date doit être avant {1}</message>
-<message id="Wt.WDateValidator.WrongDateRange">La date doit être comprise entre {1} et {2}</message>
-<message id="Wt.WDateValidator.WrongFormat">Le format doit être '{1}'</message>
-<message id="Wt.WIntValidator.NotAnInteger">Doit être un nombre entier</message>
-<message id="Wt.WIntValidator.TooSmall">Le nombre doit être plus grand que {1}</message>
-<message id="Wt.WIntValidator.BadRange">Le nombre doit être compris entre {1} et {2}</message>
-<message id="Wt.WIntValidator.TooLarge">Le nombre doit être plus petit que {1}</message>
-
+	<message id="msg-advanced-options">Options avancées</message>
+	<message id="msg-bad-password">Mot de passe invalide</message>
+	<message id="msg-confirm-action">Etes vous sûr ?</message>
+	<message id="msg-create">Créer</message>
+	<message id="msg-delete">Supprimer</message>
+	<message id="msg-description">Description</message>
+	<message id="msg-download">Télécharger</message>
+	<message id="msg-download-count">Téléchargements</message>
+	<message id="msg-download-link">Lien de téléchargement public</message>
+	<message id="msg-duration-days">Jours</message>
+	<message id="msg-duration-hours">Heures</message>
+	<message id="msg-duration-months">Mois</message>
+	<message id="msg-duration-weeks">Semaines</message>
+	<message id="msg-duration-years">Années</message>
+	<message id="msg-edit-link">Lien d'édition privé</message>
+	<message id="msg-expires">Expire le</message>
+	<message id="msg-files">Fichiers</message>
+	<message id="msg-max-share-size">La taille totale des fichiers ne doit pas dépasser {1}</message>
+	<message id="msg-optional">Optionnel</message>
+	<message id="msg-password">Mot de passe</message>
+	<message id="msg-share-create">Nouveau partage</message>
+	<message id="msg-share-create-protected-by-password">La création d'un partage est protégée par un mot de passe</message>
+	<message id="msg-share-create-success">Partage créé !</message>
+	<message id="msg-share-delete">Supprimer le partage</message>
+	<message id="msg-share-deleted">Partage supprimé !</message>
+	<message id="msg-share-download">Téléchargement</message>
+	<message id="msg-duplicate-file-names">Certains fichiers ont le même nom!</message>
+	<message id="msg-share-edit">Edition</message>
+	<message id="msg-share-not-found">Partage non trouvé !</message>
+	<message id="msg-share-protected-by-password">Ce partage est protégé par un mot de passe</message>
+	<message id="msg-share-size">Taille</message>
+	<message id="msg-size-b">{1} B</message>
+	<message id="msg-size-gb">{1} GB</message>
+	<message id="msg-size-kb">{1} KB</message>
+	<message id="msg-size-mb">{1} MB</message>
+	<message id="msg-tos">Conditions d'utilisation</message>
+	<message id="msg-unlock">Dévérouiller</message>
+	<message id="msg-upload-in-progress">Envoi en cours...</message>
+	<message id="msg-upload">Envoyer</message>
+	<message id="msg-validity-period">Durée de validité</message>
+	<message id="Wt.WDateValidator.DateTooEarly">La date doit être après {1}</message>
+	<message id="Wt.WDateValidator.DateTooLate">La date doit être avant {1}</message>
+	<message id="Wt.WDateValidator.WrongDateRange">La date doit être comprise entre {1} et {2}</message>
+	<message id="Wt.WDateValidator.WrongFormat">Le format doit être '{1}'</message>
+	<message id="Wt.WIntValidator.BadRange">Le nombre doit être compris entre {1} et {2}</message>
+	<message id="Wt.WIntValidator.NotAnInteger">Doit être un nombre entier</message>
+	<message id="Wt.WIntValidator.TooLarge">Le nombre doit être plus petit que {1}</message>
+	<message id="Wt.WIntValidator.TooSmall">Le nombre doit être plus grand que {1}</message>
+	<message id="Wt.WMessageBox.No">Non</message>
+	<message id="Wt.WMessageBox.Yes">Oui</message>
+	<message id="Wt.WValidator.Invalid">Ce champ ne peut pas être vide</message>
 </messages>

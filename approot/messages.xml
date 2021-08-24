@@ -6,8 +6,8 @@
 	<message id="msg-create">Create</message>
 	<message id="msg-delete">Delete</message>
 	<message id="msg-description">Description</message>
-	<message id="msg-download-count">Download count</message>
 	<message id="msg-download">Download</message>
+	<message id="msg-download-count">Download count</message>
 	<message id="msg-download-link">Public download link</message>
 	<message id="msg-duration-days">Days</message>
 	<message id="msg-duration-hours">Hours</message>
