@@ -20,6 +20,7 @@
 <message id="msg-share-create-success">Share successfully created!</message>
 <message id="msg-upload">Upload</message>
 <message id="msg-download">Download</message>
+<message id="msg-download-count">Download count</message>
 <message id="msg-delete">Delete</message>
 <message id="msg-unlock">Unlock</message>
 <message id="msg-description">Description</message>

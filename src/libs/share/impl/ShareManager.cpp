@@ -256,6 +256,19 @@ namespace Share
 	}
 
 	void
+	ShareManager::incrementReadCount(const ShareUUID& shareUUID)
+	{
+		Wt::Dbo::Session& session {_db.getTLSSession()};
+		Wt::Dbo::Transaction transaction {session};
+
+		const Share::pointer share {Share::getByUUID(session, shareUUID)};
+		if (!share)
+			return;
+
+		share.modify()->incReadCount();
+	}
+
+	void
 	ShareManager::validateFileSizes(const std::vector<FileCreateParameters>& files, const std::vector<FileSize>& fileSizes)
 	{
 		FileSize shareSize {};

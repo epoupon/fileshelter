@@ -109,6 +109,8 @@ ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Respons
 			}
 
 			suggestFileName(getClientFileName(share).string());
+
+			Service<IShareManager>::get()->incrementReadCount(shareUUID);
 		}
 		else
 		{

@@ -43,6 +43,7 @@ processListCommand(Share::IShareManager& shareManager, bool details)
 
 		std::cout << "Share '" << share.uuid.toString()
 				<< "', expires " << share.expiryTime.toString() << " UTC, "
+				<< "created by '" << share.creatorAddress << "', "
 				<< share.size << " bytes" << ", "
 				<< share.files.size() << " file" << (share.files.size() == 1 ? "" : "s") << ", "
 				<< share.readCount << " download" << (share.readCount > 1 ? "s" : "") << std::endl;
