@@ -40,7 +40,7 @@ namespace Share
 			ShareManager& operator=(ShareManager&&) = delete;
 
 		private:
-			FileSize				getMaxShareSize() const override { return _shareMaxSize; }
+			FileSize				getMaxShareSize() const override { return _maxShareSize; }
 			std::chrono::seconds	getMaxValidityPeriod() const override { return _maxValidityPeriod; }
 			std::chrono::seconds	getDefaultValidityPeriod() const override { return _defaultValidityPeriod; }
 			std::size_t				getMaxValidatityHits() const override { return _maxValidityHits; }
@@ -61,7 +61,7 @@ namespace Share
 			std::unique_ptr<ShareCleaner>	_shareCleaner;
 			Wt::Auth::PasswordVerifier	_passwordVerifier;
 
-			const FileSize 				_shareMaxSize {};
+			const FileSize 				_maxShareSize {};
 			const std::chrono::seconds	_maxValidityPeriod {};
 			const std::chrono::seconds	_defaultValidityPeriod {};
 			const std::size_t			_maxValidityHits {};

@@ -79,6 +79,7 @@ namespace UserInterface
 		_drop->tooLarge().connect([=](const Wt::WFileDropWidget::File* file, std::uint64_t size)
 		{
 			FS_LOG(UI, ERROR) << "File '" << file->clientFileName() << "' is too large: " << size;
+			// TODO
 		});
 
 		_shareSize = bindNew<Wt::WText>("share-size");
@@ -223,7 +224,7 @@ namespace UserInterface
 			filesParameters.emplace_back(std::move(fileParameters));
 		});
 
-		// two steps to minimize possibilities of throw (although we delete orphan uploaded files in the cleaner)
+		// two steps to minimize possibilities of throw (TODO delete orphan uploaded files in the cleaner)
 		visitUploadedFiles([&](const Wt::WFileDropWidget::File& file)
 		{
 			file.uploadedFile().stealSpoolFile();

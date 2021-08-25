@@ -74,7 +74,7 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 		pt.put("server.application-settings.<xmlattr>.location", "*");
 		pt.put("server.application-settings.log-file", wtLogFilePath.string());
 		pt.put("server.application-settings.log-config", Service<IConfig>::get()->getString("log-config", "* -debug -info:WebRequest"));
-		pt.put("server.application-settings.max-request-size", Service<IConfig>::get()->getULong("max-file-size", 100) * 1024 /* kB */);
+		pt.put("server.application-settings.max-request-size", Service<IConfig>::get()->getULong("max-share-size", 100) * 1024 /* kB */);
 
 		if (Service<IConfig>::get()->getBool("behind-reverse-proxy", false))
 		{

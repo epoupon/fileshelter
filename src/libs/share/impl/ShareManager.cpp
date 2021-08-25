@@ -97,7 +97,7 @@ namespace Share
 	ShareManager::ShareManager(const std::filesystem::path& dbFile, bool enableCleaner)
 	: _db {dbFile}
 	, _shareCleaner {enableCleaner ? std::make_unique<ShareCleaner>(_db) : nullptr}
-	, _shareMaxSize {Service<IConfig>::get()->getULong("max-share-size", 100) * 1024 * 1024}
+	, _maxShareSize {Service<IConfig>::get()->getULong("max-share-size", 100) * 1024 * 1024}
 	, _maxValidityPeriod {std::chrono::hours {24} * Service<IConfig>::get()->getULong("max-validity-days", 100)}
 	, _defaultValidityPeriod {std::chrono::hours {24} * Service<IConfig>::get()->getULong("default-validity-days", 7)}
 	, _canValidityPeriodBeSet {Service<IConfig>::get()->getBool("user-defined-validy-days", true)}
@@ -106,7 +106,7 @@ namespace Share
 		_passwordVerifier.addHashFunction(std::move(hashFunc));
 
 		// config validation
-		if (_shareMaxSize == 0)
+		if (_maxShareSize == 0)
 			throw Exception {"max-share-size must be greater than 0"};
 		if (_maxValidityPeriod.count() == 0)
 			throw Exception {"max-validity-days must be greater than 0"};
@@ -117,6 +117,8 @@ namespace Share
 			throw Exception {"max-validity-days must be greater than default-validity-days"};
 
 		FS_LOG(SHARE, DEBUG) << "Started share manager";
+		FS_LOG(SHARE, DEBUG) << "Max share size = " << _maxShareSize << " bytes";
+		FS_LOG(SHARE, DEBUG) << "Max validity period = " << std::chrono::duration_cast<std::chrono::hours>(_maxValidityPeriod).count() / 24 << " days";
 	}
 
 	ShareManager::~ShareManager()
@@ -274,7 +276,7 @@ namespace Share
 		for (std::size_t i {}; i < files.size(); ++i)
 			shareSize += fileSizes[i];
 
-		if (shareSize >= _shareMaxSize)
+		if (shareSize >= _maxShareSize)
 			throw ShareTooLargeException {};
 	}
 
