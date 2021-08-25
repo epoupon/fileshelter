@@ -177,8 +177,21 @@ namespace UserInterface
 	std::chrono::seconds
 	ShareCreateFormModel::getValidityPeriod() const
 	{
-		// TODO
-		return std::chrono::hours {48};
+		const std::size_t val {static_cast<std::size_t>(Wt::asNumber(value(ValidityPeriodField)))};
+
+		auto unit {valueText(ValidityPeriodUnitField)};
+		if (unit == Wt::WString::tr("msg-duration-hours"))
+			return std::chrono::hours {val};
+		else if (unit == Wt::WString::tr("msg-duration-days"))
+			return std::chrono::hours {val * 24};
+		else if (unit == Wt::WString::tr("msg-duration-weeks"))
+			return std::chrono::hours {24 * 7 * val};
+		else if (unit == Wt::WString::tr("msg-duration-months"))
+			return std::chrono::hours {24 * 31 * val};
+		else if (unit == Wt::WString::tr("msg-duration-years"))
+			return std::chrono::hours {24 * 365 * val};
+
+		return {};
 	}
 
 }

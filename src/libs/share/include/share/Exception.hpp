@@ -30,7 +30,7 @@ namespace Share
 	class ShareNotFoundException : public Exception
 	{
 		public:
-			ShareNotFoundException() : Exception {"Share not found!"} {}
+			ShareNotFoundException() : Exception {"Share not found"} {}
 	};
 	class FileException : public Exception
 	{
@@ -47,5 +47,11 @@ namespace Share
 	{
 		public:
 			ShareTooLargeException() : Exception {"Share too large"} {}
+	};
+
+	class OutOfRangeValidityPeriod : public Exception
+	{
+		public:
+			OutOfRangeValidityPeriod() : Exception {"Validity period out of range"} {}
 	};
 }

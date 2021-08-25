@@ -135,7 +135,8 @@ namespace Share
 		const std::vector<FileSize> fileSizes {computeFileSizes(filesParameters)};
 		validateFileSizes(filesParameters, fileSizes);
 
-		// TODO validity period!!
+		if (shareParameters.validityPeriod > _maxValidityPeriod)
+			throw OutOfRangeValidityPeriod {};
 
 		std::optional<Wt::Auth::PasswordHash> passwordHash;
 		if (!shareParameters.password.empty())
