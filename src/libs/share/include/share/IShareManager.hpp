@@ -42,7 +42,6 @@ namespace Share
 			virtual ~IShareManager() = default;
 
 			virtual FileSize				getMaxShareSize() const = 0;
-			virtual FileSize				getMaxFileSize() const = 0;
 
 			virtual std::chrono::seconds	getMaxValidityPeriod() const = 0;
 			virtual std::chrono::seconds	getDefaultValidityPeriod() const = 0;

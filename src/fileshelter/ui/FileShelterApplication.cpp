@@ -101,8 +101,6 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env)
 	requireJQuery("js/jquery-1.10.2.min.js");
 	require("js/bootstrap.min.js");
 
-	addMetaHeader(Wt::MetaHeaderType::Meta, "viewport", "width=device-width, user-scalable=no");
-
 	// Resouce bundles
 	messageResourceBundle().use(appRoot() + "templates");
 	messageResourceBundle().use(appRoot() + "messages");

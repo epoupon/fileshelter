@@ -114,7 +114,7 @@ server {
     proxy_request_buffering off;
     proxy_buffering off;
     proxy_buffer_size 4k;
-    client_max_body_size 256M; # Make the number the same as 'max-file-size' in fileshelter.conf
+    client_max_body_size 100M; # Make the number the same as 'max-share-size' in fileshelter.conf
 
     location / {
 

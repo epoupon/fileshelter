@@ -37,12 +37,6 @@ namespace Share
 		public:
 			FileException(std::string_view message) : Exception {message} {}
 	};
-
-	class FileTooLargeException : public Exception
-	{
-		public:
-			FileTooLargeException() : Exception {"File too large"} {}
-	};
 	class ShareTooLargeException : public Exception
 	{
 		public:

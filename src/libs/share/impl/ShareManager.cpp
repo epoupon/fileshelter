@@ -98,9 +98,8 @@ namespace Share
 	: _db {dbFile}
 	, _shareCleaner {enableCleaner ? std::make_unique<ShareCleaner>(_db) : nullptr}
 	, _shareMaxSize {Service<IConfig>::get()->getULong("max-share-size", 100) * 1024 * 1024}
-	, _fileMaxSize {Service<IConfig>::get()->getULong("max-file-size", 100) * 1024 * 1024}
 	, _maxValidityPeriod {std::chrono::hours {24} * Service<IConfig>::get()->getULong("max-validity-days", 100)}
-	, _defaultValidityPeriod {std::chrono::hours {24} * Service<IConfig>::get()->getULong("default-validity-days", 100)}
+	, _defaultValidityPeriod {std::chrono::hours {24} * Service<IConfig>::get()->getULong("default-validity-days", 7)}
 	, _canValidityPeriodBeSet {Service<IConfig>::get()->getBool("user-defined-validy-days", true)}
 	{
 		auto hashFunc {std::make_unique<Wt::Auth::BCryptHashFunction>(static_cast<int>(Service<IConfig>::get()->getULong("bcrypt-count", 12)))};
@@ -109,8 +108,6 @@ namespace Share
 		// config validation
 		if (_shareMaxSize == 0)
 			throw Exception {"max-share-size must be greater than 0"};
-		if (_fileMaxSize == 0)
-			throw Exception {"max-file-size must be greater than 0"};
 		if (_maxValidityPeriod.count() == 0)
 			throw Exception {"max-validity-days must be greater than 0"};
 		if (_defaultValidityPeriod.count() == 0)
@@ -133,7 +130,7 @@ namespace Share
 		FS_LOG(SHARE, DEBUG) << "Creating share! nb files = " << filesParameters.size();
 
 		const std::vector<FileSize> fileSizes {computeFileSizes(filesParameters)};
-		validateFileSizes(filesParameters, fileSizes);
+		validateShareSizes(filesParameters, fileSizes);
 
 		if (shareParameters.validityPeriod > _maxValidityPeriod)
 			throw OutOfRangeValidityPeriod {};
@@ -270,17 +267,12 @@ namespace Share
 	}
 
 	void
-	ShareManager::validateFileSizes(const std::vector<FileCreateParameters>& files, const std::vector<FileSize>& fileSizes)
+	ShareManager::validateShareSizes(const std::vector<FileCreateParameters>& files, const std::vector<FileSize>& fileSizes)
 	{
 		FileSize shareSize {};
 
 		for (std::size_t i {}; i < files.size(); ++i)
-		{
-			if (fileSizes[i] > _fileMaxSize)
-				throw FileTooLargeException {};
-
 			shareSize += fileSizes[i];
-		}
 
 		if (shareSize >= _shareMaxSize)
 			throw ShareTooLargeException {};

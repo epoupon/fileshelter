@@ -41,7 +41,6 @@ namespace Share
 
 		private:
 			FileSize				getMaxShareSize() const override { return _shareMaxSize; }
-			FileSize				getMaxFileSize() const override { return _fileMaxSize; }
 			std::chrono::seconds	getMaxValidityPeriod() const override { return _maxValidityPeriod; }
 			std::chrono::seconds	getDefaultValidityPeriod() const override { return _defaultValidityPeriod; }
 			std::size_t				getMaxValidatityHits() const override { return _maxValidityHits; }
@@ -55,7 +54,7 @@ namespace Share
 			void			visitShares(std::function<void(const ShareDesc&)>) override;
 			void			incrementReadCount(const ShareUUID& shareUUID) override;
 
-			void			validateFileSizes(const std::vector<FileCreateParameters>& files, const std::vector<FileSize>& fileSizes);
+			void			validateShareSizes(const std::vector<FileCreateParameters>& files, const std::vector<FileSize>& fileSizes);
 
 			Db _db;
 
@@ -63,7 +62,6 @@ namespace Share
 			Wt::Auth::PasswordVerifier	_passwordVerifier;
 
 			const FileSize 				_shareMaxSize {};
-			const FileSize 				_fileMaxSize {};
 			const std::chrono::seconds	_maxValidityPeriod {};
 			const std::chrono::seconds	_defaultValidityPeriod {};
 			const std::size_t			_maxValidityHits {};

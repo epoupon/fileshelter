@@ -110,7 +110,7 @@ namespace Share
 			{
 				std::error_code ec;
 				std::filesystem::remove(file->getPath(), ec);
-				if (!ec)
+				if (ec)
 					FS_LOG(SHARE, ERROR) << "Cannot remove file '" << file->getPath().string() << "' from share '" << share->getUUID().toString() << "': " << ec.message();
 			}
 		});
