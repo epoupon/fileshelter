@@ -26,7 +26,6 @@
 
 namespace UserInterface::ShareUtils
 {
-	std::string						getDownloadURL(const Share::ShareUUID& shareUUID);
 	std::unique_ptr<Wt::WAnchor>	createShareDownloadAnchor(const Share::ShareUUID& shareUUID);
 	std::unique_ptr<Wt::WAnchor>	createShareEditAnchor(const Share::ShareEditUUID& shareEditUUID);
 	Wt::WString						fileSizeToString(Share::FileSize size);

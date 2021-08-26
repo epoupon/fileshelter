@@ -27,12 +27,11 @@
 namespace UserInterface::ShareUtils
 {
 
+	static
 	std::string
-	getDownloadURL(const Share::ShareUUID& shareUUID)
+	computeURL(const std::string& internalPath)
 	{
-		const std::string downloadPath {"/share-download/" + shareUUID.toString()};
-
-		return wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + wApp->environment().deploymentPath() + downloadPath;
+		return wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + (wApp->environment().deploymentPath() == "/" ? "" : wApp->environment().deploymentPath()) + internalPath;
 	}
 
 	std::unique_ptr<Wt::WAnchor>
@@ -40,7 +39,7 @@ namespace UserInterface::ShareUtils
 	{
 		const std::string downloadPath {"/share-download/" + shareUUID.toString()};
 
-		return std::make_unique<Wt::WAnchor>(Wt::WLink {Wt::LinkType::InternalPath, downloadPath}, wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + wApp->environment().deploymentPath() + downloadPath);
+		return std::make_unique<Wt::WAnchor>(Wt::WLink {Wt::LinkType::InternalPath, downloadPath}, computeURL(downloadPath));
 	}
 
 	std::unique_ptr<Wt::WAnchor>
@@ -48,7 +47,7 @@ namespace UserInterface::ShareUtils
 	{
 		const std::string editPath {"/share-edit/" + shareEditUUID.toString()};
 
-		return std::make_unique<Wt::WAnchor>(Wt::WLink {Wt::LinkType::InternalPath, editPath}, wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + wApp->environment().deploymentPath() + editPath);
+		return std::make_unique<Wt::WAnchor>(Wt::WLink {Wt::LinkType::InternalPath, editPath}, computeURL(editPath));
 	}
 
 	template <typename T>
