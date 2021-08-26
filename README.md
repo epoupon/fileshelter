@@ -7,22 +7,22 @@ Just upload one or more files and get an URL back!
 
 A [demo](http://fileshelter.demo.poupon.io) instance is available, with the following limitations:
 - Maximum duration is set to 3 days
-- Maximum download limit is set to 10
 - Maximum file size is set to 1 MB
 
-A [docker image](https://github.com/paulgalow/fileshelter-docker) is available, thanks to Paul Galow.
-
 ## Features
-- Period of validity (from one hour to years)
-- Customizable interface to set the duration validity
-- Optional password protection (download and upload)
+- Period of validity, from one hour to many years
+- Optional password protection (download and/or upload)
 - Practically unique links, using [UUID](https://fr.wikipedia.org/wiki/Universal_Unique_Identifier)
-- Private links, used to remove the files or to check the download counters
-- Terms of service support
-- Multiple language support (english, french, german, russian)
+- Private edit links, used to remove the files or to check the download counters
+- Terms Of Service support, fully or partially customizable
+- Multiple language support
 - Low memory requirements: the demo instance runs on a _Raspberry Pi Zero W_
 
-Once the expiry date or the download limit is reached, the download is no longer available and the file is deleted.
+Once the expiry date is reached, the share is no longer available for download. The files are actually deleted roughly two hours after the share has expired. This is to make sure to not interupt any ongoing download.
+
+## Command line tools
+`fileshelter-list`: list all the shares available for download
+`fileshelter-create`: create a share using local files. The files are _not_ copied in the _Fileshelter_'s working directory. Therefore the files must still exist while the share is avalaible for download. The files are _not_ deleted once the share has expired.
 
 ## Installation
 
