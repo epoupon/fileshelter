@@ -19,8 +19,8 @@ A [demo](http://fileshelter.demo.poupon.io) instance is available, with the foll
 Once the expiry date is reached, the share is no longer available for download. The files are actually deleted roughly two hours after the share has expired. This is to make sure to not interupt any ongoing download.
 
 ## Command line tools
-`fileshelter-list`: list all the shares available for download
-`fileshelter-create`: create a share using local files. The files are _not_ copied in the _Fileshelter_'s working directory. Therefore the files must still exist while the share is avalaible for download. The files are _not_ deleted once the share has expired.
+* `fileshelter-list`: list all the shares available for download
+* `fileshelter-create`: create a share using local files. The files are _not_ copied in the _Fileshelter_'s working directory. Therefore the files must still exist while the share is avalaible for download. The files are _not_ deleted once the share has expired.
 
 ## Installation
 
