@@ -19,6 +19,8 @@
 
 #include "ShareCleaner.hpp"
 
+#include <Wt/WLocalDateTime.h>
+
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
 #include "Db.hpp"
@@ -64,12 +66,16 @@ namespace Share
 	{
 		FS_LOG(SHARE, DEBUG) << "Checking expired shares...";
 
+		const auto now {Wt::WLocalDateTime::currentServerDateTime().toUTC()};
+
 		Wt::Dbo::Session& session {_db.getTLSSession()};
 		Wt::Dbo::Transaction transaction {session};
 
-		Share::visitAll(session, [](Share::pointer& share)
+		Share::visitAll(session, [&now](Share::pointer& share)
 		{
-			if (share->isExpired())
+			// give some extra time for the share before actually removing it
+			// -> make any ongoing downloads a chance to complete before deleting the share
+			if (now > share->getExpiryTime().addSecs(3600*2))
 			{
 				FS_LOG(SHARE, INFO) << "Removing expired share '" << share->getUUID().toString() << "'";
 				Share::destroy(share);

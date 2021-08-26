@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
 
 		std::chrono::seconds validityPeriod {};
 		if (vm.count("validity-hours"))
-			validityPeriod = std::chrono::seconds {vm["validity-hours"].as<unsigned>()};
+			validityPeriod = std::chrono::hours {vm["validity-hours"].as<unsigned>()};
 		else if (vm.count("validity-days"))
 			validityPeriod = std::chrono::hours {vm["validity-days"].as<unsigned>()} * 24;
 		else

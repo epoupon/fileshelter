@@ -171,7 +171,7 @@ namespace Share
 		Wt::Dbo::Transaction transaction {session};
 
 		Share::pointer share {Share::getByEditUUID(session, shareEditUUID)};
-		if (!share)
+		if (!share || share->isExpired())
 			throw ShareNotFoundException {};
 
 		Share::destroy(share);
@@ -184,7 +184,7 @@ namespace Share
 		Wt::Dbo::Transaction transaction {session};
 
 		const Share::pointer share {Share::getByUUID(session, shareUUID)};
-		if (!share)
+		if (!share || share->isExpired())
 			throw ShareNotFoundException {};
 
 		return share->hasPassword();
@@ -202,7 +202,7 @@ namespace Share
 			Wt::Dbo::Transaction transaction {session};
 
 			const Share::Share::pointer share {Share::Share::getByUUID(session, shareUUID)};
-			if (!share)
+			if (!share || share->isExpired())
 				throw ShareNotFoundException {};
 
 			if ((!share->hasPassword() && password) || (share->hasPassword() && !password))
@@ -230,7 +230,7 @@ namespace Share
 		Wt::Dbo::Transaction transaction {session};
 
 		const Share::pointer share {Share::getByEditUUID(session, shareEditUUID)};
-		if (!share)
+		if (!share || share->isExpired())
 			throw ShareNotFoundException {};
 
 		return shareToDesc(*share.get());
@@ -247,7 +247,8 @@ namespace Share
 
 			Share::visitAll(session, [&](const Share::pointer& share)
 			{
-				shares.push_back(shareToDesc(*share.get()));
+				if (!share->isExpired())
+					shares.push_back(shareToDesc(*share.get()));
 			});
 		}
 
