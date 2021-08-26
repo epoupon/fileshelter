@@ -64,7 +64,7 @@ namespace UserInterface::ShareUtils
 	{
 		if (size >= 1024 * 1024 * 1024)
 		{
-			return Wt::WString::tr("msg-size-gb").arg(to_string_with_precision(size / 1024 / 1024 / 1024., 0));
+			return Wt::WString::tr("msg-size-gb").arg(to_string_with_precision(size / 1024 / 1024 / 1024., 1));
 		}
 		if (size >= 1024 * 1024)
 		{

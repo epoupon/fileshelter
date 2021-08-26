@@ -78,8 +78,8 @@ namespace UserInterface
 
 		_drop->tooLarge().connect([=](const Wt::WFileDropWidget::File* file, std::uint64_t size)
 		{
-			FS_LOG(UI, ERROR) << "File '" << file->clientFileName() << "' is too large: " << size;
-			// TODO
+			FS_LOG(UI, DEBUG) << "File '" << file->clientFileName() << "' is too large: " << size;
+			checkFiles();
 		});
 
 		_shareSize = bindNew<Wt::WText>("share-size");
@@ -144,14 +144,13 @@ namespace UserInterface
 	void
 	ShareCreateFormView::deleteFile(Wt::WFileDropWidget::File& file)
 	{
-		_drop->cancelUpload(&file);
-		_drop->remove(&file); 			// may not work if current handled file is before this one
-		_deletedFiles.emplace(&file);	// hence this tracking
-
 		_totalSize -= file.size();
-
 		if (file.uploadFinished())
 			_totalReceivedSize -= file.size();
+
+		_drop->cancelUpload(&file);
+		if (!_drop->remove(&file)) 			// may not work if current handled file is before this one
+			_deletedFiles.emplace(&file);	// hence this tracking
 
 		_sigProgressUpdate.emit(getProgress());
 	}
