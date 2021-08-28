@@ -18,4 +18,4 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v2
             - name: Build
-              run: mkdir build && cd build && cmake .. -DCMAKE_RELEASE_TYPE=${{ matrix.BUILD_TYPE }} && make && make test
+              run: mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} && make && make test
