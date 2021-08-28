@@ -1,9 +1,9 @@
 name: Build
 on: [push]
 env:
-    WT_VERSION=4.5.0
-    WT_INSTALL_PREFIX=${GITHUB_WORKSPACE}-${WT_VERSION}
-    BUILD_TYPE=Release
+    WT_VERSION: 4.5.0
+    WT_INSTALL_PREFIX: ${GITHUB_WORKSPACE}-${WT_VERSION}
+    BUILD_TYPE: Release
 jobs:
     Build:
         runs-on: ubuntu-latest
