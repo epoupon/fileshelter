@@ -1,9 +1,10 @@
 name: Build
 on: [push]
-env:
-    BUILD_TYPE: Release
 jobs:
     Build:
+        strategy:
+            matrix:
+                BUILD_TYPE: [Release, Debug]
         runs-on: ubuntu-latest
         steps:
             - name: Custom wt repository
