@@ -11,7 +11,7 @@ jobs:
               with:
                   repo: deb https://debian.poupon.io/apt/debian buster main
                   repo-name: epoupon
-                  key-asc: https://debian.poupon.io/apt/debian/epoupon.gpg.key
+                  keys-asc: https://debian.poupon.io/apt/debian/epoupon.gpg.key
             - name: Checkout
               uses: actions/checkout@v2
             - name: Install dependencies
