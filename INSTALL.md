@@ -24,7 +24,7 @@ __Note__: this installation process and the default values of the configuration 
 ### Debian/Ubuntu dependencies
 __Note__: a C++17 compiler is needed to compile _fileshelter_
 ```sh
-apt-get install build-essential autoconf automake libboost-dev libconfig++-dev libzip-dev
+apt-get install build-essential cmake libboost-dev libconfig++-dev
 ```
 
 You also need _Wt4_, that is not packaged yet on _Debian_. See [installation instructions](https://www.webtoolkit.eu/wt/doc/reference/html/InstallationUnix.html).
@@ -33,16 +33,17 @@ You also need _Wt4_, that is not packaged yet on _Debian_. See [installation ins
 ```sh
 git clone https://github.com/epoupon/fileshelter.git fileshelter
 cd fileshelter
-autoreconf -vfi
 mkdir build
 cd build
-../configure --prefix=/usr
+cmake .. -DCMAKE_BUILD_TYPE=Release
 ```
-configure will complain if a mandatory library is missing.
+cmake will complain if a mandatory library is missing.
+__Note__: you can customize the installation directory using `-DCMAKE_INSTALL_PREFIX=path` (defaults to `/usr/local`).
 
 ```sh
 make
 ```
+__Note__: you can use `make -jN` to speed up compilation time (N is the number of compilation workers to spawn).
 
 ### Installation
 

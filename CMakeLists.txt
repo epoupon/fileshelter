@@ -14,7 +14,6 @@ find_package(Filesystem REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system program_options)
 find_package(Wt REQUIRED COMPONENTS Wt Dbo DboSqlite3 HTTP)
 pkg_check_modules(Config++ REQUIRED IMPORTED_TARGET libconfig++)
-find_package(GTest REQUIRED)
 
 # WT
 if (NOT Wt_FOUND)
