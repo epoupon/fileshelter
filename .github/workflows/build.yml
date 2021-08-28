@@ -12,7 +12,9 @@ jobs:
                   repo: deb https://debian.poupon.io/apt/debian buster main
                   repo-name: epoupon
                   keys-asc: https://debian.poupon.io/apt/debian/epoupon.gpg.key
+            - name: Install dependencies
+              run: sudo apt-get install --no-install-recommends build-essential cmake libboost-dev libconfig++-dev libwt4-dev
             - name: Checkout
               uses: actions/checkout@v2
-            - name: Install dependencies
-              run: sudo apt-get install --no-install-recommends build-essential cmake libboost-all-dev libconfig++-dev libwt4-dev
+            - name: Build
+              run: mkdir build && cd build && cmake -DCMAKE_RELEASE_TYPE=${BUILD_TYPE} && make && make test
