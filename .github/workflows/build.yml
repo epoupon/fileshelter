@@ -13,7 +13,7 @@ jobs:
                   repo-name: epoupon
                   keys-asc: https://debian.poupon.io/apt/debian/epoupon.gpg.key
             - name: Install dependencies
-              run: sudo apt-get install --no-install-recommends build-essential cmake libboost-dev liboost-system-dev libconfig++-dev libwt4-dev
+              run: sudo apt-get install --no-install-recommends build-essential cmake libboost-dev libboost-system-dev libconfig++-dev libwt4-dev
             - name: Checkout
               uses: actions/checkout@v2
             - name: Build
