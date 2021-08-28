@@ -1,8 +1,6 @@
 name: Build
 on: [push]
 env:
-    WT_VERSION: 4.5.0
-    WT_INSTALL_PREFIX: ${GITHUB_WORKSPACE}-${WT_VERSION}
     BUILD_TYPE: Release
 jobs:
     Build:
@@ -12,12 +10,11 @@ jobs:
               uses: actions/checkout@v2
             - name: Install dependencies
               run: sudo apt-get install --no-install-recommends build-essential cmake libboost-all-dev libconfig++-dev
-            - name: Install Wt
-              uses: actions/checkout@v2
+            - name: Install Wt dependency
+              uses: myci-actions/add-deb-repo@10
               with:
-                  repository: emweb/wt
-                  ref: 4.5.0
-                  path: wt
-            - name: Build Wt
-              run: cd wt && mkdir build && cd build && cmake -DCMAKE_PREFIX_PATH=${WT_INSTALL_PREFIX} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} .. && make && make test
+                  repo: deb https://debian.poupon.io/apt/debian buster main
+                  repo-name: epoupon
+                  key-asc: https://debian.poupon.io/apt/debian/epoupon.gpg.key
+              run: sudo apt-get install --no-install-recommends libwt4-dev
 
