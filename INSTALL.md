@@ -38,6 +38,7 @@ cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 ```
 cmake will complain if a mandatory library is missing.
+
 __Note__: you can customize the installation directory using `-DCMAKE_INSTALL_PREFIX=path` (defaults to `/usr/local`).
 
 ```sh
