@@ -83,6 +83,7 @@ namespace UserInterface
 		ShareCreatePassword* view {addNew<ShareCreatePassword>()};
 		view->success().connect([=]
 		{
+			clear();
 			displayCreate();
 		});
 	}
