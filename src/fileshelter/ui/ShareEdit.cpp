@@ -104,7 +104,8 @@ namespace UserInterface
 						Service<Share::IShareManager>::get()->destroyShare(editUUID);
 						displayRemoved();
 					}
-					deleteBtn->removeChild(messageBox);
+					else
+						deleteBtn->removeChild(messageBox);
 				}
 				catch (const Share::ShareNotFoundException& e)
 				{
