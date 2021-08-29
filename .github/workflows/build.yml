@@ -41,4 +41,4 @@ jobs:
           context: docker/
           file: ./Dockerfile
           push: false
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/fileshelter:${{ GITHUB_SHA }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/fileshelter:$GITHUB_SHA
