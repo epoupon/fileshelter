@@ -97,12 +97,20 @@ namespace UserInterface
 
 			messageBox->buttonClicked().connect([=] (Wt::StandardButton btn)
 			{
-				if (btn == Wt::StandardButton::Yes)
+				try
 				{
-					Service<Share::IShareManager>::get()->destroyShare(editUUID);
-					displayRemoved();
+					if (btn == Wt::StandardButton::Yes)
+					{
+						Service<Share::IShareManager>::get()->destroyShare(editUUID);
+						displayRemoved();
+					}
+					deleteBtn->removeChild(messageBox);
 				}
-				deleteBtn->removeChild(messageBox);
+				catch (const Share::ShareNotFoundException& e)
+				{
+					FS_LOG(UI, DEBUG) << "Share already removed!";
+					displayShareNotFound();
+				}
 			});
 
 			messageBox->show();

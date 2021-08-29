@@ -167,6 +167,8 @@ namespace Share
 	void
 	ShareManager::destroyShare(const ShareEditUUID& shareEditUUID)
 	{
+		FS_LOG(UI, DEBUG) << "Destroying share edit = '" << shareEditUUID.toString() << "...";
+
 		Wt::Dbo::Session& session {_db.getTLSSession()};
 		Wt::Dbo::Transaction transaction {session};
 
@@ -175,6 +177,8 @@ namespace Share
 			throw ShareNotFoundException {};
 
 		Share::destroy(share);
+
+		FS_LOG(UI, DEBUG) << "Destroying share edit = '" << shareEditUUID.toString() << " destroyed!";
 	}
 
 	bool
