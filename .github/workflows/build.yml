@@ -3,7 +3,7 @@ on: [push, pull_request]
 jobs:
   Build:
     strategy:
-	  matrix:
+      matrix:
         BUILD_TYPE: [Release, Debug]
     runs-on: ubuntu-latest
     steps:
