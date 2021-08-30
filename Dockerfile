@@ -39,11 +39,7 @@ RUN \
 	make install
 
 # Fileshelter
-ARG	FILESHELTER_VERSION=master
-RUN \
-	DIR=/tmp/fileshelter && mkdir -p ${DIR} && cd ${DIR} && \
-	curl -sL https://github.com/epoupon/fileshelter/archive/${FILESHELTER_VERSION}.tar.gz -o ${FILESHELTER_VERSION}.tar.gz && \
-	tar -x --strip-components=1 -f ${FILESHELTER_VERSION}.tar.gz
+COPY . /tmp/fileshelter/
 
 RUN \
 	DIR=/tmp/fileshelter && mkdir -p ${DIR} && cd ${DIR} && \

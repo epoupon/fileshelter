@@ -38,7 +38,10 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: docker/
+          context: ./
           file: ./Dockerfile
           push: false
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/fileshelter:$GITHUB_SHA
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/fileshelter:latest
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+
