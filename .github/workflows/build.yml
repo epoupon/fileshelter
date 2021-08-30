@@ -22,6 +22,8 @@ jobs:
 
   Docker:
     name: Docker images
+    environment:
+      name: Docker
     runs-on: ubuntu-latest
     steps:
       - name: Check Out Repo
