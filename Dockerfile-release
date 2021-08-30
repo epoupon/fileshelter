@@ -2,8 +2,6 @@ FROM	alpine:3.13 AS build
 
 WORKDIR	/tmp/workdir
 
-ARG	MAKEFLAGS="-j2"
-
 ARG	PREFIX="/tmp/install"
 
 ARG	BUILD_PACKAGES=" \

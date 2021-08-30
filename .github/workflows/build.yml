@@ -21,6 +21,9 @@ jobs:
         run: mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} && make && make test
 
   Build-armv6:
+    strategy:
+      matrix:
+        BUILD_TYPE: [Release, Debug]
     runs-on: ubuntu-latest
     steps:
       - name: Check Out Repo
@@ -47,6 +50,7 @@ jobs:
           context: ./
           file: ./Dockerfile-build
           builder: ${{ steps.buildx.outputs.name }}
+          build-args: FILESHELTER_BUILD_TYPE=${{ matrix.BUILD_TYPE }}
           push: false
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
