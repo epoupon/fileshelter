@@ -26,15 +26,15 @@ ARG	BUILD_PACKAGES=" \
 RUN	apk add --no-cache --update ${BUILD_PACKAGES}
 
 # WT
-ARG	WT_VERSION=4.5.0
+ARG	WT_VERSION=4.5.0-r1
 RUN \
 	DIR=/tmp/wt && mkdir -p ${DIR} && cd ${DIR} && \
-	curl -sLO https://github.com/emweb/wt/archive/${WT_VERSION}.tar.gz && \
+	curl -sLO https://github.com/epoupon/wt/archive/${WT_VERSION}.tar.gz && \
 	tar -x --strip-components=1 -f ${WT_VERSION}.tar.gz
 
 RUN \
 	DIR=/tmp/wt && mkdir -p ${DIR} && cd ${DIR} && \
-	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${PREFIX} -DBUILD_EXAMPLES=OFF -DENABLE_LIBWTTEST=OFF -DCONNECTOR_FCGI=OFF && \
+	cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${PREFIX} -DBUILD_EXAMPLES=OFF -DENABLE_LIBWTTEST=OFF -DCONNECTOR_FCGI=OFF && \
 	make && \
 	make install
 
