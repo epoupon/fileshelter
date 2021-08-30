@@ -1,4 +1,7 @@
 # Installation
+## From Docker images
+Official _Docker_ images are available, please see detailed instructions at https://hub.docker.com/r/epoupon/fileshelter.
+
 ## From packages
 ### Debian Buster packages
 
