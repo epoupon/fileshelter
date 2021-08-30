@@ -59,7 +59,7 @@ namespace UserInterface::ShareUtils
 	}
 
 	Wt::WString
-	fileSizeToString(std::size_t size)
+	fileSizeToString(Share::FileSize size)
 	{
 		if (size >= 1024 * 1024 * 1024)
 		{
