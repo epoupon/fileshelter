@@ -12,7 +12,6 @@ ARG	BUILD_PACKAGES=" \
 	bzip2 \
 	pkgconfig \
 	coreutils \
-	libtool \
 	g++ \
 	make \
 	curl \
@@ -20,8 +19,7 @@ ARG	BUILD_PACKAGES=" \
 	zlib-dev \
 	openssl-dev \
 	boost-dev \
-	libconfig-dev \
-	gtest-dev"
+	libconfig-dev"
 
 RUN	apk add --no-cache --update ${BUILD_PACKAGES}
 

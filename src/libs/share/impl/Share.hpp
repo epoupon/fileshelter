@@ -98,7 +98,7 @@ namespace Share
 			ShareUUID			_uuid;
 			ShareEditUUID		_editUuid;
 
-			std::size_t	_readCount {};
+			long long _readCount {};
 
 			Wt::Dbo::collection<Wt::Dbo::ptr<File>> _files;
 	};

@@ -1,0 +1,29 @@
+FROM	alpine:3.13 AS build
+
+WORKDIR	/tmp/workdir
+
+ARG	MAKEFLAGS="-j2"
+
+ARG	BUILD_PACKAGES=" \
+	ca-certificates \
+	pkgconfig \
+	g++ \
+	make \
+	cmake \
+	zlib-dev \
+	boost-dev \
+	libconfig-dev \
+	wt-dev"
+
+RUN	apk add --no-cache --update ${BUILD_PACKAGES}
+
+# Fileshelter
+COPY . /tmp/fileshelter/
+
+ARG FILESHELTER_BUILD_TYPE="Release"
+RUN \
+	DIR=/tmp/fileshelter && mkdir -p ${DIR} && cd ${DIR} && \
+	cmake . -DCMAKE_BUILD_TYPE=${FILESHELTER_BUILD_TYPE} && \
+	VERBOSE=1 make && \
+	make test
+
