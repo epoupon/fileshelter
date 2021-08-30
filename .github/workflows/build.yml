@@ -20,7 +20,7 @@ jobs:
       - name: Build
         run: mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} && make && make test
 
-  Build (armv6):
+  Build-armv6:
     runs-on: ubuntu-latest
     steps:
       - name: Check Out Repo
