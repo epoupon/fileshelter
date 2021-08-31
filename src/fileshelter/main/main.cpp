@@ -19,6 +19,7 @@
 
 #include <filesystem>
 #include <iostream>
+#include <thread>
 
 #include <boost/property_tree/xml_parser.hpp>
 
@@ -42,6 +43,7 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 	const std::filesystem::path wtLogFilePath {Service<IConfig>::get()->getPath("log-file", "")};
 	const std::filesystem::path wtAccessLogFilePath {Service<IConfig>::get()->getPath("access-log-file", "")};
 	const std::filesystem::path userMsgPath {Service<IConfig>::get()->getPath("working-dir") / "user_messages.xml"};
+	const unsigned long configHttpServerThreadCount {Service<IConfig>::get()->getULong("http-server-thread-count", 0)};
 
 	args.push_back(execPath);
 	args.push_back("--config=" + wtConfigPath.string());
@@ -65,6 +67,12 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 	{
 		args.push_back("--http-port=" + std::to_string( Service<IConfig>::get()->getULong("listen-port", 5081)));
 		args.push_back("--http-address=" + std::string {Service<IConfig>::get()->getString("listen-addr", "0.0.0.0")});
+	}
+
+	{
+		// Reserve at least 2 threads since we still have some blocking IO (reading on disk)
+		const unsigned long httpServerThreadCount {configHttpServerThreadCount ? configHttpServerThreadCount : std::max<unsigned long>(2, std::thread::hardware_concurrency())};
+		args.push_back("--threads=" + std::to_string(httpServerThreadCount));
 	}
 
 	// Generate the wt_config.xml file
