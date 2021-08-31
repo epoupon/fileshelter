@@ -1,3 +1,12 @@
+- [Installation](#installation)
+  - [From Docker images](#from-docker-images)
+  - [From packages](#from-packages)
+  - [From source](#from-source)
+- [Deployment](#deployment)
+  - [Configuration](#configuration)
+  - [Reverse proxy settings](#reverse-proxy-settings)
+  - [Run](#run)
+
 # Installation
 ## From Docker images
 Official _Docker_ images are available, please see detailed instructions at https://hub.docker.com/r/epoupon/fileshelter.
@@ -102,7 +111,7 @@ _Fileshelter_ uses a configuration file, installed by default in `/etc/fileshelt
 A basic _Terms of Services_ is provided. The configuration file contains the definition of the fields needed by the default tos.
 You may also specify an alternate tos file to fit your needs.
 
-If a setting is not present in the configuration file, a hardcoded default value is used (the same as in the [default.conf](https://github.com/epoupon/fileshelter/blob/master/conf/fileshelter.conf) file)
+If a setting is not present in the configuration file, a hardcoded default value is used (the same as in the [default.conf](conf/fileshelter.conf) file)
 
 ## Reverse proxy settings
 _Fileshelter_ is shipped with an embedded web server, but it is recommended to deploy behind a reverse proxy. You have to set the _behind-reverse-proxy_ option to _true_ in the `fileshelter.conf` configuration file.
