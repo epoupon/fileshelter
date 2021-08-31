@@ -3,7 +3,56 @@ summary {
 	font-weight: bold;
 }
 
+.Wt-filedropzone {
+	cursor: pointer;
+	width: 200px;
+	height: 200px;
+	background-color: lightgrey;
+	border-radius: 15px;
+    transition: background-color 0.5s ease;
+	margin-bottom: 20px;
+}
+
+.Wt-filedropzone:hover {
+	background-color: darkgrey;
+}
+
+.fs-vertical-center {
+	display: flex;
+	align-items: center;
+}
+
+.fs-horizontal-center {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 .fs-nav {
 	line-height: 32px;
 }
 
+.fs-file-entry {
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+.fs-file-entry-btn-remove {
+	cursor: pointer;
+	margin-right: 8px;
+}
+
+.fs-file-entry-btn-remove:hover {
+	color: red;
+	transition: color .20s cubic-bezier(.43,-.1,.16,1.1);
+}
+
+.fs-file-entry-size {
+	margin-right: 8px;
+	min-width: 50px;
+	color: darkgrey;
+}
+
+.fs-collapsible-panel-header {
+	cursor: pointer;
+}

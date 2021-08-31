@@ -1,68 +1,54 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <messages xmlns:if="Wt.WTemplate.conditions">
-<!--FORMS message blocks-->
 
-<message id="msg-home-desc">
-	<p>${tr:msg-app-name} вашими файлами легко и быстро!</p>
-	<p>Просто загрузите и получите ссылку!</p>
-</message>
+	<message id="msg-bad-password">Неверный пароль</message>
+	<message id="msg-confirm-action">Вы уверены?</message>
 
-<message id="msg-tos">Правила пользования</message>
+	<message id="msg-delete">Удалить</message>
+	<message id="msg-description">Описание</message>
+	<message id="msg-download">Скачать</message>
+	<message id="msg-download-count">Загрузок</message>
+	<message id="msg-download-link">Публичная ссылка для загрузки</message>
+	<message id="msg-duration-days">Дней</message>
+	<message id="msg-duration-hours">Часов</message>
+	<message id="msg-duration-months">Месяцев</message>
+	<message id="msg-duration-weeks">Недель</message>
+	<message id="msg-duration-years">Лет</message>
+	<message id="msg-edit-link">Управление ссылкой</message>
+	<message id="msg-expires">Истекает</message>
 
-<message id="msg-home">Главная</message>
-<message id="msg-share-create">Поделиться</message>
-<message id="msg-share-edit">Редактировать</message>
-<message id="msg-share-download">Скачать</message>
-<message id="msg-share-not-found">Файл не найден!</message>
-<message id="msg-share-deleted">Файл удален!</message>
-<message id="msg-share-create-success">Загрузка успешна!</message>
-<message id="msg-upload">Загрузить</message>
-<message id="msg-download">Скачать</message>
-<message id="msg-delete">Удалить</message>
-<message id="msg-unlock">Разблокировать</message>
-<message id="msg-description">Описание</message>
-<message id="msg-file-name">Имя файла</message>
-<message id="msg-file-size">Размер файла</message>
-<message id="msg-file">Файл</message>
-<message id="msg-optional">Опционально</message>
-<message id="msg-hits">Загрузок</message>
-<message id="msg-share-delete">Удалить файл</message>
-<message id="msg-confirm-action">Вы уверены?</message>
-<message id="msg-bad-password">Неверный пароль</message>
-<message id="msg-internal-error">Внутренняя ошибка!</message>
-<message id="msg-share-protected-by-password">Этот файл защищен паролем !</message>
-<message id="msg-share-create-protected-by-password">Пароль обязателен !</message>
-<message id="msg-no-file-selected">Файл не выбран!</message>
-<message id="msg-max-file-size">максимальный размер файла не более {1}</message>
+	<message id="msg-max-share-size">максимальный размер файла не более {1}</message>
+	<message id="msg-optional">Опционально</message>
+	<message id="msg-password">Пароль</message>
+	<message id="msg-share-create">Поделиться</message>
+	<message id="msg-share-create-protected-by-password">Пароль обязателен !</message>
+	<message id="msg-share-create-success">Загрузка успешна!</message>
+	<message id="msg-share-delete">Удалить файл</message>
+	<message id="msg-share-deleted">Файл удален!</message>
+	<message id="msg-share-download">Скачать</message>
 
-<message id="msg-validity-period">Период доступности</message>
-<message id="msg-hours">Часов</message>
-<message id="msg-days">Дней</message>
-<message id="msg-weeks">Недель</message>
-<message id="msg-months">Месяцев</message>
-<message id="msg-years">Лет</message>
-<message id="msg-expires">Истекает</message>
+	<message id="msg-share-edit">Редактировать</message>
+	<message id="msg-share-not-found">Файл не найден!</message>
+	<message id="msg-share-protected-by-password">Этот файл защищен паролем !</message>
 
-<message id="msg-max-hits">Количество загрузок</message>
-<message id="msg-password">Пароль</message>
+	<message id="msg-size-b">{1} B</message>
+	<message id="msg-size-gb">{1} GB</message>
+	<message id="msg-size-kb">{1} KB</message>
+	<message id="msg-size-mb">{1} MB</message>
+	<message id="msg-tos">Правила пользования</message>
+	<message id="msg-unlock">Разблокировать</message>
 
-<message id="msg-download-link">Публичная ссылка для загрузки</message>
-<message id="msg-edit-link">Управление ссылкой</message>
-
-<message id="msg-share-create-too-large">Слишком болшой файл!</message>
-<message id="msg-share-create-failed">Ошибка создания ссылки!</message>
-<message id="msg-share-no-longer-available">Данный файл не существует!</message>
-
-<message id="Wt.WMessageBox.Yes">Да</message>
-<message id="Wt.WMessageBox.No">Нет</message>
-<message id="Wt.WValidator.Invalid">Это поле не может быть пустым</message>
-<message id="Wt.WDateValidator.DateTooEarly">Дата должна быть после {1}</message>
-<message id="Wt.WDateValidator.DateTooLate"> Дата должна быть до {1}</message>
-<message id="Wt.WDateValidator.WrongDateRange"> Дата должна быть между {1} и {2}</message>
-<message id="Wt.WDateValidator.WrongFormat">Формат '{1}'</message>
-<message id="Wt.WIntValidator.NotAnInteger">Должно быть целым числом</message>
-<message id="Wt.WIntValidator.TooSmall"> Число должно быть больше, чем {1}</message>
-<message id="Wt.WIntValidator.BadRange"> Число должно быть между {1} и {2}</message>
-<message id="Wt.WIntValidator.TooLarge"> Число должно быть меньше, чем {1}</message>
-
+	<message id="msg-upload">Загрузить</message>
+	<message id="msg-validity-period">Период доступности</message>
+	<message id="Wt.WDateValidator.DateTooEarly">Дата должна быть после {1}</message>
+	<message id="Wt.WDateValidator.DateTooLate"> Дата должна быть до {1}</message>
+	<message id="Wt.WDateValidator.WrongDateRange"> Дата должна быть между {1} и {2}</message>
+	<message id="Wt.WDateValidator.WrongFormat">Формат '{1}'</message>
+	<message id="Wt.WIntValidator.BadRange"> Число должно быть между {1} и {2}</message>
+	<message id="Wt.WIntValidator.NotAnInteger">Должно быть целым числом</message>
+	<message id="Wt.WIntValidator.TooLarge"> Число должно быть меньше, чем {1}</message>
+	<message id="Wt.WIntValidator.TooSmall"> Число должно быть больше, чем {1}</message>
+	<message id="Wt.WMessageBox.No">Нет</message>
+	<message id="Wt.WMessageBox.Yes">Да</message>
+	<message id="Wt.WValidator.Invalid">Это поле не может быть пустым</message>
 </messages>

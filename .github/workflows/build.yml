@@ -1,0 +1,57 @@
+name: Build
+on: [push, pull_request]
+jobs:
+  Build:
+    strategy:
+      matrix:
+        BUILD_TYPE: [Release, Debug]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Custom wt repository
+        uses: myci-actions/add-deb-repo@10
+        with:
+          repo: deb https://debian.poupon.io/apt/debian buster main
+          repo-name: epoupon
+          keys-asc: https://debian.poupon.io/apt/debian/epoupon.gpg.key
+      - name: Install dependencies
+        run: sudo apt-get install --no-install-recommends build-essential cmake libboost-all-dev libconfig++-dev libwt4-dev
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build
+        run: mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} && make && make test
+
+  Build-armv6:
+    strategy:
+      matrix:
+        BUILD_TYPE: [Release, Debug]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Out Repo
+        uses: actions/checkout@v2
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          file: ./Dockerfile-build
+          builder: ${{ steps.buildx.outputs.name }}
+          build-args: FILESHELTER_BUILD_TYPE=${{ matrix.BUILD_TYPE }}
+          push: false
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+          platforms: linux/arm/v6
