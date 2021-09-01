@@ -2,6 +2,7 @@
 
 [![Last Release](https://img.shields.io/github/v/release/epoupon/fileshelter?logo=github&label=latest)](https://github.com/epoupon/fileshelter/releases)
 [![Build](https://img.shields.io/github/workflow/status/epoupon/fileshelter/Build?logo=github)](https://github.com/epoupon/fileshelter/actions)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/epoupon/fileshelter.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/epoupon/fileshelter/context:cpp)
 
 _FileShelter_ is a self-hosted software that allows you to easily share files over the Internet.
 Just upload one or more files and get an URL back!
