@@ -80,7 +80,8 @@ cp /usr/share/fileshelter/fileshelter.service /lib/systemd/system/fileshelter.se
 Create the working directory and give it access to the _fileshelter_ user:
 ```sh
 mkdir /var/fileshelter
-chown fileshelter:fileshelter /var/fileshelter
+chown -R fileshelter:fileshelter /var/fileshelter
+chmod -R 770 /var/fileshelter
 ```
 
 To make _Fileshelter_ run automatically during startup:
