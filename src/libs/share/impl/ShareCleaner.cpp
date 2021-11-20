@@ -24,6 +24,7 @@
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
 #include "Db.hpp"
+#include "File.hpp"
 #include "Share.hpp"
 
 namespace Share
@@ -48,6 +49,44 @@ namespace Share
 	}
 
 	void
+	ShareCleaner::removeOrphanFiles(const std::filesystem::path& directory)
+	{
+		FS_LOG(SHARE, DEBUG) << "Removing orphan files in directory '" << directory.string() << "'";
+
+		for (const std::filesystem::path& directoryEntry: std::filesystem::directory_iterator {directory})
+		{
+			if (!std::filesystem::is_regular_file(directoryEntry))
+			{
+				FS_LOG(SHARE, DEBUG) << "Skipping '" << directoryEntry.string() << "': not regular";
+				continue;
+			}
+
+			if (isOrphanFile(directoryEntry))
+			{
+				std::error_code ec;
+				std::filesystem::remove(directoryEntry, ec);
+				if (ec)
+				{
+					FS_LOG(SHARE, ERROR) << "Cannot remove file '" << directoryEntry.string() << "'";
+				}
+				else
+				{
+					FS_LOG(SHARE, INFO) << "Removed orphan file '" << directoryEntry.string() << "'";
+				}
+			}
+		}
+	}
+
+	bool
+	ShareCleaner::isOrphanFile(const std::filesystem::path& filePath)
+	{
+		Wt::Dbo::Session& session {_db.getTLSSession()};
+		Wt::Dbo::Transaction transaction {session};
+
+		return !File::getByPath(session, filePath);
+	}
+
+	void
 	ShareCleaner::scheduleNextCheck()
 	{
 		_timer.expires_after(_checkPeriod);
@@ -58,6 +97,7 @@ namespace Share
 				return;
 
 			checkExpiredShares();
+			scheduleNextCheck();
 		});
 	}
 
@@ -79,6 +119,10 @@ namespace Share
 			{
 				FS_LOG(SHARE, INFO) << "Removing expired share '" << share->getUUID().toString() << "'";
 				Share::destroy(share);
+			}
+			else
+			{
+				FS_LOG(SHARE, DEBUG) << "Share '" << share->getUUID().toString() << "' not due to removal";
 			}
 		});
 	}

@@ -36,7 +36,13 @@ namespace Share
 
 		session.flush();
 		return res;
-
 	}
+
+	File::pointer
+	File::getByPath(Wt::Dbo::Session& session, const std::filesystem::path& filePath)
+	{
+		return session.find<File>().where("path = ?").bind(filePath);
+	}
+
 }
 

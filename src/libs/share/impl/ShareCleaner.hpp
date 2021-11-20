@@ -20,12 +20,14 @@
 #pragma once
 
 #include <chrono>
+#include <filesystem>
 #include <boost/asio/steady_timer.hpp>
 #include <Wt/WIOService.h>
 
 namespace Share
 {
 	class Db;
+	class Share;
 	class ShareCleaner
 	{
 		public:
@@ -37,7 +39,10 @@ namespace Share
 			ShareCleaner& operator=(const ShareCleaner&) = delete;
 			ShareCleaner& operator=(ShareCleaner&&) = delete;
 
+			void removeOrphanFiles(const std::filesystem::path& directory);
+
 		private:
+			bool	isOrphanFile(const std::filesystem::path& file);
 			void	scheduleNextCheck();
 			void	checkExpiredShares();
 

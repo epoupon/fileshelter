@@ -56,6 +56,7 @@ namespace Share
 			virtual	void					visitShares(std::function<void(const ShareDesc&)>) = 0;
 
 			virtual void					incrementReadCount(const ShareUUID& shareUUID) = 0;
+			virtual void					removeOrphanFiles(const std::filesystem::path& directory) = 0;
 	};
 
 	std::unique_ptr<IShareManager> createShareManager(const std::filesystem::path& dbFile, bool enableCleaner);

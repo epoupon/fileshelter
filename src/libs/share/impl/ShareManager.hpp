@@ -53,6 +53,7 @@ namespace Share
 			ShareDesc		getShareDesc(const ShareEditUUID& shareUUID) override;
 			void			visitShares(std::function<void(const ShareDesc&)>) override;
 			void			incrementReadCount(const ShareUUID& shareUUID) override;
+			void			removeOrphanFiles(const std::filesystem::path& directory) override;
 
 			void			validateShareSizes(const std::vector<FileCreateParameters>& files, const std::vector<FileSize>& fileSizes);
 

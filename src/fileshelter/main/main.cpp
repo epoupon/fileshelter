@@ -187,6 +187,7 @@ int main(int argc, char *argv[])
 		const std::string deployPath {Service<IConfig>::get()->getString("deploy-path", "/")};
 
 		Service<Share::IShareManager> shareManager {Share::createShareManager(Service<IConfig>::get()->getPath("working-dir") / "fileshelter.db", true /* enableCleaner */)};
+		shareManager->removeOrphanFiles(uploadedFilesPath);
 
 		ShareResource shareResource;
 		server.addResource(&shareResource, std::string {shareResource.getDeployPath()});
