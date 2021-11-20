@@ -39,6 +39,7 @@ namespace Share
 
 			// Helpers
 			static pointer	create(Wt::Dbo::Session& session, const FileCreateParameters& parameters, Wt::Dbo::ptr<Share> share);
+			static pointer	getByPath(Wt::Dbo::Session& session, const std::filesystem::path& path);
 
 			// Getters
 			const FileUUID&					getUUID() const { return _uuid; }

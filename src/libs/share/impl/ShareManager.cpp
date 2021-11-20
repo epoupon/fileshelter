@@ -274,6 +274,13 @@ namespace Share
 	}
 
 	void
+	ShareManager::removeOrphanFiles(const std::filesystem::path& directory)
+	{
+		if (_shareCleaner)
+			_shareCleaner->removeOrphanFiles(directory);
+	}
+
+	void
 	ShareManager::validateShareSizes(const std::vector<FileCreateParameters>& files, const std::vector<FileSize>& fileSizes)
 	{
 		FileSize shareSize {};
