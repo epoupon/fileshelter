@@ -18,7 +18,7 @@ _Buster_ packages are provided for _amd64_ and _armhf_ architectures.
 
 As root, trust the following debian package provider and add it in your list of repositories:
 ```sh
-wget -O - https://debian.poupon.io/apt/debian/epoupon.gpg.key | apt-key add -
+wget -O- https://debian.poupon.io/apt/debian/epoupon.gpg.key | apt-key add -
 echo "deb https://debian.poupon.io/apt/debian buster main" > /etc/apt/sources.list.d/epoupon.list
 ```
 
