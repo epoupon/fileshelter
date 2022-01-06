@@ -190,6 +190,10 @@ int main(int argc, char *argv[])
 		shareManager->removeOrphanFiles(uploadedFilesPath);
 
 		ShareResource shareResource;
+		if (!deployPath.empty() && deployPath.back() == '/')
+			shareResource.setDeployPath(deployPath + "share");
+		else
+			shareResource.setDeployPath(deployPath + "/share");
 		server.addResource(&shareResource, std::string {shareResource.getDeployPath()});
 		server.addEntryPoint(Wt::EntryPointType::Application, [&](const Wt::WEnvironment& env)
 		{
