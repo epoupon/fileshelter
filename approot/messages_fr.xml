@@ -31,6 +31,8 @@
 	<message id="msg-share-not-found">Partage non trouvé !</message>
 	<message id="msg-share-protected-by-password">Ce partage est protégé par un mot de passe</message>
 	<message id="msg-share-size">Taille</message>
+	<message id="msg-share-list">Liste des partages</message>
+	<message id="msg-share-list-protected-by-password">Un mot de passe est nécessaire pour accéder à cette page</message>
 	<message id="msg-size-b">{1} B</message>
 	<message id="msg-size-gb">{1} GB</message>
 	<message id="msg-size-kb">{1} KB</message>

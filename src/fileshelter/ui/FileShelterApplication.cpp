@@ -37,6 +37,7 @@
 #include "ShareDownload.hpp"
 #include "ShareEdit.hpp"
 #include "TermsOfService.hpp"
+#include "ShareList.hpp"
 
 namespace UserInterface {
 
@@ -62,6 +63,7 @@ enum Idx
 	IdxShareDownload	= 2,
 	IdxShareEdit		= 3,
 	IdxToS				= 4,
+	IdxShareList		= 5,
 };
 
 static
@@ -75,6 +77,7 @@ handlePathChange(Wt::WStackedWidget* stack)
 		{ "/share-download",	IdxShareDownload },
 		{ "/share-edit",		IdxShareEdit },
 		{ "/tos",				IdxToS },
+		{ "/share-list",		IdxShareList },
 	};
 
 	FS_LOG(UI, DEBUG) << "Internal path changed to '" << wApp->internalPath() << "'";
@@ -149,6 +152,7 @@ FileShelterApplication::initialize()
 	mainStack->addNew<ShareDownload>();
 	mainStack->addNew<ShareEdit>();
 	mainStack->addWidget(createTermsOfService());
+	mainStack->addNew<ShareList>();
 
 	internalPathChanged().connect(mainStack, [mainStack]
 	{

@@ -31,6 +31,8 @@
 	<message id="msg-share-not-found">Share nicht gefunden !</message>
 	<message id="msg-share-protected-by-password">Dieses Share ist durch ein Passwort geschützt</message>
 
+
+
 	<message id="msg-size-b">{1} B</message>
 	<message id="msg-size-gb">{1} GB</message>
 	<message id="msg-size-kb">{1} KB</message>
