@@ -12,14 +12,14 @@
 Official _Docker_ images are available, please see detailed instructions at https://hub.docker.com/r/epoupon/fileshelter.
 
 ## From packages
-### Debian Buster packages
+### Debian Bullseye packages
 
-_Buster_ packages are provided for _amd64_ and _armhf_ architectures.
+_Bullseye_ packages are provided for _amd64_ and _armhf_ architectures.
 
 As root, trust the following debian package provider and add it in your list of repositories:
 ```sh
-wget -O - https://debian.poupon.io/apt/debian/epoupon.gpg.key | apt-key add -
-echo "deb https://debian.poupon.io/apt/debian buster main" > /etc/apt/sources.list.d/epoupon.list
+wget -O - https://debian.poupon.dev/apt/debian/epoupon.gpg.key | apt-key add -
+echo "deb https://debian.poupon.dev/apt/debian buster main" > /etc/apt/sources.list.d/epoupon.list
 ```
 
 To install or upgrade _fileshelter_:
@@ -32,7 +32,7 @@ The _fileshelter_ service is started just after the package installation, run by
 Please refer to [Deployment](#deployment) for further configuration options.
 
 ## From source
-__Note__: this installation process and the default values of the configuration files have been written for _Debian Buster_. Therefore, you may have to adapt commands and/or paths in order to fit to your distribution.
+__Note__: this installation process and the default values of the configuration files have been written for _Debian Bullseye_. Therefore, you may have to adapt commands and/or paths in order to fit to your distribution.
 ### Debian/Ubuntu dependencies
 __Note__: a C++17 compiler is needed to compile _fileshelter_
 ```sh
@@ -47,7 +47,7 @@ git clone https://github.com/epoupon/fileshelter.git fileshelter
 cd fileshelter
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release
 ```
 cmake will complain if a mandatory library is missing.
 
