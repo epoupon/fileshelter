@@ -65,7 +65,7 @@ processCreateCommand(Share::IShareManager& shareManager,
 	fileParameters.reserve(files.size());
 	for (const std::string& strPath : files)
 	{
-		const std::filesystem::path p {strPath};
+		const std::filesystem::path p {std::filesystem::absolute(strPath)};
 		fileParameters.emplace_back(FileCreateParameters {p, p.filename()});
 	}
 
