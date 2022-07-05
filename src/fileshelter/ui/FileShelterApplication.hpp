@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <filesystem>
 #include <memory>
 #include <string_view>
 #include <Wt/WApplication.h>
@@ -36,14 +37,17 @@ namespace UserInterface
 		public:
 			FileShelterApplication(const Wt::WEnvironment& env);
 
-			static std::unique_ptr<Wt::WApplication> create(const Wt::WEnvironment& env);
-			static FileShelterApplication* instance();
+			static std::filesystem::path	prepareUploadDirectory();
+			static FileShelterApplication*	instance();
+			const std::filesystem::path&	getWorkingDirectory() const { return _workingDirectory; }
 
 		private:
 			void initialize() override;
 			void notify(const Wt::WEvent& event) override;
 
 			void displayError(std::string_view error);
+
+			static inline std::filesystem::path _workingDirectory;
 	};
 
 #define FsApp FileShelterApplication::instance()

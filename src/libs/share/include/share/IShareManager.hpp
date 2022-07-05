@@ -59,6 +59,6 @@ namespace Share
 			virtual void					removeOrphanFiles(const std::filesystem::path& directory) = 0;
 	};
 
-	std::unique_ptr<IShareManager> createShareManager(const std::filesystem::path& dbFile, bool enableCleaner);
+	std::unique_ptr<IShareManager> createShareManager(bool enableCleaner);
 
 } // namespace Share

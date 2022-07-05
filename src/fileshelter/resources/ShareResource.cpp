@@ -46,17 +46,19 @@ namespace
 
 		return share.uuid.toString() + ".zip";
 	}
+}
 
-	std::unique_ptr<Zip::Zipper>
-	createZipper(const ShareDesc& share)
+void
+ShareResource::setWorkingDirectory(std::filesystem::path workingDirectory)
+{
+	if (std::filesystem::is_directory(workingDirectory))
 	{
-
-		std::map<std::string, std::filesystem::path> zipFiles;
-		for (const FileDesc& file : share.files)
-			zipFiles.emplace(file.clientPath, file.path);
-
-		// mask creation time
-		return std::make_unique<Zip::Zipper>(zipFiles, Wt::WLocalDateTime::currentDateTime().toUTC());
+		_workingDirectory = workingDirectory;
+		FS_LOG(RESOURCE, INFO) << "Working directory set to '" << _workingDirectory.string() << "'";
+	}
+	else
+	{
+		FS_LOG(RESOURCE, ERROR) << "Cannot set working directory to '" << _workingDirectory.string() << "'";
 	}
 }
 
@@ -105,7 +107,7 @@ ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Respons
 			else
 			{
 				response.setMimeType("application/octet-stream");
-				resourceHandler = createFileResourceHandler(share.files.front().path);
+				resourceHandler = createFileResourceHandler(getAbsolutePath(share.files.front().path));
 			}
 
 			suggestFileName(getClientFileName(share).string());
@@ -133,5 +135,22 @@ ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Respons
 	{
 		FS_LOG(RESOURCE, ERROR) << "Zipper exception: " << exception.what();
 	}
+}
+
+std::filesystem::path
+ShareResource::getAbsolutePath(const std::filesystem::path& p)
+{
+	return p.is_absolute() ? p : _workingDirectory / p;
+}
+
+std::unique_ptr<Zip::Zipper>
+ShareResource::createZipper(const ShareDesc& share)
+{
+	std::map<std::string, std::filesystem::path> zipFiles;
+	for (const FileDesc& file : share.files)
+		zipFiles.emplace(file.clientPath, getAbsolutePath(file.path));
+
+	// mask creation time
+	return std::make_unique<Zip::Zipper>(zipFiles, Wt::WLocalDateTime::currentDateTime().toUTC());
 }
 

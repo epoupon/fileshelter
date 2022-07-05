@@ -35,12 +35,6 @@ namespace
 {
 	using namespace Share;
 
-	std::filesystem::path
-	getFilesStorePath()
-	{
-		return Service<IConfig>::get()->getPath("working-dir") / "files";
-	}
-
 	ShareDesc
 	shareToDesc(const Share::Share& share)
 	{
@@ -69,16 +63,19 @@ namespace
 	}
 
 	std::vector<FileSize>
-	computeFileSizes(const std::vector<FileCreateParameters>& files)
+	computeFileSizes(const std::vector<FileCreateParameters>& files, const std::filesystem::path& workingDirectory)
 	{
 		std::vector<FileSize> sizes(files.size(), 0);
 		std::transform(std::cbegin(files), std::cend(files), std::begin(sizes),
-				[](const FileCreateParameters& file)
+				[&](const FileCreateParameters& file)
 				{
 					std::error_code ec;
-					const std::uintmax_t fileSize {std::filesystem::file_size(file.path, ec)};
+					const std::filesystem::path filePath {file.path.is_absolute() ? file.path : workingDirectory / file.path};
+					const std::uintmax_t fileSize {std::filesystem::file_size(file.path.is_absolute() ? file.path : workingDirectory / file.path, ec)};
 					if (ec)
-						throw FileException {ec.message()};
+					{
+						throw FileException {filePath, ec.message()};
+					}
 					return fileSize;
 				});
 
@@ -89,14 +86,15 @@ namespace
 namespace Share
 {
 	std::unique_ptr<IShareManager>
-	createShareManager(const std::filesystem::path& dbFile, bool enableCleaner)
+	createShareManager(bool enableCleaner)
 	{
-		return std::make_unique<ShareManager>(dbFile, enableCleaner);
+		return std::make_unique<ShareManager>(enableCleaner);
 	}
 
-	ShareManager::ShareManager(const std::filesystem::path& dbFile, bool enableCleaner)
-	: _db {dbFile}
-	, _shareCleaner {enableCleaner ? std::make_unique<ShareCleaner>(_db) : nullptr}
+	ShareManager::ShareManager(bool enableCleaner)
+	: _workingDirectory {Service<IConfig>::get()->getPath("working-dir")}
+	, _db {_workingDirectory / "fileshelter.db"}
+	, _shareCleaner {enableCleaner ? std::make_unique<ShareCleaner>(_db, _workingDirectory) : nullptr}
 	, _maxShareSize {Service<IConfig>::get()->getULong("max-share-size", 100) * 1024 * 1024}
 	, _maxValidityPeriod {std::chrono::hours {24} * Service<IConfig>::get()->getULong("max-validity-days", 100)}
 	, _defaultValidityPeriod {std::chrono::hours {24} * Service<IConfig>::get()->getULong("default-validity-days", 7)}
@@ -131,7 +129,7 @@ namespace Share
 	{
 		FS_LOG(SHARE, DEBUG) << "Creating share! nb files = " << filesParameters.size();
 
-		const std::vector<FileSize> fileSizes {computeFileSizes(filesParameters)};
+		const std::vector<FileSize> fileSizes {computeFileSizes(filesParameters, _workingDirectory)};
 		validateShareSizes(filesParameters, fileSizes);
 
 		if (shareParameters.validityPeriod > _maxValidityPeriod)

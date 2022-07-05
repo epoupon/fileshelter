@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <filesystem>
 #include "utils/Exception.hpp"
 
 namespace Share
@@ -35,7 +36,7 @@ namespace Share
 	class FileException : public Exception
 	{
 		public:
-			FileException(std::string_view message) : Exception {message} {}
+			FileException(const std::filesystem::path& p, std::string_view message) : Exception {"File error on '" + p.string() + "': " + std::string {message}} {}
 	};
 	class ShareTooLargeException : public Exception
 	{

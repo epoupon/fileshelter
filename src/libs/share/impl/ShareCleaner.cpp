@@ -29,8 +29,9 @@
 
 namespace Share
 {
-	ShareCleaner::ShareCleaner(Db& db)
+	ShareCleaner::ShareCleaner(Db& db, const std::filesystem::path& workingDirectory)
 	: _db {db}
+	, _workingDirectory {workingDirectory}
 	, _timer {_ioService}
 	{
 		FS_LOG(SHARE, DEBUG) << "Started cleaner";
@@ -80,10 +81,12 @@ namespace Share
 	bool
 	ShareCleaner::isOrphanFile(const std::filesystem::path& filePath)
 	{
+		std::filesystem::path relativePath {std::filesystem::relative(filePath, _workingDirectory)};
+
 		Wt::Dbo::Session& session {_db.getTLSSession()};
 		Wt::Dbo::Transaction transaction {session};
 
-		return !File::getByPath(session, filePath);
+		return !File::getByPath(session, relativePath.empty() ? filePath : relativePath);
 	}
 
 	void

@@ -31,7 +31,7 @@ namespace Share
 	class ShareManager : public IShareManager
 	{
 		public:
-			ShareManager(const std::filesystem::path& dbFile, bool enableCleaner);
+			ShareManager(bool enableCleaner);
 			~ShareManager();
 
 			ShareManager(const ShareManager&) = delete;
@@ -57,6 +57,7 @@ namespace Share
 
 			void			validateShareSizes(const std::vector<FileCreateParameters>& files, const std::vector<FileSize>& fileSizes);
 
+			const std::filesystem::path	_workingDirectory;
 			Db _db;
 
 			std::unique_ptr<ShareCleaner>	_shareCleaner;
