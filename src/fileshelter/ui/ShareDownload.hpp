@@ -21,6 +21,7 @@
 
 #include <Wt/WContainerWidget.h>
 #include "share/Types.hpp"
+#include <optional>
 
 namespace UserInterface
 {
