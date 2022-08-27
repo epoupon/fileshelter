@@ -7,7 +7,7 @@
 _FileShelter_ is a self-hosted software that allows you to easily share files over the Internet.
 Just upload one or more files and get an URL back!
 
-A [demo](http://fileshelter.demo.poupon.io) instance is available, with the following limitations:
+A [demo](https://fileshelter-demo.poupon.dev) instance is available, with the following limitations:
 - Maximum duration is set to 3 days
 - Maximum file size is set to 1 MB
 
