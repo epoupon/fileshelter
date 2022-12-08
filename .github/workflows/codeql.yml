@@ -1,0 +1,64 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  schedule:
+    - cron: "40 15 * * 2"
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ cpp ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake libboost-all-dev libconfig++-dev
+
+      - name: Configure
+        run: |
+          export WT_VERSION=4.5.0
+          export WT_INSTALL_PREFIX=${LGTM_WORKSPACE}/wt-${WT_VERSION}
+          cmake -DCMAKE_PREFIX_PATH=${WT_INSTALL_PREFIX} -DCMAKE_BUILD_TYPE=Release
+
+      - name: After Prepare
+        run: |
+          export WT_VERSION=4.5.0 && echo "WT_VERSION=$WT_VERSION" >> $GITHUB_ENV
+          export WT_INSTALL_PREFIX=${LGTM_WORKSPACE}/wt-${WT_VERSION} && echo "WT_INSTALL_PREFIX=$WT_INSTALL_PREFIX" >> $GITHUB_ENV
+          pushd ${LGTM_WORKSPACE}
+          git clone https://github.com/emweb/wt.git ${LGTM_WORKSPACE}/wt
+          pushd ${LGTM_WORKSPACE}/wt
+          git checkout ${WT_VERSION}
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${WT_INSTALL_PREFIX} -DBUILD_EXAMPLES=OFF -DENABLE_LIBWTTEST=OFF -DCONNECTOR_FCGI=OFF
+          make install
+          popd
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+          queries: +security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{ matrix.language }}"
