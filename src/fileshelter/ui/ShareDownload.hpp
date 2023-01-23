@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <optional>
 #include <Wt/WContainerWidget.h>
 #include "share/Types.hpp"
 

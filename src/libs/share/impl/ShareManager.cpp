@@ -31,12 +31,11 @@
 #include "Share.hpp"
 #include "ShareCleaner.hpp"
 
-namespace
+namespace Share
 {
-	using namespace Share;
-
+	static
 	ShareDesc
-	shareToDesc(const Share::Share& share)
+	shareToDesc(const Share& share)
 	{
 		ShareDesc desc;
 		desc.uuid = share.getUUID();
@@ -49,7 +48,7 @@ namespace
 
 		share.visitFiles([&](const File::pointer& file)
 		{
-			Share::FileDesc fileDesc;
+			FileDesc fileDesc;
 			fileDesc.uuid = file->getUUID();
 			fileDesc.path = file->getPath();
 			fileDesc.clientPath = file->getClientPath();
@@ -62,6 +61,7 @@ namespace
 		return desc;
 	}
 
+	static
 	std::vector<FileSize>
 	computeFileSizes(const std::vector<FileCreateParameters>& files, const std::filesystem::path& workingDirectory)
 	{
@@ -81,10 +81,7 @@ namespace
 
 		return sizes;
 	}
-}
 
-namespace Share
-{
 	std::unique_ptr<IShareManager>
 	createShareManager(bool enableCleaner)
 	{

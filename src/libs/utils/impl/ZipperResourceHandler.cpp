@@ -24,11 +24,11 @@
 std::unique_ptr<IResourceHandler>
 createZipperResourceHandler(std::unique_ptr<Zip::Zipper> zipper)
 {
-	return std::make_unique<ZipperResourceHandler>(move(zipper));
+	return std::make_unique<ZipperResourceHandler>(std::move(zipper));
 }
 
 ZipperResourceHandler::ZipperResourceHandler(std::unique_ptr<Zip::Zipper> zipper)
-: _zipper {move(zipper)}
+: _zipper {std::move(zipper)}
 {
 }
 
@@ -36,7 +36,7 @@ Wt::Http::ResponseContinuation*
 ZipperResourceHandler::processRequest(const Wt::Http::Request& request, Wt::Http::Response& response)
 {
 	std::array<std::byte, _bufferSize> buffer;
-	const std::size_t nbWrittenBytes {_zipper->writeSome(buffer.data(), buffer.size())};
+	const Zip::SizeType nbWrittenBytes {_zipper->writeSome(buffer.data(), buffer.size())};
 
 	response.out().write(reinterpret_cast<const char *>(buffer.data()), nbWrittenBytes);
 
