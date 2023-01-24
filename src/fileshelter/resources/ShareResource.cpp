@@ -110,7 +110,14 @@ ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Respons
 				resourceHandler = createFileResourceHandler(getAbsolutePath(share.files.front().path));
 			}
 
-			suggestFileName(getClientFileName(share).string());
+			auto encodeHttpHeaderField = [](const std::string& fieldName, const std::string& fieldValue)
+			{
+				// This implements RFC 5987
+				return fieldName + "*=UTF-8''" + Wt::Utils::urlEncode(fieldValue);
+			};
+
+			const std::string cdp {encodeHttpHeaderField("filename", getClientFileName(share).string())};
+			response.addHeader("Content-Disposition", "attachment; " + cdp);
 
 			Service<IShareManager>::get()->incrementReadCount(shareUUID);
 		}
@@ -122,6 +129,8 @@ ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Respons
 		continuation = resourceHandler->processRequest(request, response);
 		if (continuation)
 			continuation->setData(resourceHandler);
+
+		return;
 	}
 	catch (const UUIDException& e)
 	{
@@ -135,6 +144,8 @@ ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Respons
 	{
 		FS_LOG(RESOURCE, ERROR) << "Zipper exception: " << exception.what();
 	}
+
+	response.setStatus(404);
 }
 
 std::filesystem::path
