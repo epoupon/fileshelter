@@ -1,0 +1,36 @@
+FROM --platform=$BUILDPLATFORM tonistiigi/xx AS xx
+FROM --platform=$BUILDPLATFORM alpine:3.17
+
+ARG BUILD_PACKAGES="\
+	clang \
+	make \
+	cmake \
+	lld \
+	pkgconfig"
+
+RUN	apk add --no-cache ${BUILD_PACKAGES}
+
+ARG	FILESHELTER_BUILD_PACKAGES=" \
+	gcc \
+	g++ \
+	musl-dev \
+	boost-dev \
+	libconfig-dev \
+	wt-dev \
+	gtest-dev"
+
+COPY --from=xx / /
+
+ARG TARGETPLATFORM
+RUN	xx-apk add --no-scripts --no-cache ${FILESHELTER_BUILD_PACKAGES}
+
+# FILESHELTER
+COPY . /tmp/fileshelter/
+ARG FILESHELTER_BUILD_TYPE="Release"
+RUN \
+	DIR=/tmp/fileshelter/build && mkdir -p ${DIR} && cd ${DIR}  && \
+		xx-info is-cross && export BUILD_TESTS=OFF || export BUILD_TESTS=ON && \
+		PKG_CONFIG_PATH=/$(xx-info)/usr/lib/pkgconfig cmake /tmp/fileshelter/ -DCMAKE_INCLUDE_PATH=${PREFIX}/include -DCMAKE_BUILD_TYPE=${FILESHELTER_BUILD_TYPE} $(xx-clang --print-cmake-defines) -DCMAKE_PREFIX_PATH=/$(xx-info)/usr/lib/cmake -DBUILD_TESTING=${BUILD_TESTS} && \
+		VERBOSE=1 make -j$(nproc) && \
+		xx-verify src/fileshelter/fileshelter && \
+		(xx-info is-cross || make test)

@@ -45,8 +45,9 @@ namespace UserInterface
 		return (_totalReceivedSize + _currentReceivedSize ) * 100 / _totalSize;
 	}
 
-	ShareCreateFormView::ShareCreateFormView()
-	: _model {std::make_shared<ShareCreateFormModel>()}
+	ShareCreateFormView::ShareCreateFormView(const std::filesystem::path& workingDirectory)
+	: _workingDirectory {workingDirectory}
+	, _model {std::make_shared<ShareCreateFormModel>()}
 	{
 		setTemplateText(tr("template-share-create-form"));
 
@@ -217,7 +218,7 @@ namespace UserInterface
 		{
 			Share::FileCreateParameters fileParameters;
 
-			fileParameters.path = file.uploadedFile().spoolFileName();
+			fileParameters.path = getRelativeToWorkingDirectoryPath(file.uploadedFile().spoolFileName());
 			fileParameters.name = file.uploadedFile().clientFileName();
 
 			filesParameters.emplace_back(std::move(fileParameters));
@@ -268,7 +269,7 @@ namespace UserInterface
 		{
 			if (!isFileDeleted(*file))
 			{
-				auto [it, inserted] {names.emplace(file->clientFileName())};
+				[[maybe_unused]] auto [it, inserted] {names.emplace(file->clientFileName())};
 				if (!inserted)
 					return true;
 			}
@@ -342,5 +343,19 @@ namespace UserInterface
 	{
 		_error->setHidden(true);
 	}
+
+	std::filesystem::path
+	ShareCreateFormView::getRelativeToWorkingDirectoryPath(const std::filesystem::path& path)
+	{
+		std::error_code ec;
+		std::filesystem::path res {std::filesystem::relative(path, _workingDirectory, ec)};
+		if (ec)
+			throw FsException {"Relative path error: " + ec.message()};
+
+		FS_LOG(UI, DEBUG) << "File '" << path.string() << "' relative file = '" << res.string() << "'";
+
+		return res;
+	}
+
 } // namespace UiserInterface
 

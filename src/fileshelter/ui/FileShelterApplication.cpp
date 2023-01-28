@@ -42,17 +42,16 @@ namespace UserInterface {
 
 static const char * defaultPath{ "/share-create" };
 
-
-std::unique_ptr<Wt::WApplication>
-FileShelterApplication::create(const Wt::WEnvironment& env)
+std::filesystem::path
+prepareUploadDirectory()
 {
-	return std::make_unique<FileShelterApplication>(env);
+	return FileShelterApplication::prepareUploadDirectory();
 }
 
-FileShelterApplication*
-FileShelterApplication::instance()
+std::unique_ptr<Wt::WApplication>
+createFileShelterApplication(const Wt::WEnvironment& env)
 {
-	return reinterpret_cast<FileShelterApplication*>(Wt::WApplication::instance());
+	return std::make_unique<FileShelterApplication>(env);
 }
 
 enum Idx
@@ -120,6 +119,26 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env)
 	enableInternalPaths();
 }
 
+std::filesystem::path
+FileShelterApplication::prepareUploadDirectory()
+{
+	_workingDirectory = Service<IConfig>::get()->getPath("working-dir");
+
+	std::filesystem::path uploadDirectory {_workingDirectory / "uploaded-files"};
+	std::filesystem::create_directories (uploadDirectory);
+
+	// Set the WT_TMP_DIR inside the working dir, used to upload files
+	setenv("WT_TMP_DIR", uploadDirectory.string().c_str(), 1);
+
+	return uploadDirectory;
+}
+
+FileShelterApplication*
+FileShelterApplication::instance()
+{
+	return reinterpret_cast<FileShelterApplication*>(Wt::WApplication::instance());
+}
+
 void
 FileShelterApplication::initialize()
 {
@@ -144,7 +163,7 @@ FileShelterApplication::initialize()
 
 	// Same order as Idx enum
 	Wt::WStackedWidget* mainStack {container->addNew<Wt::WStackedWidget>()};
-	mainStack->addNew<ShareCreate>();
+	mainStack->addNew<ShareCreate>(_workingDirectory);
 	mainStack->addNew<ShareCreated>();
 	mainStack->addNew<ShareDownload>();
 	mainStack->addNew<ShareEdit>();

@@ -25,8 +25,6 @@
 #include <Wt/WDate.h>
 #include <Wt/WTime.h>
 
-//#include "utils/Path.hpp"
-
 // Done using specs from https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
 
 namespace Zip

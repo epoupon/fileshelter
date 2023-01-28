@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
         }
 
 		Service<IConfig> config {createConfig(vm["conf"].as<std::string>())};
-		Service<Share::IShareManager> shareManager {Share::createShareManager(Service<IConfig>::get()->getPath("working-dir") / "fileshelter.db", false /* enableCleaner */)};
+		Service<Share::IShareManager> shareManager {Share::createShareManager(false /* enableCleaner */)};
 
 		processListCommand(*shareManager.get(), vm.count("details"));
 	}

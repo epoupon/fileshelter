@@ -31,7 +31,7 @@ namespace Share
 	class ShareCleaner
 	{
 		public:
-			ShareCleaner(Db& _db);
+			ShareCleaner(Db& _db, const std::filesystem::path& workingDirectory);
 			~ShareCleaner();
 
 			ShareCleaner(const ShareCleaner&) = delete;
@@ -47,6 +47,7 @@ namespace Share
 			void	checkExpiredShares();
 
 			Db&							_db;
+			const std::filesystem::path	_workingDirectory;
 			const std::chrono::seconds	_checkPeriod {std::chrono::hours {1}};
 			Wt::WIOService				_ioService;
 			boost::asio::steady_timer	_timer;

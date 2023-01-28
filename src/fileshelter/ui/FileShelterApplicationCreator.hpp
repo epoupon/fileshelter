@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Emeric Poupon
+ * Copyright (C) 2022 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -21,27 +21,8 @@
 
 #include <filesystem>
 
-#include <Wt/WString.h>
-#include <Wt/WContainerWidget.h>
-
-#include "utils/UUID.hpp"
-
 namespace UserInterface
 {
-
-	class ShareCreate : public Wt::WContainerWidget
-	{
-		public:
-			ShareCreate(const std::filesystem::path& workingDirectory);
-
-		private:
-			void handlePathChanged();
-
-			void displayCreate();
-			void displayPassword();
-
-			const std::filesystem::path& _workingDirectory;
-	};
-
-} // namespace UserInterface
-
+	std::filesystem::path prepareUploadDirectory();
+	std::unique_ptr<Wt::WApplication> createFileShelterApplication(const Wt::WEnvironment& env);
+}

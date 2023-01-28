@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <filesystem>
 #include <unordered_set>
 
 #include <Wt/WSignal.h>
@@ -39,7 +40,7 @@ namespace UserInterface
 	class ShareCreateFormView : public Wt::WTemplateFormView
 	{
 		public:
-			ShareCreateFormView();
+			ShareCreateFormView(const std::filesystem::path& workingDirectory);
 
 			unsigned getProgress() const;
 
@@ -68,12 +69,15 @@ namespace UserInterface
 			void showError(const Wt::WString& error);
 			void hideError();
 
+			std::filesystem::path getRelativeToWorkingDirectoryPath(const std::filesystem::path& path);
+
 			bool								_validated {};
 
 			Wt::Signal<>						_sigValidated;
 			Wt::Signal<unsigned>				_sigProgressUpdate;
 			ShareCreateCompleteSignal			_sigComplete;
 
+			const std::filesystem::path&		_workingDirectory;
 			std::shared_ptr<ShareCreateFormModel> _model;
 			Wt::WPushButton*			_createBtn {};
 			Wt::WTemplate*				_error {};

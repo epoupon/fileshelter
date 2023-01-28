@@ -65,7 +65,7 @@ processCreateCommand(Share::IShareManager& shareManager,
 	fileParameters.reserve(files.size());
 	for (const std::string& strPath : files)
 	{
-		const std::filesystem::path p {strPath};
+		const std::filesystem::path p {std::filesystem::absolute(strPath)};
 		fileParameters.emplace_back(FileCreateParameters {p, p.filename()});
 	}
 
@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 		}
 
 		Service<IConfig> config {createConfig(vm["conf"].as<std::string>())};
-		Service<Share::IShareManager> shareManager {Share::createShareManager(Service<IConfig>::get()->getPath("working-dir") / "fileshelter.db", false /* enableCleaner */)};
+		Service<Share::IShareManager> shareManager {Share::createShareManager(false /* enableCleaner */)};
 
 		conflictingOptions(vm, "validity-hours", "validity-days");
 

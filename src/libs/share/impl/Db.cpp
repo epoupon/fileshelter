@@ -19,6 +19,8 @@
 
 #include "Db.hpp"
 
+#include <unordered_map>
+
 #include <Wt/Dbo/backend/Sqlite3.h>
 #include <Wt/Dbo/FixedSqlConnectionPool.h>
 

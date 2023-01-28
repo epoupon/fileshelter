@@ -52,7 +52,8 @@ namespace UserInterface
 	};
 
 
-	ShareCreate::ShareCreate()
+	ShareCreate::ShareCreate(const std::filesystem::path& workingDirectory)
+	: _workingDirectory {workingDirectory}
 	{
 		wApp->internalPathChanged().connect(this, [this]
 		{
@@ -101,7 +102,7 @@ namespace UserInterface
 
 		Wt::WStackedWidget* stack {addNew<Wt::WStackedWidget>()};
 
-		ShareCreateFormView* form {stack->addNew<ShareCreateFormView>()};
+		ShareCreateFormView* form {stack->addNew<ShareCreateFormView>(_workingDirectory)};
 		ShareCreateProgress* progress {stack->addNew<ShareCreateProgress>()};
 
 		form->progressUpdate().connect(progress, [=](unsigned progressPerCent) { progress->handleProgressUpdate(progressPerCent); });
@@ -114,7 +115,7 @@ namespace UserInterface
 		form->complete().connect([=](const ShareCreateParameters& shareParameters, const std::vector<FileCreateParameters>& filesParameters)
 		{
 			FS_LOG(UI, DEBUG) << "Upload complete!";
-			const Share::ShareEditUUID editUUID {Service<IShareManager>::get()->createShare(shareParameters, filesParameters, true /* transfer ownership */)};
+			const Share::ShareEditUUID editUUID {Service<IShareManager>::get()->createShare(shareParameters, filesParameters, true /* transfer file ownership */)};
 
 			FS_LOG(UI, DEBUG) << "Redirecting...";
 			wApp->setInternalPath("/share-created/" + editUUID.toString(), true);

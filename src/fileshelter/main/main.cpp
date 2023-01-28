@@ -33,7 +33,7 @@
 
 #include "resources/ShareResource.hpp"
 
-#include "ui/FileShelterApplication.hpp"
+#include "ui/FileShelterApplicationCreator.hpp"
 
 std::vector<std::string> generateWtConfig(std::string execPath)
 {
@@ -162,13 +162,12 @@ int main(int argc, char *argv[])
 		Service<IConfig> config {createConfig(configFilePath)};
 
 		// Make sure the working directory exists
-		std::filesystem::create_directories(Service<IConfig>::get()->getPath("working-dir"));
+		const std::filesystem::path workingDirectory {Service<IConfig>::get()->getPath("working-dir")};
+		if (!workingDirectory.is_absolute())
+			throw FsException {"Working directory '" + workingDirectory.string() + "' is not absolute!"};
+		std::filesystem::create_directories(workingDirectory);
 
-		const auto uploadedFilesPath {Service<IConfig>::get()->getPath("working-dir") / "uploaded-files"};
-		std::filesystem::create_directories(uploadedFilesPath);
-
-		// Set the WT_TMP_DIR inside the working dir, used to upload files
-		setenv("WT_TMP_DIR", uploadedFilesPath.string().c_str(), 1);
+		const std::filesystem::path uploadDirectory {UserInterface::prepareUploadDirectory()};
 
 		// Construct WT configuration and get the argc/argv back
 		std::vector<std::string> wtServerArgs {generateWtConfig(argv[0])};
@@ -186,10 +185,11 @@ int main(int argc, char *argv[])
 
 		const std::string deployPath {Service<IConfig>::get()->getString("deploy-path", "/")};
 
-		Service<Share::IShareManager> shareManager {Share::createShareManager(Service<IConfig>::get()->getPath("working-dir") / "fileshelter.db", true /* enableCleaner */)};
-		shareManager->removeOrphanFiles(uploadedFilesPath);
+		Service<Share::IShareManager> shareManager {Share::createShareManager(true /* enableCleaner */)};
+		shareManager->removeOrphanFiles(uploadDirectory);
 
 		ShareResource shareResource;
+		shareResource.setWorkingDirectory(workingDirectory);
 		if (!deployPath.empty() && deployPath.back() == '/')
 			shareResource.setDeployPath(deployPath + "share");
 		else
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
 		server.addResource(&shareResource, std::string {shareResource.getDeployPath()});
 		server.addEntryPoint(Wt::EntryPointType::Application, [&](const Wt::WEnvironment& env)
 		{
-		    return UserInterface::FileShelterApplication::create(env);
+		    return UserInterface::createFileShelterApplication(env);
 		});
 
 		FS_LOG(MAIN, INFO) << "Starting server...";

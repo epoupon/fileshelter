@@ -1,0 +1,23 @@
+FROM archlinux:latest
+
+ARG BUILD_PACKAGES="\
+	clang \
+	cmake \
+	boost \
+	gtest \
+	libconfig \
+	make \
+	pkgconfig \
+	wt"
+
+RUN	pacman -Syu --noconfirm
+RUN pacman -S --noconfirm ${BUILD_PACKAGES}
+
+# FILESHELTER
+COPY . /tmp/fileshelter/
+ARG FILESHELTER_BUILD_TYPE="Release"
+RUN \
+	DIR=/tmp/fileshelter/build && mkdir -p ${DIR} && cd ${DIR}  && \
+		cmake /tmp/fileshelter/ -DCMAKE_BUILD_TYPE=${FILESHELTER_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=/usr && \
+		VERBOSE=1 make -j$(nproc) && \
+		make test
