@@ -269,7 +269,7 @@ namespace UserInterface
 		{
 			if (!isFileDeleted(*file))
 			{
-				auto [it, inserted] {names.emplace(file->clientFileName())};
+				[[maybe_unused]] auto [it, inserted] {names.emplace(file->clientFileName())};
 				if (!inserted)
 					return true;
 			}
