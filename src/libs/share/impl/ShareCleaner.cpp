@@ -81,12 +81,16 @@ namespace Share
 	bool
 	ShareCleaner::isOrphanFile(const std::filesystem::path& filePath)
 	{
-		std::filesystem::path relativePath {std::filesystem::relative(filePath, _workingDirectory)};
+		const std::filesystem::path relativeFilePath {std::filesystem::relative(filePath, _workingDirectory)};
+		assert(!relativeFilePath.empty());
 
 		Wt::Dbo::Session& session {_db.getTLSSession()};
 		Wt::Dbo::Transaction transaction {session};
 
-		return !File::getByPath(session, relativePath.empty() ? filePath : relativePath);
+		FS_LOG(SHARE, DEBUG) << "Checking orphan file '" << filePath.string() << "', relative file path = '" << relativeFilePath.string() << "'";
+
+		return !File::getByPath(session, relativeFilePath)
+			&& !File::getByPath(session, filePath);
 	}
 
 	void
