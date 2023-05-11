@@ -29,9 +29,9 @@
 
 static
 void
-processListCommand(Share::IShareManager& shareManager, bool details)
+processListCommand(Share::IShareManager& shareManager, bool details, std::string_view deployURL)
 {
-	std::cout.imbue(std::locale(""));
+	std::cout.imbue(std::locale {""});
 
 	std::size_t nbShares{};
 	std::size_t totalShareSize{};
@@ -50,9 +50,12 @@ processListCommand(Share::IShareManager& shareManager, bool details)
 		if (!details)
 			return;
 
+		if (!deployURL.empty())
+			std::cout << "\tDownload URL: " << deployURL << "/share-download/" << share.uuid.toString() << std::endl;
+
 		for (const Share::FileDesc& file : share.files)
 		{
-			std::cout << "\tFile '" << file.path.string() << "' " << (file.isOwned ? "(owned)" : "") << ", '" << file.clientPath.string() << "', " << file.size << " bytes" << std::endl;
+			std::cout << "\tFile '" << file.path.string() << "'" << (file.isOwned ? " (owned)" : "") << ", '" << file.clientPath.string() << "', " << file.size << " bytes" << std::endl;
 		}
 	});
 
@@ -65,11 +68,12 @@ int main(int argc, char* argv[])
 	{
 		namespace po = boost::program_options;
 
-		po::options_description options{"Options"};
+		po::options_description options {"Options"};
 		options.add_options()
 			("help,h", "print usage message")
 			("conf,c", po::value<std::string>()->default_value("/etc/fileshelter.conf"), "fileshelter config file")
-			("details", "Show details");
+			("url,u", po::value<std::string>()->default_value(""), "deploy URL")
+			("details,d", "Show details");
 
 		po::variables_map vm;
         po::store(po::parse_command_line(argc, argv, options), vm);
@@ -83,7 +87,7 @@ int main(int argc, char* argv[])
 		Service<IConfig> config {createConfig(vm["conf"].as<std::string>())};
 		Service<Share::IShareManager> shareManager {Share::createShareManager(false /* enableCleaner */)};
 
-		processListCommand(*shareManager.get(), vm.count("details"));
+		processListCommand(*shareManager.get(), vm.count("details"), vm["url"].as<std::string>());
 	}
 	catch (const std::exception& e)
 	{

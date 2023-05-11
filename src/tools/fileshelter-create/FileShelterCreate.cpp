@@ -49,11 +49,12 @@ processCreateCommand(Share::IShareManager& shareManager,
 		const std::vector<std::string>& files,
 		std::string_view desc,
 		std::chrono::seconds validityPeriod,
-		std::string_view password)
+		std::string_view password,
+		std::string_view deployURL)
 {
 	using namespace Share;
 
-	std::cout.imbue(std::locale(""));
+	std::cout.imbue(std::locale {""});
 
 	Share::ShareCreateParameters shareParameters;
 	shareParameters.validityPeriod = validityPeriod;
@@ -71,6 +72,10 @@ processCreateCommand(Share::IShareManager& shareManager,
 
 	const ShareEditUUID shareEditUUID {shareManager.createShare(shareParameters, fileParameters, false /* keep ownership */)};
 	std::cout << "Successfuly created share. Edit UUID = '" << shareEditUUID.toString() << "'" << std::endl;
+	if (!deployURL.empty())
+	{
+		std::cout << "\tEdit URL: " << deployURL << "/share-edit/" << shareEditUUID.toString() << std::endl;
+	}
 }
 
 int main(int argc, char* argv[])
@@ -89,7 +94,8 @@ int main(int argc, char* argv[])
 				("desc", po::value<std::string>()->default_value(""), "description")
 				("password", po::value<std::string>()->default_value(""), "password")
 				("validity-hours", po::value<unsigned>(), "validity period in hours")
-				("validity-days", po::value<unsigned>(), "Validity period in days");
+				("validity-days", po::value<unsigned>(), "Validity period in days")
+				("url,u", po::value<std::string>()->default_value(""), "deploy URL");
 
 			po::options_description hiddenOptions{"Hidden options"};
 			hiddenOptions.add_options()
@@ -142,7 +148,7 @@ int main(int argc, char* argv[])
 		else
 			validityPeriod = shareManager.get()->getDefaultValidityPeriod();
 
-		processCreateCommand(*shareManager.get(), vm["file"].as<std::vector<std::string>>(), vm["desc"].as<std::string>(), validityPeriod, vm["password"].as<std::string>());
+		processCreateCommand(*shareManager.get(), vm["file"].as<std::vector<std::string>>(), vm["desc"].as<std::string>(), validityPeriod, vm["password"].as<std::string>(), vm["url"].as<std::string>());
 	}
 	catch (const std::exception& e)
 	{
