@@ -19,6 +19,7 @@
 
 #include "FileResourceHandler.hpp"
 
+#include <cstring>
 #include <fstream>
 
 #include "utils/Logger.hpp"
@@ -41,20 +42,21 @@ FileResourceHandler::processRequest(const Wt::Http::Request& request, Wt::Http::
 {
 	::uint64_t startByte {_offset};
 	std::ifstream ifs {_path.string().c_str(), std::ios::in | std::ios::binary};
+	if (!ifs)
+	{
+		const int err {errno};
+		FS_LOG(UTILS, ERROR) << "Cannot open input file '" << _path.string() << "': " << std::string {::strerror(err)};
+		_isFinished = true;
+
+		if (startByte == 0)
+			response.setStatus(404);
+
+		return {};
+	}
 
 	if (startByte == 0)
 	{
-		if (!ifs)
-		{
-			FS_LOG(UTILS, ERROR) << "Cannot open file stream for '" << _path.string() << "'";
-			response.setStatus(404);
-			_isFinished = true;
-			return {};
-		}
-		else
-		{
-			response.setStatus(200);
-		}
+		response.setStatus(200);
 
 		ifs.seekg(0, std::ios::end);
 		const ::uint64_t fileSize {static_cast<::uint64_t>(ifs.tellg())};
@@ -98,14 +100,13 @@ FileResourceHandler::processRequest(const Wt::Http::Request& request, Wt::Http::
 			response.setContentLength(_beyondLastByte);
 		}
 	}
-	else if (!ifs)
+
+	if (!ifs.seekg(static_cast<std::istream::pos_type>(startByte)))
 	{
-		FS_LOG(UTILS, ERROR) << "Cannot reopen file stream for '" << _path.string() << "'";
-		_isFinished = true;
+		const int err {errno};
+		FS_LOG(UTILS, ERROR) << "Failed to seek in file '" << _path.string() << "' at " << startByte << ": " << std::string {::strerror(err)};
 		return {};
 	}
-
-	ifs.seekg(static_cast<std::istream::pos_type>(startByte));
 
 	std::vector<char> buf;
 	buf.resize(_chunkSize);
@@ -113,7 +114,12 @@ FileResourceHandler::processRequest(const Wt::Http::Request& request, Wt::Http::
 	::uint64_t restSize = _beyondLastByte - startByte;
 	::uint64_t pieceSize = buf.size() > restSize ? restSize : buf.size();
 
-	ifs.read(&buf[0], pieceSize);
+	if (!ifs.read(&buf[0], pieceSize))
+	{
+		const int err {errno};
+		FS_LOG(UTILS, ERROR) << "Read failed in file '" << _path.string() << "': " << std::string {::strerror(err)};
+		return {};
+	}
 	const ::uint64_t actualPieceSize {static_cast<::uint64_t>(ifs.gcount())};
 	response.out().write(&buf[0], actualPieceSize);
 
