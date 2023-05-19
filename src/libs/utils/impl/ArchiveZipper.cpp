@@ -260,7 +260,7 @@ namespace Zip
 		if (fileSize < _currentEntryOffset)
 			throw FileException {_currentEntry->filePath, "size changed?"};
 
-		SizeType bytesToRead {std::min(fileSize - _currentEntryOffset, _readBufferSize)};
+		const SizeType bytesToRead {std::min(fileSize - _currentEntryOffset, _readBufferSize)};
 
 		// read from file
 		if (!ifs.seekg(_currentEntryOffset, std::ios::beg))

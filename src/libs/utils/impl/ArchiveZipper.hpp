@@ -72,9 +72,9 @@ namespace Zip
 			EntryContainer::const_iterator _currentEntry;
 			ArchiveEntryPtr _currentArchiveEntry;
 
-			std::size_t _currentEntryOffset {};
+			std::uint64_t _currentEntryOffset {};
 			std::ostream* _currentOutputStream {};
-			std::size_t _bytesWrittenInCurrentOutputStream {};
+			std::uint64_t _bytesWrittenInCurrentOutputStream {};
 	};
 
 } // namespace Zip
