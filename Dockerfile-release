@@ -12,6 +12,7 @@ ARG	BUILD_PACKAGES=" \
 	coreutils \
 	curl \
 	g++ \
+	libarchive-dev \
 	libconfig-dev \
 	make \
 	openssl-dev \
@@ -80,6 +81,7 @@ ARG	RUNTIME_PACKAGES=" \
 	boost-program_options \
 	boost-system \
 	boost-thread \
+	libarchive \
 	libconfig++"
 
 ARG	FILESHELTER_USER=fileshelter

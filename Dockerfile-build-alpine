@@ -16,6 +16,7 @@ ARG	FILESHELTER_BUILD_PACKAGES=" \
 	musl-dev \
 	boost-dev \
 	libconfig-dev \
+	libarchive-dev \
 	wt-dev \
 	gtest-dev"
 
