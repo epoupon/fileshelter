@@ -19,8 +19,9 @@
 
 #include "ArchiveZipper.hpp"
 
+#include <algorithm>
 #include <cassert>
-#include <cstring>
+#include <cstring> // strerror
 #include <fstream>
 #include <archive.h>
 #include <archive_entry.h>
@@ -95,7 +96,7 @@ namespace Zip
 			return ARCHIVE_OK;
 		}};
 
-		auto archiveWrite {[](struct ::archive* a, void* clientData, const void* buff, ::size_t n)
+		auto archiveWrite {[](struct ::archive* a, void* clientData, const void* buff, ::size_t n) -> la_ssize_t
 		{
 			ArchiveZipper* zipper {static_cast<ArchiveZipper*>(clientData)};
 			return zipper->onWriteCallback(static_cast<const std::byte*>(buff), n);
