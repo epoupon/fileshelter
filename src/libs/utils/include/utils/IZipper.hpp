@@ -27,8 +27,6 @@
 
 namespace Zip
 {
-	using SizeType = std::uint64_t;
-
 	struct Entry
 	{
 		std::string fileName;
@@ -46,8 +44,7 @@ namespace Zip
 		public:
 			virtual ~IZipper() = default;
 
-			static constexpr SizeType minMaxSize {1024};
-			virtual SizeType writeSome(std::ostream& output) = 0;
+			virtual std::uint64_t writeSome(std::ostream& output) = 0;
 			virtual bool isComplete() const = 0;
 			virtual void abort() = 0;
 	};

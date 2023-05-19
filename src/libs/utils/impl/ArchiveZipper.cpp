@@ -125,7 +125,7 @@ namespace Zip
 			throw ArchiveException {_archive.get()};
 	}
 
-	SizeType
+	std::uint64_t
 	ArchiveZipper::writeSome(std::ostream& output)
 	{
 		assert(!_currentOutputStream);
@@ -164,7 +164,7 @@ namespace Zip
 		}
 
 		_currentOutputStream = nullptr;
-		return 0;
+		return _bytesWrittenInCurrentOutputStream;
 	}
 
 	bool
@@ -260,7 +260,7 @@ namespace Zip
 		if (fileSize < _currentEntryOffset)
 			throw FileException {_currentEntry->filePath, "size changed?"};
 
-		const SizeType bytesToRead {std::min(fileSize - _currentEntryOffset, _readBufferSize)};
+		const std::uint64_t bytesToRead {std::min(fileSize - _currentEntryOffset, static_cast<std::uint64_t>(_readBufferSize))};
 
 		// read from file
 		if (!ifs.seekg(_currentEntryOffset, std::ios::beg))

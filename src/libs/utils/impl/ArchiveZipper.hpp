@@ -39,7 +39,7 @@ namespace Zip
 			ArchiveZipper& operator=(const ArchiveZipper&) = delete;
 
 		private:
-			SizeType writeSome(std::ostream& output) override;
+			std::uint64_t writeSome(std::ostream& output) override;
 			bool isComplete() const override;
 			void abort() override;
 
