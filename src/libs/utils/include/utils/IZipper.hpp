@@ -19,10 +19,39 @@
 
 #pragma once
 
+#include <filesystem>
 #include <memory>
+#include <vector>
 
-#include "utils/IResourceHandler.hpp"
-#include "utils/IZipper.hpp"
+#include "Exception.hpp"
 
-std::unique_ptr<IResourceHandler> createZipperResourceHandler(std::unique_ptr<Zip::IZipper> zipper);
+namespace Zip
+{
+	using SizeType = std::uint64_t;
+
+	struct Entry
+	{
+		std::string fileName;
+		std::filesystem::path filePath;
+	};
+	using EntryContainer = std::vector<Entry>;
+
+	class Exception : public FsException
+	{
+		using FsException::FsException;
+	};
+
+	class IZipper
+	{
+		public:
+			virtual ~IZipper() = default;
+
+			static constexpr SizeType minMaxSize {1024};
+			virtual SizeType writeSome(std::ostream& output) = 0;
+			virtual bool isComplete() const = 0;
+			virtual void abort() = 0;
+	};
+
+	std::unique_ptr<IZipper> createArchiveZipper(const EntryContainer& entries);
+} // namespace Zip
 

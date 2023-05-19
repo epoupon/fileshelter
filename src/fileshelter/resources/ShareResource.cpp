@@ -31,7 +31,7 @@
 #include "utils/FileResourceHandlerCreator.hpp"
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
-#include "utils/Zipper.hpp"
+#include "utils/IZipper.hpp"
 #include "utils/ZipperResourceHandlerCreator.hpp"
 
 using namespace Share;
@@ -73,7 +73,6 @@ ShareResource::createLink(const ShareUUID& uuid, std::optional<std::string_view>
 	return {Wt::LinkType::Url, std::string {getDeployPath()} + "?id=" + uuid.toString() + (password ? ("&p=" + Wt::Utils::hexEncode(std::string {*password})) : "")};
 }
 
-
 void
 ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Response& response)
 {
@@ -99,8 +98,7 @@ ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Respons
 			const ShareDesc share {Service<IShareManager>::get()->getShareDesc(shareUUID, password)};
 			if (share.files.size() > 1)
 			{
-				std::unique_ptr<Zip::Zipper> zipper {createZipper(share)};
-				response.setContentLength(zipper->getTotalZipFile());
+				std::unique_ptr<Zip::IZipper> zipper {createZipper(share)};
 				response.setMimeType("application/zip");
 				resourceHandler = createZipperResourceHandler(std::move(zipper));
 			}
@@ -126,9 +124,12 @@ ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Respons
 			resourceHandler = Wt::cpp17::any_cast<std::shared_ptr<IResourceHandler>>(continuation->data());
 		}
 
-		continuation = resourceHandler->processRequest(request, response);
-		if (continuation)
+		resourceHandler->processRequest(request, response);
+		if (!resourceHandler->isComplete())
+		{
+			continuation = response.createContinuation();
 			continuation->setData(resourceHandler);
+		}
 
 		return;
 	}
@@ -140,12 +141,23 @@ ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Respons
 	{
 		FS_LOG(RESOURCE, ERROR) << "Caught Share::Exception: " << e.what();
 	}
-	catch (Zip::ZipperException& exception)
+	catch (Zip::Exception& exception)
 	{
 		FS_LOG(RESOURCE, ERROR) << "Zipper exception: " << exception.what();
 	}
 
 	response.setStatus(404);
+}
+
+void
+ShareResource::handleAbort(const Wt::Http::Request& request)
+{
+	Wt::Http::ResponseContinuation* continuation {request.continuation()};
+	if (!continuation)
+		return;
+
+	std::shared_ptr<IResourceHandler> resourceHandler {Wt::cpp17::any_cast<std::shared_ptr<IResourceHandler>>(continuation->data())};
+	resourceHandler->abort();
 }
 
 std::filesystem::path
@@ -154,14 +166,14 @@ ShareResource::getAbsolutePath(const std::filesystem::path& p)
 	return p.is_absolute() ? p : _workingDirectory / p;
 }
 
-std::unique_ptr<Zip::Zipper>
+std::unique_ptr<Zip::IZipper>
 ShareResource::createZipper(const ShareDesc& share)
 {
-	std::map<std::string, std::filesystem::path> zipFiles;
+	Zip::EntryContainer zipEntries;
 	for (const FileDesc& file : share.files)
-		zipFiles.emplace(file.clientPath, getAbsolutePath(file.path));
+		zipEntries.emplace_back(Zip::Entry {file.clientPath, getAbsolutePath(file.path)});
 
 	// mask creation time
-	return std::make_unique<Zip::Zipper>(zipFiles, Wt::WLocalDateTime::currentDateTime().toUTC());
+	return Zip::createArchiveZipper(zipEntries);
 }
 

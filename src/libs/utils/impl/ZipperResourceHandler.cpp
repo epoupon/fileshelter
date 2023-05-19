@@ -18,35 +18,47 @@
  */
 
 #include "ZipperResourceHandler.hpp"
+#include "utils/Logger.hpp"
 
 #include <array>
 
 std::unique_ptr<IResourceHandler>
-createZipperResourceHandler(std::unique_ptr<Zip::Zipper> zipper)
+createZipperResourceHandler(std::unique_ptr<Zip::IZipper> zipper)
 {
 	return std::make_unique<ZipperResourceHandler>(std::move(zipper));
 }
 
-ZipperResourceHandler::ZipperResourceHandler(std::unique_ptr<Zip::Zipper> zipper)
+ZipperResourceHandler::ZipperResourceHandler(std::unique_ptr<Zip::IZipper> zipper)
 : _zipper {std::move(zipper)}
 {
 }
 
-Wt::Http::ResponseContinuation*
+void
 ZipperResourceHandler::processRequest(const Wt::Http::Request& request, Wt::Http::Response& response)
 {
-	std::array<std::byte, _bufferSize> buffer;
-	const Zip::SizeType nbWrittenBytes {_zipper->writeSome(buffer.data(), buffer.size())};
-
-	response.out().write(reinterpret_cast<const char *>(buffer.data()), nbWrittenBytes);
-
-	if (!_zipper->isComplete())
+	try
 	{
-		Wt::Http::ResponseContinuation* continuation {response.createContinuation()};
-		continuation->setData(_zipper);
-		return continuation;
+		_zipper->writeSome(response.out());
 	}
-
-	return nullptr;
+	catch (const Zip::Exception& e)
+	{
+		FS_LOG(UTILS, ERROR) << "Caught exception while writing zip: " << e.what();
+		_zipper.reset();
+	}
 }
 
+bool
+ZipperResourceHandler::isComplete() const
+{
+	return !_zipper || _zipper->isComplete();
+}
+
+void
+ZipperResourceHandler::abort()
+{
+	if (!_zipper)
+		return;
+
+	_zipper->abort();
+	_zipper.reset();
+}

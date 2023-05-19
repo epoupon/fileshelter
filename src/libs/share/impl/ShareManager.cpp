@@ -71,11 +71,14 @@ namespace Share
 				{
 					std::error_code ec;
 					const std::filesystem::path filePath {file.path.is_absolute() ? file.path : workingDirectory / file.path};
-					const std::uintmax_t fileSize {std::filesystem::file_size(file.path.is_absolute() ? file.path : workingDirectory / file.path, ec)};
+
+					if (!std::filesystem::is_regular_file(filePath, ec))
+						throw FileException {filePath, ec ? ec.message() : "not a regular file"};
+
+					const std::uintmax_t fileSize {std::filesystem::file_size(filePath, ec)};
 					if (ec)
-					{
 						throw FileException {filePath, ec.message()};
-					}
+
 					return fileSize;
 				});
 

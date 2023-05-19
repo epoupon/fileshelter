@@ -37,7 +37,7 @@ FileResourceHandler::FileResourceHandler(const std::filesystem::path& path)
 }
 
 
-Wt::Http::ResponseContinuation*
+void
 FileResourceHandler::processRequest(const Wt::Http::Request& request, Wt::Http::Response& response)
 {
 	::uint64_t startByte {_offset};
@@ -51,7 +51,7 @@ FileResourceHandler::processRequest(const Wt::Http::Request& request, Wt::Http::
 		if (startByte == 0)
 			response.setStatus(404);
 
-		return {};
+		return;
 	}
 
 	if (startByte == 0)
@@ -74,7 +74,7 @@ FileResourceHandler::processRequest(const Wt::Http::Request& request, Wt::Http::
 
 			FS_LOG(UTILS, DEBUG) << "Range not satisfiable";
 			_isFinished = true;
-			return {};
+			return;
 		}
 
 		if (ranges.size() == 1)
@@ -105,7 +105,8 @@ FileResourceHandler::processRequest(const Wt::Http::Request& request, Wt::Http::
 	{
 		const int err {errno};
 		FS_LOG(UTILS, ERROR) << "Failed to seek in file '" << _path.string() << "' at " << startByte << ": " << std::string {::strerror(err)};
-		return {};
+		_isFinished = true;
+		return;
 	}
 
 	std::vector<char> buf;
@@ -118,27 +119,30 @@ FileResourceHandler::processRequest(const Wt::Http::Request& request, Wt::Http::
 	{
 		const int err {errno};
 		FS_LOG(UTILS, ERROR) << "Read failed in file '" << _path.string() << "': " << std::string {::strerror(err)};
-		return {};
+		_isFinished = true;
+		return;
 	}
 	const ::uint64_t actualPieceSize {static_cast<::uint64_t>(ifs.gcount())};
 	response.out().write(&buf[0], actualPieceSize);
 
-	FS_LOG(UTILS, DEBUG) << "Written " << actualPieceSize << " bytes";
-
-	FS_LOG(UTILS, DEBUG) << "Progress: " << actualPieceSize << "/" << restSize;
 	if (ifs.good() && actualPieceSize < restSize)
 	{
 		_offset = startByte + actualPieceSize;
-		FS_LOG(UTILS, DEBUG) << "Job not complete! Next chunk offset = " << _offset;
-
-		return response.createContinuation();
+		return;
 	}
 
 	_isFinished = true;
-	FS_LOG(UTILS, DEBUG) << "Job complete!";
-
-	return {};
 }
 
+bool
+FileResourceHandler::isComplete() const
+{
+	return _isFinished;
+}
 
+void
+FileResourceHandler::abort()
+{
+	_isFinished = true;
+}
 
