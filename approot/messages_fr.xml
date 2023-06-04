@@ -39,7 +39,8 @@
 	<message id="msg-unlock">Dévérouiller</message>
 	<message id="msg-upload-in-progress">Envoi en cours...</message>
 	<message id="msg-upload">Envoyer</message>
-	<message id="msg-validity-period">Durée de validité</message>
+	<message id="msg-validity-period">Période de validité</message>
+	<message id="msg-validity-period-unit">Unité de la période de validité</message>
 	<message id="Wt.WDateValidator.DateTooEarly">La date doit être après {1}</message>
 	<message id="Wt.WDateValidator.DateTooLate">La date doit être avant {1}</message>
 	<message id="Wt.WDateValidator.WrongDateRange">La date doit être comprise entre {1} et {2}</message>

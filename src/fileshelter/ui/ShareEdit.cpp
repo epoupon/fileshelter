@@ -79,8 +79,8 @@ namespace UserInterface
 		Wt::WTemplate *t {addNew<Wt::WTemplate>(tr("template-share-edit"))};
 		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
-		t->bindInt("download-count", share.readCount);
-		t->bindString("expiry-date-time", share.expiryTime.toString() + " UTC", Wt::TextFormat::Plain);
+		t->bindNew<Wt::WText>("download-count", std::to_string(share.readCount), Wt::TextFormat::Plain);
+		t->bindNew<Wt::WText>("expiry-date-time", share.expiryTime.toString() + " UTC", Wt::TextFormat::Plain);
 
 		t->bindWidget("download-link", ShareUtils::createShareDownloadAnchor(share.uuid));
 

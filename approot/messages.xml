@@ -40,4 +40,5 @@
 	<message id="msg-upload-in-progress">Upload in progress...</message>
 	<message id="msg-upload">Upload</message>
 	<message id="msg-validity-period">Validity period</message>
+	<message id="msg-validity-period-unit">Validity period unit</message>
 </messages>

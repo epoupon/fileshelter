@@ -83,11 +83,11 @@ ShareDownload::displayDownload(const Share::ShareDesc& share, std::optional<std:
 	if (!share.description.empty())
 	{
 		t->setCondition("if-desc", true);
-		t->bindString("file-desc", Wt::WString::fromUTF8(std::string {share.description}), Wt::TextFormat::Plain);
+		t->bindNew<Wt::WText>("file-desc", Wt::WString::fromUTF8(std::string {share.description}), Wt::TextFormat::Plain);
 	}
 
-	t->bindString("share-size", ShareUtils::fileSizeToString(share.size), Wt::TextFormat::Plain);
-	t->bindString("expiry-date-time", share.expiryTime.toString() + " UTC", Wt::TextFormat::Plain);
+	t->bindNew<Wt::WText>("share-size", ShareUtils::fileSizeToString(share.size), Wt::TextFormat::Plain);
+	t->bindNew<Wt::WText>("expiry-date-time", share.expiryTime.toString() + " UTC", Wt::TextFormat::Plain);
 
 	{
 		Wt::WPushButton* downloadBtn {t->bindNew<Wt::WPushButton>("download-btn", tr("msg-download"))};
