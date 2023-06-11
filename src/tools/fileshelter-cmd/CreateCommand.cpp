@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2019 Emeric Poupon
  *
@@ -18,12 +17,13 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreateCommand.hpp"
+
 #include <stdlib.h>
 #include <filesystem>
 #include <iostream>
 #include <stdexcept>
 #include <vector>
-#include <boost/program_options.hpp>
 
 #include "share/CreateParameters.hpp"
 #include "share/IShareManager.hpp"
@@ -43,7 +43,6 @@ conflictingOptions(const boost::program_options::variables_map& vm, const char* 
 	}
 }
 
-static
 void
 processCreateCommand(Share::IShareManager& shareManager,
 		const std::vector<std::string>& files,
@@ -78,83 +77,74 @@ processCreateCommand(Share::IShareManager& shareManager,
 	}
 }
 
-int main(int argc, char* argv[])
+CreateCommand::CreateCommand(std::string_view processArg)
+	: _processArg {processArg}
 {
-	try
+	namespace po = boost::program_options;
+
+	po::options_description options {"Options"};
+	options.add_options()
+		("conf,c", po::value<std::string>()->default_value("/etc/fileshelter.conf"), "fileshelter config file")
+		("desc", po::value<std::string>()->default_value(""), "description")
+		("password", po::value<std::string>()->default_value(""), "password")
+		("validity-hours", po::value<unsigned>(), "validity period in hours")
+		("validity-days", po::value<unsigned>(), "Validity period in days")
+		("url,u", po::value<std::string>()->default_value(""), "deploy URL");
+
+	po::options_description hiddenOptions{"Hidden options"};
+	hiddenOptions.add_options()
+		("file", po::value<std::vector<std::string>>()->composing(), "file");
+
+	_allOptions.add(options).add(hiddenOptions);
+	_visibleOptions.add(options);
+
+}
+
+
+void
+CreateCommand::displayHelp(std::ostream& os) const
+{
+	os << "Usage: " << _processArg << " " << getName() << " [options] file...\n";
+	os << _visibleOptions << std::endl;
+}
+
+int
+CreateCommand::process(const std::vector<std::string>& args) const
+{
+	namespace po = boost::program_options;
+
+	po::positional_options_description pos;
+	pos.add("file", -1);
+
+	po::variables_map vm;
 	{
-		namespace po = boost::program_options;
-
-		po::options_description allOptions;
-		po::options_description visibleOptions;
-		{
-			po::options_description options{"Options"};
-			options.add_options()
-				("help,h", "print usage message")
-				("conf,c", po::value<std::string>()->default_value("/etc/fileshelter.conf"), "fileshelter config file")
-				("desc", po::value<std::string>()->default_value(""), "description")
-				("password", po::value<std::string>()->default_value(""), "password")
-				("validity-hours", po::value<unsigned>(), "validity period in hours")
-				("validity-days", po::value<unsigned>(), "Validity period in days")
-				("url,u", po::value<std::string>()->default_value(""), "deploy URL");
-
-			po::options_description hiddenOptions{"Hidden options"};
-			hiddenOptions.add_options()
-				("file,f", po::value<std::vector<std::string>>()->composing(), "file");
-
-			allOptions.add(options).add(hiddenOptions);
-			visibleOptions.add(options);
-		}
-
-		po::positional_options_description pos;
-		pos.add("file", -1);
-
-		po::variables_map vm;
-		{
-			po::parsed_options parsed {po::command_line_parser(argc, argv).
-			    options(allOptions).
-			    positional(pos).
-			    run()
-			};
-			po::store(parsed, vm);
-		}
-
-		auto displayUsage {[&](std::ostream& os)
-		{
-			os << "Usage: " << argv[0] << " [options] file..." << std::endl;
-			os << visibleOptions << std::endl;
-		}};
-
-		if (vm.count("help"))
-		{
-			displayUsage(std::cout);
-			return EXIT_SUCCESS;
-		}
-		else if (!vm.count("file"))
-		{
-			displayUsage(std::cerr);
-			return EXIT_FAILURE;
-		}
-
-		Service<IConfig> config {createConfig(vm["conf"].as<std::string>())};
-		Service<Share::IShareManager> shareManager {Share::createShareManager(false /* enableCleaner */)};
-
-		conflictingOptions(vm, "validity-hours", "validity-days");
-
-		std::chrono::seconds validityPeriod {};
-		if (vm.count("validity-hours"))
-			validityPeriod = std::chrono::hours {vm["validity-hours"].as<unsigned>()};
-		else if (vm.count("validity-days"))
-			validityPeriod = std::chrono::hours {vm["validity-days"].as<unsigned>()} * 24;
-		else
-			validityPeriod = shareManager.get()->getDefaultValidityPeriod();
-
-		processCreateCommand(*shareManager.get(), vm["file"].as<std::vector<std::string>>(), vm["desc"].as<std::string>(), validityPeriod, vm["password"].as<std::string>(), vm["url"].as<std::string>());
+		po::parsed_options parsed {po::command_line_parser(args)
+			.options(_allOptions)
+				.positional(pos)
+				.run()};
+		po::store(parsed, vm);
 	}
-	catch (const std::exception& e)
+
+	if (!vm.count("file"))
 	{
-		std::cerr << "Caught exception: " << e.what() << std::endl;
+		displayHelp(std::cerr);
 		return EXIT_FAILURE;
 	}
+
+	Service<IConfig> config {createConfig(vm["conf"].as<std::string>())};
+	Service<Share::IShareManager> shareManager {Share::createShareManager(false /* enableCleaner */)};
+
+	conflictingOptions(vm, "validity-hours", "validity-days");
+
+	std::chrono::seconds validityPeriod {};
+	if (vm.count("validity-hours"))
+		validityPeriod = std::chrono::hours {vm["validity-hours"].as<unsigned>()};
+	else if (vm.count("validity-days"))
+		validityPeriod = std::chrono::hours {vm["validity-days"].as<unsigned>()} * 24;
+	else
+		validityPeriod = shareManager.get()->getDefaultValidityPeriod();
+
+	processCreateCommand(*shareManager.get(), vm["file"].as<std::vector<std::string>>(), vm["desc"].as<std::string>(), validityPeriod, vm["password"].as<std::string>(), vm["url"].as<std::string>());
 
 	return EXIT_SUCCESS;
 }

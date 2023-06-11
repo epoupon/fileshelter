@@ -1,3 +1,1 @@
-add_subdirectory(fileshelter-create)
-add_subdirectory(fileshelter-list)
-
+add_subdirectory(fileshelter-cmd)

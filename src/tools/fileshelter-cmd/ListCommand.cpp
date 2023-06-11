@@ -17,10 +17,11 @@
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ListCommand.hpp"
+
 #include <stdlib.h>
 #include <filesystem>
 #include <iostream>
-#include <boost/program_options.hpp>
 
 #include "share/IShareManager.hpp"
 #include "utils/IConfig.hpp"
@@ -62,38 +63,42 @@ processListCommand(Share::IShareManager& shareManager, bool details, std::string
 	std::cout << std::endl << "Share count: " << nbShares << ", " << totalShareSize << " bytes" << std::endl;
 }
 
-int main(int argc, char* argv[])
+ListCommand::ListCommand(std::string_view processArg)
+	: _processArg {processArg}
+	, _options {"Options"}
 {
-	try
+	namespace po = boost::program_options;
+
+	_options.add_options()
+		("conf,c", po::value<std::string>()->default_value("/etc/fileshelter.conf"), "fileshelter config file")
+		("url,u", po::value<std::string>()->default_value(""), "deploy URL")
+		("details,d", "Show details");
+}
+
+void
+ListCommand::displayHelp(std::ostream& os) const
+{
+	os << "Usage: " << _processArg << " " << getName() << " [options]\n\n";
+	os << _options << std::endl;
+}
+
+int
+ListCommand::process(const std::vector<std::string>& args) const
+{
+	namespace po = boost::program_options;
+
+	po::variables_map vm;
 	{
-		namespace po = boost::program_options;
-
-		po::options_description options {"Options"};
-		options.add_options()
-			("help,h", "print usage message")
-			("conf,c", po::value<std::string>()->default_value("/etc/fileshelter.conf"), "fileshelter config file")
-			("url,u", po::value<std::string>()->default_value(""), "deploy URL")
-			("details,d", "Show details");
-
-		po::variables_map vm;
-        po::store(po::parse_command_line(argc, argv, options), vm);
-
-		if (vm.count("help"))
-		{
-			std::cout << options << std::endl;
-            return EXIT_SUCCESS;
-        }
-
-		Service<IConfig> config {createConfig(vm["conf"].as<std::string>())};
-		Service<Share::IShareManager> shareManager {Share::createShareManager(false /* enableCleaner */)};
-
-		processListCommand(*shareManager.get(), vm.count("details"), vm["url"].as<std::string>());
+		po::parsed_options parsed {po::command_line_parser(args)
+			.options(_options)
+			.run()};
+		po::store(parsed, vm);
 	}
-	catch (const std::exception& e)
-	{
-		std::cerr << "Caught exception: " << e.what() << std::endl;
-		return EXIT_FAILURE;
-	}
+
+	Service<IConfig> config {createConfig(vm["conf"].as<std::string>())};
+	Service<Share::IShareManager> shareManager {Share::createShareManager(false /* enableCleaner */)};
+
+	processListCommand(*shareManager.get(), vm.count("details"), vm["url"].as<std::string>());
 
 	return EXIT_SUCCESS;
 }
