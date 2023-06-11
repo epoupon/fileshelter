@@ -27,6 +27,7 @@
 #include "utils/IConfig.hpp"
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
+#include "Common.hpp"
 
 static
 void
@@ -41,23 +42,7 @@ processListCommand(Share::IShareManager& shareManager, bool details, std::string
 	{
 		nbShares++;
 		totalShareSize += share.size;
-
-		std::cout << "Share '" << share.uuid.toString()
-				<< "', expires " << share.expiryTime.toString() << " UTC, "
-				<< "created by '" << share.creatorAddress << "', "
-				<< share.size << " bytes" << ", "
-				<< share.files.size() << " file" << (share.files.size() == 1 ? "" : "s") << ", "
-				<< share.readCount << " download" << (share.readCount > 1 ? "s" : "") << std::endl;
-		if (!details)
-			return;
-
-		if (!deployURL.empty())
-			std::cout << "\tDownload URL: " << deployURL << "/share-download/" << share.uuid.toString() << std::endl;
-
-		for (const Share::FileDesc& file : share.files)
-		{
-			std::cout << "\tFile '" << file.path.string() << "'" << (file.isOwned ? " (owned)" : "") << ", '" << file.clientPath.string() << "', " << file.size << " bytes" << std::endl;
-		}
+		displayShareDesc(share, details, deployURL);
 	});
 
 	std::cout << std::endl << "Share count: " << nbShares << ", " << totalShareSize << " bytes" << std::endl;

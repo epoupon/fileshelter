@@ -39,6 +39,7 @@ namespace Share
 	{
 		ShareDesc desc;
 		desc.uuid = share.getUUID();
+		desc.editUuid = share.getEditUUID();
 		desc.readCount = share.getReadCount();
 		desc.size = share.getShareSize();
 		desc.hasPassword = share.hasPassword();
@@ -124,7 +125,7 @@ namespace Share
 		FS_LOG(SHARE, DEBUG) << "Stopped share manager";
 	}
 
-	ShareEditUUID
+	ShareDesc
 	ShareManager::createShare(const ShareCreateParameters& shareParameters, const std::vector<FileCreateParameters>& filesParameters, bool transferFileOwnership)
 	{
 		FS_LOG(SHARE, DEBUG) << "Creating share! nb files = " << filesParameters.size();
@@ -158,7 +159,7 @@ namespace Share
 				file.modify()->setSize(fileSizes[i]);
 			}
 
-			return share->getEditUUID();
+			return shareToDesc(*share.get());
 		}
 	}
 

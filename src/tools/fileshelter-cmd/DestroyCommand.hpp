@@ -19,24 +19,24 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
+#include <boost/program_options.hpp>
 #include "ICommand.hpp"
 
-class HelpCommand : public ICommand
+class DestroyCommand : public ICommand
 {
 	public:
-		HelpCommand(std::string_view processArg, const std::vector<std::unique_ptr<ICommand>>& commands);
+		DestroyCommand(std::string_view processArg);
 
-		std::string_view getName() const { return "help"; }
-		std::string_view getDescription() const { return "Show this help or display command specific help"; }
+	private:
+		std::string_view getName() const { return "destroy"; }
+		std::string_view getDescription() const { return "Destroy shares"; }
+
 		void displayHelp(std::ostream& os) const override;
 		int process(const std::vector<std::string>& args) const override;
 
-	private:
-		std::string generateCommandDesc(const std::vector<std::unique_ptr<ICommand>>& commands) const;
-
 		const std::string _processArg;
-		const std::vector<std::unique_ptr<ICommand>>& _commands;
+		boost::program_options::options_description _allOptions;
+		boost::program_options::options_description _visibleOptions;
+		boost::program_options::options_description _hiddenOptions;
 };
 

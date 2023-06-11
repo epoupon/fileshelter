@@ -19,24 +19,12 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
-#include "ICommand.hpp"
+#include <string_view>
 
-class HelpCommand : public ICommand
+namespace Share
 {
-	public:
-		HelpCommand(std::string_view processArg, const std::vector<std::unique_ptr<ICommand>>& commands);
+	struct ShareDesc;
+}
 
-		std::string_view getName() const { return "help"; }
-		std::string_view getDescription() const { return "Show this help or display command specific help"; }
-		void displayHelp(std::ostream& os) const override;
-		int process(const std::vector<std::string>& args) const override;
-
-	private:
-		std::string generateCommandDesc(const std::vector<std::unique_ptr<ICommand>>& commands) const;
-
-		const std::string _processArg;
-		const std::vector<std::unique_ptr<ICommand>>& _commands;
-};
+void displayShareDesc(const Share::ShareDesc& share, bool details, std::string_view deployURL);;
 

@@ -1,7 +1,9 @@
 
 add_executable(fileshelter-cmd
 	FileShelterCmd.cpp
+	Common.cpp
 	CreateCommand.cpp
+	DestroyCommand.cpp
 	HelpCommand.cpp
 	ListCommand.cpp
 	)

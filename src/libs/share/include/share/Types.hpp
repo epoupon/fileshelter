@@ -59,6 +59,7 @@ namespace Share
 	struct ShareDesc
 	{
 		ShareUUID				uuid;
+		ShareEditUUID			editUuid;
 		std::size_t				readCount {};
 		FileSize				size {};
 		bool					hasPassword {};

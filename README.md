@@ -21,9 +21,10 @@ A [demo](https://fileshelter-demo.poupon.dev) instance is available, with the fo
 Once the expiry date is reached, the share is no longer available for download. The files are actually deleted roughly two hours after the share has expired. This is to make sure to not interrupt a download in progress.
 
 ## Command line tool
-`fileshelter-cmd` is a command line tool to run commands:
-* list: list all the shares available for download
-* create: create a share using local files. The files are _not_ copied in the _Fileshelter_'s working directory. Therefore the files must still exist while the share is available for download. The files are _not_ deleted once the share has expired.
+`fileshelter-cmd` is a command line tool with the following features:
+* list all the shares available for download.
+* create a share using local files. The files are _not_ copied in the _Fileshelter_'s working directory. Therefore the files must still exist while the share is available for download. The files are _not_ deleted once the share has expired.
+* destroy shares.
 
 ## Installation
 See [INSTALL.md](INSTALL.md) file.

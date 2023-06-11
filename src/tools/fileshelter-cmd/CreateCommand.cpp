@@ -30,6 +30,7 @@
 #include "utils/IConfig.hpp"
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
+#include "Common.hpp"
 
 /* Function used to check that 'opt1' and 'opt2' are not specified
    at the same time. */
@@ -43,6 +44,7 @@ conflictingOptions(const boost::program_options::variables_map& vm, const char* 
 	}
 }
 
+static
 void
 processCreateCommand(Share::IShareManager& shareManager,
 		const std::vector<std::string>& files,
@@ -69,12 +71,10 @@ processCreateCommand(Share::IShareManager& shareManager,
 		fileParameters.emplace_back(FileCreateParameters {p, p.filename()});
 	}
 
-	const ShareEditUUID shareEditUUID {shareManager.createShare(shareParameters, fileParameters, false /* keep ownership */)};
-	std::cout << "Successfuly created share. Edit UUID = '" << shareEditUUID.toString() << "'" << std::endl;
-	if (!deployURL.empty())
-	{
-		std::cout << "\tEdit URL: " << deployURL << "/share-edit/" << shareEditUUID.toString() << std::endl;
-	}
+	const ShareDesc shareDesc {shareManager.createShare(shareParameters, fileParameters, false /* keep ownership */)};
+	std::cout << "Successfuly created share:" << std::endl;
+
+	displayShareDesc(shareDesc, true /* details */, deployURL);
 }
 
 CreateCommand::CreateCommand(std::string_view processArg)

@@ -34,6 +34,7 @@
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
 #include "CreateCommand.hpp"
+#include "DestroyCommand.hpp"
 #include "HelpCommand.hpp"
 #include "ListCommand.hpp"
 
@@ -54,8 +55,9 @@ int main(int argc, char* argv[])
 	{
 		Commands commands;
 		commands.push_back(std::make_unique<HelpCommand>(argv[0], commands));
-		commands.push_back(std::make_unique<CreateCommand>(argv[0]));
 		commands.push_back(std::make_unique<ListCommand>(argv[0]));
+		commands.push_back(std::make_unique<CreateCommand>(argv[0]));
+		commands.push_back(std::make_unique<DestroyCommand>(argv[0]));
 
 		if (argc <= 1)
 		{
