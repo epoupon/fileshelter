@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Emeric Poupon
+ * Copyright (C) 2023 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -19,10 +19,22 @@
 
 #pragma once
 
-#include <memory>
+#include <boost/program_options.hpp>
+#include "ICommand.hpp"
 
-#include "utils/IResourceHandler.hpp"
-#include "utils/IZipper.hpp"
+class ListCommand : public ICommand
+{
+	public:
+		ListCommand(std::string_view processArg);
 
-std::unique_ptr<IResourceHandler> createZipperResourceHandler(std::unique_ptr<Zip::IZipper> zipper);
+	private:
+		std::string_view getName() const { return "list"; }
+		std::string_view getDescription() const { return "List available shares"; }
+
+		void displayHelp(std::ostream& os) const override;
+		int process(const std::vector<std::string>& args) const override;
+
+		const std::string _processArg;
+		boost::program_options::options_description _options;
+};
 

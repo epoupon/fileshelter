@@ -18,18 +18,18 @@
  */
 
 #include <memory>
-#include "utils/Zipper.hpp"
+#include "utils/IZipper.hpp"
 #include "utils/IResourceHandler.hpp"
 
 class ZipperResourceHandler final : public IResourceHandler
 {
 	public:
-		ZipperResourceHandler(std::unique_ptr<Zip::Zipper> zipper);
+		ZipperResourceHandler(std::unique_ptr<Zip::IZipper> zipper);
 
 	private:
+		void processRequest(const Wt::Http::Request& request, Wt::Http::Response& response) override;
+		bool isComplete() const override;
+		void abort() override;
 
-		Wt::Http::ResponseContinuation* processRequest(const Wt::Http::Request& request, Wt::Http::Response& response) override;
-
-		static constexpr std::size_t _bufferSize {32768};
-		std::shared_ptr<Zip::Zipper> _zipper;
+		std::unique_ptr<Zip::IZipper> _zipper;
 };

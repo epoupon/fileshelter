@@ -28,6 +28,8 @@ class IResourceHandler
 	public:
 		virtual ~IResourceHandler() = default;
 
-		[[nodiscard]] virtual Wt::Http::ResponseContinuation* processRequest(const Wt::Http::Request& request, Wt::Http::Response& response) = 0;
+		virtual void processRequest(const Wt::Http::Request& request, Wt::Http::Response& response) = 0;
+		[[nodiscard]] virtual bool isComplete() const = 0;
+		virtual void abort() = 0;
 };
 

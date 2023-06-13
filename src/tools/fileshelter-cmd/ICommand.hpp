@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Emeric Poupon
+ * Copyright (C) 2023 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -16,13 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with fileshelter.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #pragma once
 
-#include <memory>
+#include <ostream>
+#include <string>
+#include <string_view>
+#include <vector>
 
-#include "utils/IResourceHandler.hpp"
-#include "utils/IZipper.hpp"
+class ICommand
+{
+	public:
+		virtual ~ICommand() = default;
 
-std::unique_ptr<IResourceHandler> createZipperResourceHandler(std::unique_ptr<Zip::IZipper> zipper);
-
+		virtual std::string_view getName() const = 0;
+		virtual std::string_view getDescription() const = 0;
+		virtual void displayHelp(std::ostream& os) const = 0;
+		virtual int process(const std::vector<std::string>& args) const = 0;
+};

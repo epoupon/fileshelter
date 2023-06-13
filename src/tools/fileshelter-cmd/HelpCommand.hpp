@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Emeric Poupon
+ * Copyright (C) 2023 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -20,9 +20,23 @@
 #pragma once
 
 #include <memory>
+#include <vector>
+#include "ICommand.hpp"
 
-#include "utils/IResourceHandler.hpp"
-#include "utils/IZipper.hpp"
+class HelpCommand : public ICommand
+{
+	public:
+		HelpCommand(std::string_view processArg, const std::vector<std::unique_ptr<ICommand>>& commands);
 
-std::unique_ptr<IResourceHandler> createZipperResourceHandler(std::unique_ptr<Zip::IZipper> zipper);
+		std::string_view getName() const { return "help"; }
+		std::string_view getDescription() const { return "Show this help or display command specific help"; }
+		void displayHelp(std::ostream& os) const override;
+		int process(const std::vector<std::string>& args) const override;
+
+	private:
+		std::string generateCommandDesc(const std::vector<std::unique_ptr<ICommand>>& commands) const;
+
+		const std::string _processArg;
+		const std::vector<std::unique_ptr<ICommand>>& _commands;
+};
 

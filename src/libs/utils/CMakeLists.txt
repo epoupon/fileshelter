@@ -5,7 +5,7 @@ add_library(fileshelterutils SHARED
 	impl/Logger.cpp
 	impl/String.cpp
 	impl/UUID.cpp
-	impl/Zipper.cpp
+	impl/ArchiveZipper.cpp
 	impl/ZipperResourceHandler.cpp
 	)
 
@@ -19,6 +19,7 @@ target_include_directories(fileshelterutils PRIVATE
 
 target_link_libraries(fileshelterutils PRIVATE
 	PkgConfig::Config++
+	PkgConfig::Archive
 	)
 
 target_link_libraries(fileshelterutils PUBLIC

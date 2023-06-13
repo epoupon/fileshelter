@@ -115,10 +115,10 @@ namespace UserInterface
 		form->complete().connect([=](const ShareCreateParameters& shareParameters, const std::vector<FileCreateParameters>& filesParameters)
 		{
 			FS_LOG(UI, DEBUG) << "Upload complete!";
-			const Share::ShareEditUUID editUUID {Service<IShareManager>::get()->createShare(shareParameters, filesParameters, true /* transfer file ownership */)};
+			const Share::ShareDesc shareDesc {Service<IShareManager>::get()->createShare(shareParameters, filesParameters, true /* transfer file ownership */)};
 
 			FS_LOG(UI, DEBUG) << "Redirecting...";
-			wApp->setInternalPath("/share-created/" + editUUID.toString(), true);
+			wApp->setInternalPath("/share-created/" + shareDesc.editUuid.toString(), true);
 
 			// Clear the widget in order to flush the temporary uploaded files
 			FS_LOG(UI, DEBUG) << "Clearing...";

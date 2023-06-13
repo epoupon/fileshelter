@@ -39,6 +39,7 @@ namespace Share
 	{
 		ShareDesc desc;
 		desc.uuid = share.getUUID();
+		desc.editUuid = share.getEditUUID();
 		desc.readCount = share.getReadCount();
 		desc.size = share.getShareSize();
 		desc.hasPassword = share.hasPassword();
@@ -71,11 +72,14 @@ namespace Share
 				{
 					std::error_code ec;
 					const std::filesystem::path filePath {file.path.is_absolute() ? file.path : workingDirectory / file.path};
-					const std::uintmax_t fileSize {std::filesystem::file_size(file.path.is_absolute() ? file.path : workingDirectory / file.path, ec)};
+
+					if (!std::filesystem::is_regular_file(filePath, ec))
+						throw FileException {filePath, ec ? ec.message() : "not a regular file"};
+
+					const std::uintmax_t fileSize {std::filesystem::file_size(filePath, ec)};
 					if (ec)
-					{
 						throw FileException {filePath, ec.message()};
-					}
+
 					return fileSize;
 				});
 
@@ -121,7 +125,7 @@ namespace Share
 		FS_LOG(SHARE, DEBUG) << "Stopped share manager";
 	}
 
-	ShareEditUUID
+	ShareDesc
 	ShareManager::createShare(const ShareCreateParameters& shareParameters, const std::vector<FileCreateParameters>& filesParameters, bool transferFileOwnership)
 	{
 		FS_LOG(SHARE, DEBUG) << "Creating share! nb files = " << filesParameters.size();
@@ -155,7 +159,7 @@ namespace Share
 				file.modify()->setSize(fileSizes[i]);
 			}
 
-			return share->getEditUUID();
+			return shareToDesc(*share.get());
 		}
 	}
 

@@ -3,19 +3,8 @@
 <!--FORMS message blocks-->
 
 <message id="template-main">
-	${navbar-top}
+	${navbar-top class="navbar-light bg-light mb-2"}
 	<div class="container">
-		${contents}
-	</div>
-</message>
-
-<message id="Wt.WNavigationBar.template">
-	<div class="container">
-		${collapse-button}
-		<div class="navbar-header">
-			${expand-button}
-			${title-link}
-		</div>
 		${contents}
 	</div>
 </message>
@@ -23,72 +12,50 @@
 <message id="template-share-create-form">
 	<h1><i class="fa fa-upload"></i> ${tr:msg-share-create}</h1>
 	${file-drop class="fs-horizontal-center"}
-	<div class="panel panel-default">
-		<div class="panel-heading">${tr:msg-files} <span class="badge">${share-size}</span></div>
-		<div class="panel-body">
-			${files}
-		</div>
+	<div class="card mb-3">
+		<div class="card-header">${tr:msg-files} <span class="badge bg-secondary">${share-size}</span></div>
+		<div class="card-body">${files}</div>
 	</div>
-	<div class="panel panel-default">
-		<div class="panel-heading fs-collapsible-panel-header" data-toggle="collapse" data-target="#collapsiblePanel">${tr:msg-advanced-options}</div>
-		<div id="collapsiblePanel" class="panel-collapse collapse">
-			<div class="panel-body">
-				<div class="form-horizontal">
-					<div class="form-group">
-						<label class="control-label col-sm-2"  for="${id:desc}">
-							${tr:msg-description}
-						</label>
-						<div class="col-sm-5">
-							${desc}
-						</div>
-						<div class="help-block col-sm-5">
-							${desc-info}
-						</div>
-					</div>
-					${<if-validity-period>}
-						<div class="form-group">
-							<label class="control-label col-sm-2"  for="${id:validity-period}">
-								${tr:msg-validity-period}
-							</label>
-							<div class="col-sm-5">
-								<div  class="row">
-									<div class="col-sm-6">
-										${validity-period}
-									</div>
-									<div class="col-sm-6">
-										${validity-period-unit}
-									</div>
-								</div>
-							</div>
-							<div class="help-block col-sm-5">
-								${validity-period-info}
-							</div>
-						</div>
-						${</if-validity-period>}
-
-					<div class="form-group">
-						<label class="control-label col-sm-2"  for="${id:password}">
-							${tr:msg-password}
-						</label>
-						<div class="col-sm-5">
-							${password}
-						</div>
-						<div class="help-block col-sm-5">
-							${password-info}
-						</div>
-					</div>
+	<div class="collapse" id="advancedOptions">
+	<div class="card mb-3">
+		<div class="card-header">${tr:msg-advanced-options}</div>
+		<div class="card-body">
+			<div class="row g-3">
+				${<if-validity-period>}
+				<div class="col-md-6">
+					<label class="form-label"  for="${id:validity-period}">${tr:msg-validity-period}</label>
+					${validity-period class="form-control"}
+					<div class="form-text">${validity-period-info}</div>
+				</div>
+				<div class="col-md-6">
+					<label class="form-label"  for="${id:validity-period-unit}">${tr:msg-validity-period-unit}</label>
+					${validity-period-unit class="form-control"}
+					<div class="form-text">${validity-period-unit-info}</div>
+				</div>
+				${</if-validity-period>}
+				<div class="col-md-6">
+					<label class="form-label"  for="${id:desc}">${tr:msg-description}</label>
+					${desc class="form-control"}
+					<div class="form-text">${desc-info}</div>
+				</div>
+				<div class="col-md-6">
+					<label class="form-label"  for="${id:password}">${tr:msg-password}</label>
+					${password class="form-control"}
+					<div class="form-text">${password-info}</div>
 				</div>
 			</div>
 		</div>
+		</div>
 	</div>
 	${error}
-	<div class="form-group">
-		${create-btn class="btn-primary fs-horizontal-center"}
+	<div class="mb-3">
+		${create-btn class="btn btn-primary me-2"}
+		<button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#advancedOptions" aria-expanded="false" aria-controls="advancedOptions">${tr:msg-advanced-options}</button>
 	</div>
 </message>
 
 <message id="template-share-create-error">
-	<div class="alert alert-danger">
+	<div class="alert alert-danger" role="alert">
 		<i class="fa fa-warning" aria-hidden="true"></i> ${error}
 	</div>
 </message>
@@ -137,27 +104,13 @@
 
 <message id="template-share-created">
 	<h1><i class="fa fa-check"></i> ${tr:msg-share-create-success}</h1>
-	<div class="form-horizontal">
-		<div class="form-group">
-			<label class="control-label col-sm-2"  for="${id:public-link}">
-				<i class="fa fa-download"></i> ${tr:msg-download-link}
-			</label>
-			<div class="col-sm-10">
-				<div class="well well-sm">
-					${download-link}
-				</div>
-			</div>
-		</div>
-		<div class="form-group">
-			<label class="control-label col-sm-2"  for="${id:edit-link}">
-				<i class="fa fa-edit"></i> ${tr:msg-edit-link}
-			</label>
-			<div class="col-sm-10">
-				<div class="well well-sm">
-					${edit-link}
-				</div>
-			</div>
-		</div>
+	<div class="row mb-3">
+		<label class="col-form-label col-sm-2"><i class="fa fa-download"></i> ${tr:msg-download-link}</label>
+		<div class="col-sm-10">${download-link class="form-control"}</div>
+	</div>
+	<div class="row mb-3">
+		<label class="col-form-label col-sm-2"><i class="fa fa-edit"></i> ${tr:msg-edit-link}</label>
+		<div class="col-sm-10">${edit-link class="form-control"}</div>
 	</div>
 </message>
 
@@ -193,54 +146,26 @@
 		${error}
 	</div>
 	${</if-error>}
-	<div class="form-horizontal">
-		${<if-desc>}
-			<div class="form-group">
-				<label class="control-label col-sm-2">
-					${tr:msg-description}
-				</label>
-				<div class="col-sm-10">
-					<div class="well well-sm">
-						${file-desc}
-					</div>
-				</div>
-			</div>
-			${</if-desc>}
-		<div class="form-group">
-			<label class="control-label col-sm-2">
-				${tr:msg-share-size}
-			</label>
-			<div class="col-sm-10">
-				<div class="well well-sm">
-					${share-size}
-				</div>
-			</div>
-		</div>
-		<div class="form-group">
-			<label class="control-label col-sm-2">
-				${tr:msg-expires}
-			</label>
-			<div class="col-sm-10">
-				<div class="well well-sm">
-					${expiry-date-time}
-				</div>
-			</div>
-		</div>
-		<div class="form-group">
-			<label class="control-label col-sm-2">
-				${tr:msg-files}
-			</label>
-			<div class="col-sm-10">
-				<div class="well well-sm">
-					${files}
-				</div>
-			</div>
-		</div>
-		<div class="form-group">
-			<div class="col-sm-offset-2 col-sm-5">
-				${download-btn class="btn-primary"}
-			</div>
-		</div>
+	${<if-desc>}
+	<div class="row mb-3">
+		<label class="col-form-label col-sm-2">${tr:msg-description}</label>
+		<div class="col-sm-10">${file-desc class="form-control"}</div>
+	</div>
+	${</if-desc>}
+	<div class="row mb-3">
+		<label class="col-form-label col-sm-2">${tr:msg-share-size}</label>
+		<div class="col-sm-10">${share-size class="form-control"}</div>
+	</div>
+	<div class="row mb-3">
+		<label class="col-form-label col-sm-2">${tr:msg-expires}</label>
+		<div class="col-sm-10">${expiry-date-time class="form-control"}</div>
+	</div>
+	<div class="row mb-3">
+		<label class="col-form-label col-sm-2">${tr:msg-files}</label>
+		<div class="col-sm-10">${files class="form-control"}</div>
+	</div>
+	<div class="row mb-3">
+		<div class="col-sm-10 offset-sm-2">${download-btn class="btn btn-primary"}</div>
 	</div>
 </message>
 
@@ -253,42 +178,20 @@
 
 <message id="template-share-edit">
 	<h1><i class="fa fa-edit"></i> ${tr:msg-share-edit}</h1>
-	<div class="form-horizontal">
-		<div class="form-group">
-			<label class="control-label col-sm-2">
-				${tr:msg-expires}
-			</label>
-			<div class="col-sm-5">
-				<div class="well well-sm">
-					${expiry-date-time}
-				</div>
-			</div>
-		</div>
-		<div class="form-group">
-			<label class="control-label col-sm-2">
-				${tr:msg-download-count}
-			</label>
-			<div class="col-sm-5">
-				<div class="well well-sm">
-					${download-count}
-				</div>
-			</div>
-		</div>
-		<div class="form-group">
-			<label class="control-label col-sm-2">
-				${tr:msg-download-link}
-			</label>
-			<div class="col-sm-5">
-				<div class="well well-sm">
-					${download-link}
-				</div>
-			</div>
-		</div>
-		<div class="form-group">
-			<div class="col-sm-offset-2 col-sm-5">
-				${delete-btn class="btn-danger"}
-			</div>
-		</div>
+	<div class="row mb-3">
+		<label class="col-form-label col-sm-2">${tr:msg-expires}</label>
+		<div class="col-sm-10">${expiry-date-time class="form-control"}</div>
+	</div>
+	<div class="row mb-3">
+		<label class="col-form-label col-sm-2">${tr:msg-download-count}</label>
+		<div class="col-sm-10">${download-count class="form-control"}</div>
+	</div>
+	<div class="row mb-3">
+		<label class="col-form-label col-sm-2"><i class="fa fa-download"></i> ${tr:msg-download-link}</label>
+		<div class="col-sm-10">${download-link class="form-control"}</div>
+	</div>
+	<div class="row mb-3">
+		<div class="col-sm-10 offset-sm-2">${delete-btn class="btn btn-danger"}</div>
 	</div>
 </message>
 

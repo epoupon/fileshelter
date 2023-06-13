@@ -34,7 +34,7 @@ namespace Share
 
 namespace Zip
 {
-	class Zipper;
+	class IZipper;
 }
 
 class ShareResource : public Wt::WResource
@@ -49,13 +49,11 @@ class ShareResource : public Wt::WResource
 		static Wt::WLink		createLink(const Share::ShareUUID& shareId, std::optional<std::string_view> password);
 
 	private:
-
 		std::filesystem::path getAbsolutePath(const std::filesystem::path& p);
-		std::unique_ptr<Zip::Zipper> createZipper(const Share::ShareDesc& share);
+		std::unique_ptr<Zip::IZipper> createZipper(const Share::ShareDesc& share);
 
 		std::filesystem::path		_workingDirectory;
 		static inline std::string	_deployPath;
 		void handleRequest(const Wt::Http::Request& request, Wt::Http::Response& response) override;
+		void handleAbort(const Wt::Http::Request& request) override;
 };
-
-

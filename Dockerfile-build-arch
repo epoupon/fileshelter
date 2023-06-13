@@ -5,6 +5,7 @@ ARG BUILD_PACKAGES="\
 	cmake \
 	boost \
 	gtest \
+	libarchive \
 	libconfig \
 	make \
 	pkgconfig \

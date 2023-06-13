@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Emeric Poupon
+ * Copyright (C) 2023 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -19,10 +19,12 @@
 
 #pragma once
 
-#include <memory>
+#include <string_view>
 
-#include "utils/IResourceHandler.hpp"
-#include "utils/IZipper.hpp"
+namespace Share
+{
+	struct ShareDesc;
+}
 
-std::unique_ptr<IResourceHandler> createZipperResourceHandler(std::unique_ptr<Zip::IZipper> zipper);
+void displayShareDesc(const Share::ShareDesc& share, bool details, std::string_view deployURL);;
 

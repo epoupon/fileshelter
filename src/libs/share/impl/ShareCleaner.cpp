@@ -87,8 +87,6 @@ namespace Share
 		Wt::Dbo::Session& session {_db.getTLSSession()};
 		Wt::Dbo::Transaction transaction {session};
 
-		FS_LOG(SHARE, DEBUG) << "Checking orphan file '" << filePath.string() << "', relative file path = '" << relativeFilePath.string() << "'";
-
 		return !File::getByPath(session, relativeFilePath)
 			&& !File::getByPath(session, filePath);
 	}

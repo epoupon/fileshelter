@@ -20,7 +20,7 @@
 #include "FileShelterApplication.hpp"
 
 #include <Wt/WEnvironment.h>
-#include <Wt/WBootstrapTheme.h>
+#include <Wt/WBootstrap5Theme.h>
 #include <Wt/WStackedWidget.h>
 #include <Wt/WNavigationBar.h>
 #include <Wt/WMenu.h>
@@ -96,10 +96,6 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env)
 	useStyleSheet("css/fileshelter.css");
 	useStyleSheet("resources/font-awesome/css/font-awesome.min.css");
 
-	// Extra javascript
-	requireJQuery("js/jquery-1.10.2.min.js");
-	require("js/bootstrap.min.js");
-
 	// Resouce bundles
 	messageResourceBundle().use(appRoot() + "templates");
 	messageResourceBundle().use(appRoot() + "messages");
@@ -107,9 +103,7 @@ FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env)
 	if (Service<IConfig>::get()->getPath("tos-custom").empty())
 		messageResourceBundle().use(appRoot() + "tos");
 
-	auto bootstrapTheme {std::make_unique<Wt::WBootstrapTheme>()};
-	bootstrapTheme->setVersion(Wt::BootstrapVersion::v3);
-	bootstrapTheme->setResponsive(true);
+	auto bootstrapTheme {std::make_unique<Wt::WBootstrap5Theme>()};
 	setTheme(std::move(bootstrapTheme));
 
 	FS_LOG(UI, INFO) << "Client address = " << env.clientAddress() << ", UserAgent = '" << env.userAgent() << "', Locale = " << env.locale().name() << ", path = '" << env.internalPath() << "'";
@@ -145,8 +139,7 @@ FileShelterApplication::initialize()
 	Wt::WTemplate* main {root()->addNew<Wt::WTemplate>(Wt::WString::tr("template-main"))};
 
 	Wt::WNavigationBar* navbar {main->bindNew<Wt::WNavigationBar>("navbar-top")};
-	navbar->setResponsive(true);
-	navbar->setTitle("<i class=\"fa fa-external-link\"></i> " + Wt::WString::tr("msg-app-name"), Wt::WLink(Wt::LinkType::InternalPath, defaultPath));
+	navbar->setTitle("<i class=\"fa fa-external-link\"></i> " + Wt::WString::tr("msg-app-name"), Wt::WLink {Wt::LinkType::InternalPath, defaultPath});
 
 	Wt::WMenu* menu {navbar->addMenu(std::make_unique<Wt::WMenu>())};
 	{
