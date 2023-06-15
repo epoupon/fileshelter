@@ -32,7 +32,7 @@ RUN \
 RUN \
 	DIR=/tmp/wt && mkdir -p ${DIR} && cd ${DIR} && \
 	cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${PREFIX} -DBUILD_EXAMPLES=OFF -DENABLE_LIBWTTEST=OFF -DCONNECTOR_FCGI=OFF -DINSTALL_THEMES=OFF && \
-	make && \
+	make -j$(nproc) && \
 	make install
 
 # Fileshelter
@@ -43,7 +43,7 @@ RUN \
 	PKG_CONFIG_PATH=/tmp/install/lib/pkgconfig CXXFLAGS="-I${PREFIX}/include" LDFLAGS="-L${PREFIX}/lib -Wl,--rpath-link=${PREFIX}/lib" cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_PREFIX_PATH=${PREFIX} && \
 	LD_LIBRARY_PATH=${PREFIX}/lib VERBOSE=1 make && \
 	LD_LIBRARY_PATH=${PREFIX}/lib make test && \
-	make install && \
+	make install -j$(nproc) && \
 	mkdir -p ${PREFIX}/etc/ && \
 	cp conf/fileshelter.conf ${PREFIX}/etc
 
@@ -67,7 +67,7 @@ RUN \
 	rm -rf /tmp/fakeroot/share/Wt/resources/themes/default && \
 	rm -rf /tmp/fakeroot/share/Wt/resources/themes/polished && \
 	rm -rf /tmp/fakeroot/share/Wt/resources/themes/bootstrap/2 && \
-	rm -rf /tmp/fakeroot/share/Wt/resources/themes/bootstrap/5
+	rm -rf /tmp/fakeroot/share/Wt/resources/themes/bootstrap/3
 
 ## Release Stage
 FROM		alpine:3.17 AS release
