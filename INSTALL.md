@@ -1,6 +1,6 @@
 - [Installation](#installation)
   - [From Docker images](#from-docker-images)
-  - [From packages](#from-packages)
+  - [From Debian packages](#from-debian-packages)
   - [From source](#from-source)
 - [Deployment](#deployment)
   - [Configuration](#configuration)
@@ -11,28 +11,22 @@
 ## From Docker images
 Official _Docker_ images are available, please see detailed instructions at https://hub.docker.com/r/epoupon/fileshelter.
 
-## From packages
-### Debian Bullseye packages
-
-_Bullseye_ packages are provided for _amd64_ and _armhf_ architectures.
-
+## From Debian packages
+_Bookworm_ packages are provided for _amd64_ architectures.
 As root, trust the following debian package provider and add it in your list of repositories:
 ```sh
-wget -O - https://debian.poupon.dev/apt/debian/epoupon.gpg.key | apt-key add -
-echo "deb https://debian.poupon.dev/apt/debian buster main" > /etc/apt/sources.list.d/epoupon.list
+wget https://debian.poupon.dev/apt/debian/epoupon.gpg -P /usr/share/keyrings
+echo "deb [signed-by=/usr/share/keyrings/epoupon.gpg] https://debian.poupon.dev/apt/debian bookworm main" > /etc/apt/sources.list.d/epoupon.list
 ```
-
 To install or upgrade _fileshelter_:
 ```sh
 apt update
 apt install fileshelter
 ```
-
 The _fileshelter_ service is started just after the package installation, run by a dedicated _fileshelter_ system user.</br>
 Please refer to [Deployment](#deployment) for further configuration options.
-
 ## From source
-__Note__: this installation process and the default values of the configuration files have been written for _Debian Bullseye_. Therefore, you may have to adapt commands and/or paths in order to fit to your distribution.
+__Note__: this installation process and the default values of the configuration files have been written for _Debian Bookworm_. Therefore, you may have to adapt commands and/or paths in order to fit to your distribution.
 ### Debian/Ubuntu dependencies
 __Note__: a C++17 compiler is needed to compile _fileshelter_
 ```sh
