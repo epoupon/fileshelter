@@ -41,6 +41,7 @@ namespace UserInterface
 			void displayPassword();
 
 			const std::filesystem::path& _workingDirectory;
+			bool _isPasswordVerified{};
 	};
 
 } // namespace UserInterface
