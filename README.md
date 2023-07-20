@@ -12,10 +12,11 @@ A [demo](https://fileshelter-demo.poupon.dev) instance is available, with the fo
 - Period of validity, from one hour to many years
 - Optional password protection (download and/or upload)
 - Practically unique links, using [UUID](https://fr.wikipedia.org/wiki/Universal_Unique_Identifier)
+- Create a zip file on the fly for shares containing multiple files
 - Private edit links, used to remove the files or to check the download counters
 - Terms Of Service support, fully or partially customizable
 - Multiple language support
-- Low memory requirements: the demo instance runs on a _Raspberry Pi Zero W_
+- Low memory requirements: the demo instance runs on a _Raspberry Pi_
 - Command line tools to list and create shares
 
 Once the expiry date is reached, the share is no longer available for download. The files are actually deleted roughly two hours after the share has expired. This is to make sure to not interrupt a download in progress.
