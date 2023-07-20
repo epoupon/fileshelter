@@ -72,7 +72,7 @@ namespace UserInterface
 		if (!wApp->internalPathMatches("/share-create"))
 			return;
 
-		if (PasswordUtils::isUploadPassordRequired())
+		if (!_isPasswordVerified && PasswordUtils::isUploadPassordRequired())
 			displayPassword();
 		else
 			displayCreate();
@@ -84,6 +84,7 @@ namespace UserInterface
 		ShareCreatePassword* view {addNew<ShareCreatePassword>()};
 		view->success().connect([=]
 		{
+			_isPasswordVerified = true;
 			clear();
 			displayCreate();
 		});
