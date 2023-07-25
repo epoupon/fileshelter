@@ -23,17 +23,17 @@ To install or upgrade _fileshelter_:
 apt update
 apt install fileshelter
 ```
-The _fileshelter_ service is started just after the package installation, run by a dedicated _fileshelter_ system user.</br>
+The _fileshelter_ service is started just after the package installation, run by a dedicated `fileshelter` system user.</br>
 Please refer to [Deployment](#deployment) for further configuration options.
 ## From source
 __Note__: this installation process and the default values of the configuration files have been written for _Debian Bookworm_. Therefore, you may have to adapt commands and/or paths in order to fit to your distribution.
 ### Debian/Ubuntu dependencies
 __Note__: a C++17 compiler is needed to compile _fileshelter_
 ```sh
-apt-get install build-essential cmake libboost-dev libconfig++-dev
+apt-get install build-essential cmake libboost-dev libconfig++-dev libarchive-dev
 ```
 
-You also need _Wt4_, that is not packaged yet on _Debian_. See [installation instructions](https://www.webtoolkit.eu/wt/doc/reference/html/InstallationUnix.html).
+You also need _Wt4_, that is not packaged on _Debian_. See [installation instructions](https://www.webtoolkit.eu/wt/doc/reference/html/InstallationUnix.html).
 
 ### Build
 ```sh
@@ -71,7 +71,7 @@ cp /usr/share/fileshelter/fileshelter.conf /etc/fileshelter.conf
 cp /usr/share/fileshelter/fileshelter.service /lib/systemd/system/fileshelter.service
 ```
 
-Create the working directory and give it access to the _fileshelter_ user:
+Create the working directory and give it access to the `fileshelter` user:
 ```sh
 mkdir /var/fileshelter
 chown -R fileshelter:fileshelter /var/fileshelter
@@ -103,13 +103,15 @@ systemctl restart fileshelter
 ## Configuration
 _Fileshelter_ uses a configuration file, installed by default in `/etc/fileshelter.conf`. It is recommended to edit this file and change relevant settings (listen address, listen port, working directory, ...).
 
-A basic _Terms of Services_ is provided. The configuration file contains the definition of the fields needed by the default tos.
-You may also specify an alternate tos file to fit your needs.
+A basic _Terms of Services_ is provided. The configuration file contains the definition of the fields needed by the default ToS.
+You may also specify an alternate ToS file to fit your needs.
 
 If a setting is not present in the configuration file, a hardcoded default value is used (the same as in the [default.conf](conf/fileshelter.conf) file)
 
 ## Reverse proxy settings
-_Fileshelter_ is shipped with an embedded web server, but it is recommended to deploy behind a reverse proxy. You have to set the _behind-reverse-proxy_ option to _true_ in the `fileshelter.conf` configuration file.
+_Fileshelter_ is shipped with an embedded web server, but it is recommended to deploy behind a reverse proxy.
+You have to set the `behind-reverse-proxy` option to `true` in the `fileshelter.conf` configuration file and to adjust the trusted proxy list in `trusted-proxies`.
+__Note__: when running in a docker environment, you have to trust the docker gateway IP (which is `172.17.0.1` by default)
 
 Here is an example to make _Fileshelter_ properly work on _myserver.org_ using _nginx_:
 ```
@@ -143,7 +145,7 @@ server {
 systemctl start fileshelter
 ```
 
-Log traces can be accessed using journactl:
+Logs can be accessed using `journalctl`:
 ```sh
 journalctl -u fileshelter.service
 ```
