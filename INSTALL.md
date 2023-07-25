@@ -18,17 +18,17 @@ As root, trust the following debian package provider and add it in your list of 
 wget https://debian.poupon.dev/apt/debian/epoupon.gpg -P /usr/share/keyrings
 echo "deb [signed-by=/usr/share/keyrings/epoupon.gpg] https://debian.poupon.dev/apt/debian bookworm main" > /etc/apt/sources.list.d/epoupon.list
 ```
-To install or upgrade _fileshelter_:
+To install or upgrade _Fileshelter_:
 ```sh
 apt update
 apt install fileshelter
 ```
-The _fileshelter_ service is started just after the package installation, run by a dedicated `fileshelter` system user.</br>
+The `fileshelter` service is started just after the package installation, run by a dedicated `fileshelter` system user.</br>
 Please refer to [Deployment](#deployment) for further configuration options.
 ## From source
 __Note__: this installation process and the default values of the configuration files have been written for _Debian Bookworm_. Therefore, you may have to adapt commands and/or paths in order to fit to your distribution.
 ### Debian/Ubuntu dependencies
-__Note__: a C++17 compiler is needed to compile _fileshelter_
+__Note__: a C++17 compiler is needed to compile _Fileshelter_
 ```sh
 apt-get install build-essential cmake libboost-dev libconfig++-dev libarchive-dev
 ```
@@ -103,7 +103,7 @@ systemctl restart fileshelter
 ## Configuration
 _Fileshelter_ uses a configuration file, installed by default in `/etc/fileshelter.conf`. It is recommended to edit this file and change relevant settings (listen address, listen port, working directory, ...).
 
-A basic _Terms of Services_ is provided. The configuration file contains the definition of the fields needed by the default ToS.
+A basic _Terms of Service_ is provided. The configuration file contains the definition of the fields needed by the default ToS.
 You may also specify an alternate ToS file to fit your needs.
 
 If a setting is not present in the configuration file, a hardcoded default value is used (the same as in the [default.conf](conf/fileshelter.conf) file)
@@ -111,6 +111,7 @@ If a setting is not present in the configuration file, a hardcoded default value
 ## Reverse proxy settings
 _Fileshelter_ is shipped with an embedded web server, but it is recommended to deploy behind a reverse proxy.
 You have to set the `behind-reverse-proxy` option to `true` in the `fileshelter.conf` configuration file and to adjust the trusted proxy list in `trusted-proxies`.
+
 __Note__: when running in a docker environment, you have to trust the docker gateway IP (which is `172.17.0.1` by default)
 
 Here is an example to make _Fileshelter_ properly work on _myserver.org_ using _nginx_:
