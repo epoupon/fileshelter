@@ -26,12 +26,26 @@
 
 namespace UserInterface::ShareUtils
 {
+    
+    static
+    std::string
+    getScheme()
+    {
+        const std::string xForwardedProto = wApp->environment().getHeaderValue("X-Forwarded-Proto");
+        if (!xForwardedProto.empty())
+        {
+            return xForwardedProto;  // will be 'http' or 'https'
+        }
 
+        // Fallback if header is not set
+        return "http";
+    }
+    
 	static
 	std::string
 	computeURL(const std::string& internalPath)
 	{
-		return wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + (wApp->environment().deploymentPath() == "/" ? "" : wApp->environment().deploymentPath()) + internalPath;
+		return getScheme() + "://" + wApp->environment().hostName() + (wApp->environment().deploymentPath() == "/" ? "" : wApp->environment().deploymentPath()) + internalPath;
 	}
 
 	std::unique_ptr<Wt::WAnchor>
