@@ -31,7 +31,7 @@ namespace UserInterface::ShareUtils
     std::string
     getScheme()
     {
-        const std::string xForwardedProto = wApp->environment().HeaderValue("X-Forwarded-Proto");
+        const std::string xForwardedProto = wApp->environment().headerValue("X-Forwarded-Proto");
         if (!xForwardedProto.empty())
         {
             return xForwardedProto;  // will be 'http' or 'https'
