@@ -91,18 +91,7 @@ namespace UserInterface
 	{
 		auto model {std::make_shared<ShareDownloadPasswordFormModel>(shareUUID)};
 
-		setTemplateText(tr("template-share-download-password"));
-		addFunction("id", &WTemplate::Functions::id);
-		addFunction("block", &WTemplate::Functions::block);
-
-		// Password
-		auto password = std::make_unique<Wt::WLineEdit>();
-		password->setEchoMode(Wt::EchoMode::Password);
-		setFormWidget(ShareDownloadPasswordFormModel::PasswordField, std::move(password));
-
-		// Buttons
-		Wt::WPushButton *unlockBtn = bindNew<Wt::WPushButton>("unlock-btn", tr("msg-unlock"));
-		unlockBtn->clicked().connect([=]
+		auto validateForm {[this, model]
 		{
 			updateModel(model.get());
 
@@ -117,7 +106,21 @@ namespace UserInterface
 			FS_LOG(UI, DEBUG) << "Download password validation failed";
 
 			updateView(model.get());
-		});
+		}};
+
+		setTemplateText(tr("template-share-download-password"));
+		addFunction("id", &WTemplate::Functions::id);
+		addFunction("block", &WTemplate::Functions::block);
+
+		// Password
+		auto password = std::make_unique<Wt::WLineEdit>();
+		password->setEchoMode(Wt::EchoMode::Password);
+		password->enterPressed().connect([=]{ validateForm(); });
+		setFormWidget(ShareDownloadPasswordFormModel::PasswordField, std::move(password));
+
+		// Buttons
+		Wt::WPushButton *unlockBtn = bindNew<Wt::WPushButton>("unlock-btn", tr("msg-unlock"));
+		unlockBtn->clicked().connect([=] { validateForm(); });
 
 		updateView(model.get());
 	}
