@@ -31,6 +31,8 @@ namespace UserInterface::ShareUtils
     std::string
     getScheme()
     {
+        // Necessary because the scheme in envonment does not pay attention to X-Forwarded_Proto by default
+        //and we have to use that beause you cannot get the full URL out of wLink as text
         const std::string xForwardedProto = wApp->environment().headerValue("X-Forwarded-Proto");
         if (!xForwardedProto.empty())
         {
