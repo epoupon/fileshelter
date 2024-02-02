@@ -142,11 +142,6 @@ FileShelterApplication::initialize()
 
 	Wt::WNavigationBar* navbar {main->bindNew<Wt::WNavigationBar>("navbar-top")};
     
-   // auto link = std::make_unique<Wt::WAnchor>(Wt::WLink(Wt::LinkType::InternalPath, defaultPath));
-  //  auto icon = std::make_unique<Wt::WText>("<i class='fa fa-external-link'></i>", Wt::TextFormat::XHTML);
-   // link->addWidget(std::move(icon));
-   // navbar->addWidget(std::move(link));
-    
 	navbar->setTitle(Wt::WString::tr("msg-app-name"));
 
 	Wt::WMenu* menu {navbar->addMenu(std::make_unique<Wt::WMenu>())};
