@@ -40,7 +40,7 @@ namespace UserInterface::ShareUtils
         }
 
         // Fallback if header is not set
-        return "http";
+        return wApp->environment().urlScheme();
     }
     
 	static
