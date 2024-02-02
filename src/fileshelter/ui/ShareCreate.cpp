@@ -29,6 +29,7 @@
 #include "ProgressBar.hpp"
 #include "ShareCreateFormView.hpp"
 #include "ShareCreatePassword.hpp"
+#include "FileShelterApplication.hpp"
 
 namespace UserInterface
 {
@@ -71,6 +72,9 @@ namespace UserInterface
 
 		if (!wApp->internalPathMatches("/share-create"))
 			return;
+        
+        auto app = dynamic_cast<FileShelterApplication*>(Wt::WApplication::instance());
+        app->updateMenuVisibility();
 
 		if (!_isPasswordVerified && PasswordUtils::isUploadPassordRequired())
 			displayPassword();

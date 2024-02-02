@@ -28,7 +28,7 @@
 #include "share/Types.hpp"
 
 #include "ShareUtils.hpp"
-
+#include "FileShelterApplication.hpp"
 
 namespace UserInterface {
 
@@ -49,7 +49,10 @@ ShareCreated::handlePathChanged()
 
 	if (!wApp->internalPathMatches("/share-created"))
 		return;
-
+    
+     auto app = dynamic_cast<FileShelterApplication*>(Wt::WApplication::instance());
+     app->updateMenuVisibility();
+    
 	try
 	{
 		const Share::ShareEditUUID shareEditUUID {wApp->internalPathNextPart("/share-created/")};

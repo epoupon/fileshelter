@@ -33,6 +33,7 @@
 #include "Exception.hpp"
 #include "ShareDownloadPassword.hpp"
 #include "ShareUtils.hpp"
+#include "FileShelterApplication.hpp"
 
 namespace UserInterface {
 
@@ -53,8 +54,11 @@ ShareDownload::handlePathChanged()
 
 	if (!wApp->internalPathMatches("/share-download"))
 		return;
-
-	try
+	
+    auto app = dynamic_cast<FileShelterApplication*>(Wt::WApplication::instance());
+    app->updateMenuVisibility();
+    
+    try
 	{
 		const Share::ShareUUID shareUUID {wApp->internalPathNextPart("/share-download/")};
 

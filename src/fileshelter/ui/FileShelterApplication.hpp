@@ -36,7 +36,8 @@ namespace UserInterface
 	{
 		public:
 			FileShelterApplication(const Wt::WEnvironment& env);
-
+            void updateMenuVisibility();
+            
 			static std::filesystem::path	prepareUploadDirectory();
 			static FileShelterApplication*	instance();
 			const std::filesystem::path&	getWorkingDirectory() const { return _workingDirectory; }
@@ -46,7 +47,10 @@ namespace UserInterface
 			void notify(const Wt::WEvent& event) override;
 
 			void displayError(std::string_view error);
-
+            
+            Wt::WMenuItem* menuItemShareCreate;
+            Wt::WMenuItem* menuItemTos;
+            
 			static inline std::filesystem::path _workingDirectory;
 	};
 

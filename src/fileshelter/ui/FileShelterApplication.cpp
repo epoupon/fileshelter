@@ -26,6 +26,8 @@
 #include <Wt/WMenu.h>
 #include <Wt/WTemplate.h>
 #include <Wt/WText.h>
+#include <Wt/WAnchor.h>
+#include <Wt/WHBoxLayout.h>
 
 #include "utils/IConfig.hpp"
 #include "utils/Logger.hpp"
@@ -139,19 +141,24 @@ FileShelterApplication::initialize()
 	Wt::WTemplate* main {root()->addNew<Wt::WTemplate>(Wt::WString::tr("template-main"))};
 
 	Wt::WNavigationBar* navbar {main->bindNew<Wt::WNavigationBar>("navbar-top")};
-	navbar->setTitle("<i class=\"fa fa-external-link\"></i> " + Wt::WString::tr("msg-app-name"), Wt::WLink {Wt::LinkType::InternalPath, defaultPath});
+    
+   // auto link = std::make_unique<Wt::WAnchor>(Wt::WLink(Wt::LinkType::InternalPath, defaultPath));
+  //  auto icon = std::make_unique<Wt::WText>("<i class='fa fa-external-link'></i>", Wt::TextFormat::XHTML);
+   // link->addWidget(std::move(icon));
+   // navbar->addWidget(std::move(link));
+    
+	navbar->setTitle(Wt::WString::tr("msg-app-name"));
 
 	Wt::WMenu* menu {navbar->addMenu(std::make_unique<Wt::WMenu>())};
-	{
-		auto menuItem = menu->addItem(Wt::WString::tr("msg-share-create"));
-		menuItem->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/share-create"});
-		menuItem->setSelectable(true);
-	}
-	{
-		auto menuItem = menu->addItem(Wt::WString::tr("msg-tos"));
-		menuItem->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/tos"});
-		menuItem->setSelectable(true);
-	}
+ 
+	menuItemShareCreate = menu->addItem(Wt::WString::tr("msg-share-create"));
+	menuItemShareCreate->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/share-create"});
+	menuItemShareCreate->setSelectable(true);
+
+	menuItemTos = menu->addItem(Wt::WString::tr("msg-tos"));
+	menuItemTos->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/tos"});
+	menuItemTos->setSelectable(true);
+
 	Wt::WContainerWidget* container {main->bindNew<Wt::WContainerWidget>("contents")};
 
 	// Same order as Idx enum
@@ -168,6 +175,24 @@ FileShelterApplication::initialize()
 	});
 
 	handlePathChange(mainStack);
+    
+   FS_LOG(UI, INFO) << "end init";
+}
+
+void 
+FileShelterApplication::updateMenuVisibility()
+{
+    if (!Service<IConfig>::get()->getBool("show-create-links-on-download", true))
+    {
+        if (wApp->internalPathMatches("/share-download"))
+        {
+            menuItemShareCreate->hide();
+        }
+        else
+        {
+            menuItemShareCreate->show();
+        }
+    }
 }
 
 void

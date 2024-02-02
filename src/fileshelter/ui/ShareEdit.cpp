@@ -32,6 +32,7 @@
 #include "share/Types.hpp"
 
 #include "ShareUtils.hpp"
+#include "FileShelterApplication.hpp"
 
 namespace UserInterface
 {
@@ -53,6 +54,9 @@ namespace UserInterface
 
 		if (!wApp->internalPathMatches("/share-edit"))
 			return;
+        
+        auto app = dynamic_cast<FileShelterApplication*>(Wt::WApplication::instance());
+        app->updateMenuVisibility();
 
 		try
 		{
