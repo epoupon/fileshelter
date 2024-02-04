@@ -26,8 +26,6 @@
 #include <Wt/WMenu.h>
 #include <Wt/WTemplate.h>
 #include <Wt/WText.h>
-#include <Wt/WAnchor.h>
-#include <Wt/WHBoxLayout.h>
 
 #include "utils/IConfig.hpp"
 #include "utils/Logger.hpp"
@@ -84,16 +82,15 @@ handlePathChange(Wt::WStackedWidget* stack)
 	{
 		if (wApp->internalPathMatches(index.first))
 		{
-            auto app = dynamic_cast<FileShelterApplication*>(Wt::WApplication::instance());
-            app->updateMenuVisibility();
-            
+			FsApp->updateMenuVisibility();
+
 			stack->setCurrentIndex(index.second);
 
 			return;
 		}
 	}
-    
-    wApp->setInternalPath(defaultPath, true);
+
+	wApp->setInternalPath(defaultPath, true);
 }
 
 FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env)
@@ -145,19 +142,20 @@ FileShelterApplication::initialize()
 	Wt::WTemplate* main {root()->addNew<Wt::WTemplate>(Wt::WString::tr("template-main"))};
 
 	Wt::WNavigationBar* navbar {main->bindNew<Wt::WNavigationBar>("navbar-top")};
-    
+
 	navbar->setTitle(Wt::WString::tr("msg-app-name"));
 
 	Wt::WMenu* menu {navbar->addMenu(std::make_unique<Wt::WMenu>())};
- 
-	_menuItemShareCreate = menu->addItem(Wt::WString::tr("msg-share-create"));
-	_menuItemShareCreate->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/share-create"});
-	_menuItemShareCreate->setSelectable(true);
-
-	Wt::WMenuItem* menuItemTos = menu->addItem(Wt::WString::tr("msg-tos"));
-	menuItemTos->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/tos"});
-	menuItemTos->setSelectable(true);
-
+	{
+		_menuItemShareCreate = menu->addItem(Wt::WString::tr("msg-share-create"));
+		_menuItemShareCreate->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/share-create"});
+		_menuItemShareCreate->setSelectable(true);
+	}
+	{
+		Wt::WMenuItem* menuItemTos = menu->addItem(Wt::WString::tr("msg-tos"));
+		menuItemTos->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/tos"});
+		menuItemTos->setSelectable(true);
+	} 
 	Wt::WContainerWidget* container {main->bindNew<Wt::WContainerWidget>("contents")};
 
 	// Same order as Idx enum
@@ -174,24 +172,22 @@ FileShelterApplication::initialize()
 	});
 
 	handlePathChange(mainStack);
-    
-   FS_LOG(UI, INFO) << "end init";
 }
 
 void 
 FileShelterApplication::updateMenuVisibility()
 {
-    if (!Service<IConfig>::get()->getBool("show-create-links-on-download", true))
-    {
-        if (wApp->internalPathMatches("/share-download"))
-        {
-            _menuItemShareCreate->hide();
-        }
-        else
-        {
-            _menuItemShareCreate->show();
-        }
-    }
+	if (!Service<IConfig>::get()->getBool("show-create-links-on-download", true))
+	{
+		if (wApp->internalPathMatches("/share-download"))
+		{
+			_menuItemShareCreate->hide();
+		}
+		else
+		{
+			_menuItemShareCreate->show();
+		}
+	}
 }
 
 void

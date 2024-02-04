@@ -28,7 +28,6 @@
 #include "share/Types.hpp"
 
 #include "ShareUtils.hpp"
-#include "FileShelterApplication.hpp"
 
 namespace UserInterface {
 

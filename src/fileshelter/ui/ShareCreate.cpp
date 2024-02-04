@@ -29,7 +29,6 @@
 #include "ProgressBar.hpp"
 #include "ShareCreateFormView.hpp"
 #include "ShareCreatePassword.hpp"
-#include "FileShelterApplication.hpp"
 
 namespace UserInterface
 {

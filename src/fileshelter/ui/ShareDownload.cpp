@@ -33,7 +33,6 @@
 #include "Exception.hpp"
 #include "ShareDownloadPassword.hpp"
 #include "ShareUtils.hpp"
-#include "FileShelterApplication.hpp"
 
 namespace UserInterface {
 
@@ -54,8 +53,8 @@ ShareDownload::handlePathChanged()
 
 	if (!wApp->internalPathMatches("/share-download"))
 		return;
-    
-    try
+
+	try
 	{
 		const Share::ShareUUID shareUUID {wApp->internalPathNextPart("/share-download/")};
 
