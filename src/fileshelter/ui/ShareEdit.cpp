@@ -54,9 +54,6 @@ namespace UserInterface
 
 		if (!wApp->internalPathMatches("/share-edit"))
 			return;
-        
-        auto app = dynamic_cast<FileShelterApplication*>(Wt::WApplication::instance());
-        app->updateMenuVisibility();
 
 		try
 		{

@@ -84,12 +84,16 @@ handlePathChange(Wt::WStackedWidget* stack)
 	{
 		if (wApp->internalPathMatches(index.first))
 		{
+            auto app = dynamic_cast<FileShelterApplication*>(Wt::WApplication::instance());
+            app->updateMenuVisibility();
+            
 			stack->setCurrentIndex(index.second);
+
 			return;
 		}
 	}
-
-	wApp->setInternalPath(defaultPath, true);
+    
+    wApp->setInternalPath(defaultPath, true);
 }
 
 FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env)
@@ -146,11 +150,11 @@ FileShelterApplication::initialize()
 
 	Wt::WMenu* menu {navbar->addMenu(std::make_unique<Wt::WMenu>())};
  
-	menuItemShareCreate = menu->addItem(Wt::WString::tr("msg-share-create"));
-	menuItemShareCreate->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/share-create"});
-	menuItemShareCreate->setSelectable(true);
+	_menuItemShareCreate = menu->addItem(Wt::WString::tr("msg-share-create"));
+	_menuItemShareCreate->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/share-create"});
+	_menuItemShareCreate->setSelectable(true);
 
-	menuItemTos = menu->addItem(Wt::WString::tr("msg-tos"));
+	Wt::WMenuItem* menuItemTos = menu->addItem(Wt::WString::tr("msg-tos"));
 	menuItemTos->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/tos"});
 	menuItemTos->setSelectable(true);
 
@@ -181,11 +185,11 @@ FileShelterApplication::updateMenuVisibility()
     {
         if (wApp->internalPathMatches("/share-download"))
         {
-            menuItemShareCreate->hide();
+            _menuItemShareCreate->hide();
         }
         else
         {
-            menuItemShareCreate->show();
+            _menuItemShareCreate->show();
         }
     }
 }

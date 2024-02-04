@@ -54,9 +54,6 @@ ShareDownload::handlePathChanged()
 
 	if (!wApp->internalPathMatches("/share-download"))
 		return;
-	
-    auto app = dynamic_cast<FileShelterApplication*>(Wt::WApplication::instance());
-    app->updateMenuVisibility();
     
     try
 	{

@@ -49,10 +49,7 @@ ShareCreated::handlePathChanged()
 
 	if (!wApp->internalPathMatches("/share-created"))
 		return;
-    
-     auto app = dynamic_cast<FileShelterApplication*>(Wt::WApplication::instance());
-     app->updateMenuVisibility();
-    
+
 	try
 	{
 		const Share::ShareEditUUID shareEditUUID {wApp->internalPathNextPart("/share-created/")};
