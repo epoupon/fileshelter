@@ -82,7 +82,10 @@ handlePathChange(Wt::WStackedWidget* stack)
 	{
 		if (wApp->internalPathMatches(index.first))
 		{
+			FsApp->updateMenuVisibility();
+
 			stack->setCurrentIndex(index.second);
+
 			return;
 		}
 	}
@@ -139,19 +142,20 @@ FileShelterApplication::initialize()
 	Wt::WTemplate* main {root()->addNew<Wt::WTemplate>(Wt::WString::tr("template-main"))};
 
 	Wt::WNavigationBar* navbar {main->bindNew<Wt::WNavigationBar>("navbar-top")};
-	navbar->setTitle("<i class=\"fa fa-external-link\"></i> " + Wt::WString::tr("msg-app-name"), Wt::WLink {Wt::LinkType::InternalPath, defaultPath});
+
+	navbar->setTitle(Wt::WString::tr("msg-app-name"));
 
 	Wt::WMenu* menu {navbar->addMenu(std::make_unique<Wt::WMenu>())};
 	{
-		auto menuItem = menu->addItem(Wt::WString::tr("msg-share-create"));
-		menuItem->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/share-create"});
-		menuItem->setSelectable(true);
+		_menuItemShareCreate = menu->addItem(Wt::WString::tr("msg-share-create"));
+		_menuItemShareCreate->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/share-create"});
+		_menuItemShareCreate->setSelectable(true);
 	}
 	{
-		auto menuItem = menu->addItem(Wt::WString::tr("msg-tos"));
-		menuItem->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/tos"});
-		menuItem->setSelectable(true);
-	}
+		Wt::WMenuItem* menuItemTos = menu->addItem(Wt::WString::tr("msg-tos"));
+		menuItemTos->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/tos"});
+		menuItemTos->setSelectable(true);
+	} 
 	Wt::WContainerWidget* container {main->bindNew<Wt::WContainerWidget>("contents")};
 
 	// Same order as Idx enum
@@ -168,6 +172,22 @@ FileShelterApplication::initialize()
 	});
 
 	handlePathChange(mainStack);
+}
+
+void 
+FileShelterApplication::updateMenuVisibility()
+{
+	if (!Service<IConfig>::get()->getBool("show-create-links-on-download", true))
+	{
+		if (wApp->internalPathMatches("/share-download"))
+		{
+			_menuItemShareCreate->hide();
+		}
+		else
+		{
+			_menuItemShareCreate->show();
+		}
+	}
 }
 
 void

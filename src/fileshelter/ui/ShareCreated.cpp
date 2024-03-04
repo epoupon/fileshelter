@@ -29,7 +29,6 @@
 
 #include "ShareUtils.hpp"
 
-
 namespace UserInterface {
 
 ShareCreated::ShareCreated()
