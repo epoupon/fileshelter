@@ -69,20 +69,9 @@ namespace UserInterface
 
 	ShareCreatePassword::ShareCreatePassword()
 	{
-		auto model = std::make_shared<ShareCreatePasswordFormModel>();
+		auto model {std::make_shared<ShareCreatePasswordFormModel>()};
 
-		setTemplateText(tr("template-share-create-password"));
-		addFunction("id", &WTemplate::Functions::id);
-		addFunction("block", &WTemplate::Functions::block);
-
-		// Password
-		auto password = std::make_unique<Wt::WLineEdit>();
-		password->setEchoMode(Wt::EchoMode::Password);
-		setFormWidget(ShareCreatePasswordFormModel::PasswordField, std::move(password));
-
-		// Buttons
-		Wt::WPushButton* unlockBtn {bindNew<Wt::WPushButton>("unlock-btn", tr("msg-unlock"))};
-		unlockBtn->clicked().connect([=]
+		auto validateForm {[this, model]
 		{
 			updateModel(model.get());
 
@@ -100,7 +89,21 @@ namespace UserInterface
 			std::this_thread::sleep_for(std::chrono::seconds {1});
 
 			updateView(model.get());
-		});
+		}};
+
+		setTemplateText(tr("template-share-create-password"));
+		addFunction("id", &WTemplate::Functions::id);
+		addFunction("block", &WTemplate::Functions::block);
+
+		// Password
+		auto password = std::make_unique<Wt::WLineEdit>();
+		password->setEchoMode(Wt::EchoMode::Password);
+		password->enterPressed().connect([=]{ validateForm(); });
+		setFormWidget(ShareCreatePasswordFormModel::PasswordField, std::move(password));
+
+		// Buttons
+		Wt::WPushButton* unlockBtn {bindNew<Wt::WPushButton>("unlock-btn", tr("msg-unlock"))};
+		unlockBtn->clicked().connect([=] { validateForm(); });
 
 		updateView(model.get());
 	}
