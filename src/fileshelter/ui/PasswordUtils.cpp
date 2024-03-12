@@ -53,4 +53,30 @@ namespace UserInterface::PasswordUtils
 		return res;
 	}
 
+	bool
+	isListPasswordDefined()
+	{
+		bool hasStrings {};
+		Service<IConfig>::get()->visitStrings("list-passwords", [&](std::string_view str)
+		{
+			if (!str.empty())
+				hasStrings = true;
+		});
+
+		return hasStrings;
+	}
+
+	bool
+	checkListPassword(std::string_view listPassword)
+	{
+		bool res{};
+		Service<IConfig>::get()->visitStrings("list-passwords", [&](std::string_view password)
+		{
+			if (password == listPassword)
+				res = true;
+		});
+
+		return res;
+	}
+
 }

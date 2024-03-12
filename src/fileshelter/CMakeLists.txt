@@ -14,6 +14,8 @@ add_executable(fileshelter
 	ui/ShareDownload.cpp
 	ui/ShareEdit.cpp
 	ui/ShareDownloadPassword.cpp
+	ui/ShareList.cpp
+	ui/ShareListPassword.cpp
 	ui/TermsOfService.cpp
 	)
 

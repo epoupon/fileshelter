@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Emeric Poupon
+ * Copyright (C) 2016 Emeric Poupon
  *
  * This file is part of fileshelter.
  *
@@ -19,12 +19,21 @@
 
 #pragma once
 
-#include <string_view>
+#include <Wt/WContainerWidget.h>
 
-namespace UserInterface::PasswordUtils
+namespace UserInterface
 {
-	bool isUploadPassordRequired();
-	bool checkUploadPassord(std::string_view uploadPassword);
-    bool isListPasswordDefined();
-    bool checkListPassword(std::string_view listPassword);
-}
+
+    class ShareList : public Wt::WContainerWidget
+    {
+        public:
+            ShareList();
+
+        private:
+            void handlePathChanged();
+
+            void displayPassword();
+            void displayList();
+    };
+
+} // namespace UserInterface

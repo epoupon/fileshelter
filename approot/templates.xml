@@ -187,6 +187,67 @@
 	<h1><i class="fa fa-remove"></i> ${tr:msg-share-deleted}</h1>
 </message>
 
+<message id="template-share-list-password">
+	<h1><i class="fa fa-list"></i> ${tr:msg-share-list}</h1>
+	<div class="alert alert-info">
+		${tr:msg-share-list-protected-by-password}
+	</div>
+	<div class="form-horizontal">
+		<div class="form-group">
+			<label class="control-label col-sm-2"  for="${id:password}">
+				${tr:msg-password}
+			</label>
+			<div class="col-sm-5">
+				${password}
+			</div>
+			<div class="help-block col-sm-5">
+				${password-info}
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-5">
+				${unlock-btn class="btn-primary"}
+			</div>
+		</div>
+	</div>
+</message>
+
+<message id="template-share-list">
+	<h1><i class="fa fa-list"></i> ${tr:msg-share-list}</h1>
+
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th scope="col">UUID</th>
+				<th scope="col">${tr:msg-expires}</th>
+				<th class="hidden-xs" scope="col">${tr:msg-share-size}</th>
+				<th scope="col">${tr:msg-download-count}</th>
+				<th scope="col"></th>
+			</tr>
+		</thead>
+		<tbody>
+			${shares}
+			<tr>
+				<td>${total-shares}</td>
+				<td></td>
+				<td class="fs-file-entry-size hidden-xs"></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+</message>
+
+<message id="template-share-list-file">
+	<tr>
+		<td>${share-uuid}</td>
+		<td>${expiry-date-time}</td>
+		<td class="fs-file-entry-size hidden-xs">${share-size}</td>
+		<td>${download-count}</td>
+		<td>${created-by}</td>
+	</tr>
+</message>
+
 <message id="template-progress-bar">
 	<div class="progress">
 		${progress}

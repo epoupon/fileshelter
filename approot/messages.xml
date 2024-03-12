@@ -31,6 +31,8 @@
 	<message id="msg-share-not-found">Share not found!</message>
 	<message id="msg-share-protected-by-password">This share is protected by a password</message>
 	<message id="msg-share-size">Share size</message>
+	<message id="msg-share-list">List of shares</message>
+	<message id="msg-share-list-protected-by-password">A password is required to access this page</message>
 	<message id="msg-size-b">{1} B</message>
 	<message id="msg-size-gb">{1} GB</message>
 	<message id="msg-size-kb">{1} KB</message>
