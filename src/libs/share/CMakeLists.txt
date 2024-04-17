@@ -28,5 +28,5 @@ target_link_libraries(filesheltershare PUBLIC
 	Wt::Wt
 	)
 
-install(TARGETS filesheltershare DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS filesheltershare DESTINATION lib)
 
