@@ -57,14 +57,16 @@ std::vector<std::string> generateWtConfig(std::string execPath)
 
 	if (Service<IConfig>::get()->getBool("tls-enable", false))
 	{
-		args.push_back("--https-listen=" + std::string {Service<IConfig>::get()->getString("listen", "0.0.0.0:5091")});
+		args.push_back("--https-port=" + std::to_string( Service<IConfig>::get()->getULong("listen-port", 5091)));
+		args.push_back("--https-address=" + std::string {Service<IConfig>::get()->getString("listen-addr", "0.0.0.0")});
 		args.push_back("--ssl-certificate=" + std::string {Service<IConfig>::get()->getString("tls-cert")});
 		args.push_back("--ssl-private-key=" + std::string {Service<IConfig>::get()->getString("tls-key")});
 		args.push_back("--ssl-tmp-dh=" + std::string {Service<IConfig>::get()->getString("tls-dh")});
 	}
 	else
 	{
-		args.push_back("--http-listen=" + std::string {Service<IConfig>::get()->getString("listen-addr", "0.0.0.0:5091")});
+		args.push_back("--http-port=" + std::to_string( Service<IConfig>::get()->getULong("listen-port", 5091)));
+		args.push_back("--http-address=" + std::string {Service<IConfig>::get()->getString("listen-addr", "0.0.0.0")});
 	}
 
 	{
