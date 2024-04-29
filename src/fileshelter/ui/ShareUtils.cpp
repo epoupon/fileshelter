@@ -26,12 +26,28 @@
 
 namespace UserInterface::ShareUtils
 {
+    
+    static
+    std::string
+    getScheme()
+    {
+        // Necessary because the scheme in envonment does not pay attention to X-Forwarded_Proto by default
+        //and we have to use that beause you cannot get the full URL out of wLink as text
+        const std::string xForwardedProto = wApp->environment().headerValue("X-Forwarded-Proto");
+        if (!xForwardedProto.empty())
+        {
+            return xForwardedProto;  // will be 'http' or 'https'
+        }
 
+        // Fallback if header is not set
+        return wApp->environment().urlScheme();
+    }
+    
 	static
 	std::string
 	computeURL(const std::string& internalPath)
 	{
-		return wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + (wApp->environment().deploymentPath() == "/" ? "" : wApp->environment().deploymentPath()) + internalPath;
+		return getScheme() + "://" + wApp->environment().hostName() + (wApp->environment().deploymentPath() == "/" ? "" : wApp->environment().deploymentPath()) + internalPath;
 	}
 
 	std::unique_ptr<Wt::WAnchor>
