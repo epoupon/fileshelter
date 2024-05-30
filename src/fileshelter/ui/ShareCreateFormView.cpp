@@ -19,6 +19,7 @@
 
 #include "ShareCreateFormView.hpp"
 
+#include <algorithm>
 #include <numeric>
 
 #include <Wt/WApplication.h>
