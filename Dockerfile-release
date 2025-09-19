@@ -1,4 +1,4 @@
-FROM	alpine:3.17 AS build
+FROM	alpine:3.22 AS build
 
 WORKDIR	/tmp/workdir
 
@@ -23,7 +23,7 @@ ARG	BUILD_PACKAGES=" \
 RUN	apk add --no-cache --update ${BUILD_PACKAGES}
 
 # WT
-ARG	WT_VERSION=4.9.1
+ARG	WT_VERSION=4.12.0
 RUN \
 	DIR=/tmp/wt && mkdir -p ${DIR} && cd ${DIR} && \
 	curl -sLO https://github.com/emweb/wt/archive/${WT_VERSION}.tar.gz && \
@@ -31,7 +31,7 @@ RUN \
 
 RUN \
 	DIR=/tmp/wt && mkdir -p ${DIR} && cd ${DIR} && \
-	cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${PREFIX} -DBUILD_EXAMPLES=OFF -DENABLE_LIBWTTEST=OFF -DCONNECTOR_FCGI=OFF -DINSTALL_THEMES=OFF && \
+	cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${PREFIX} -DBUILD_EXAMPLES=OFF -DENABLE_LIBWTTEST=OFF -DCONNECTOR_FCGI=OFF -DINSTALL_THEMES=OFF -DCMAKE_CXX_STANDARD=17 -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE && \
 	make -j$(nproc) && \
 	make install
 
@@ -40,10 +40,9 @@ COPY . /tmp/fileshelter/
 
 RUN \
 	DIR=/tmp/fileshelter && mkdir -p ${DIR} && cd ${DIR} && \
-	PKG_CONFIG_PATH=/tmp/install/lib/pkgconfig CXXFLAGS="-I${PREFIX}/include" LDFLAGS="-L${PREFIX}/lib -Wl,--rpath-link=${PREFIX}/lib" cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_PREFIX_PATH=${PREFIX} && \
-	LD_LIBRARY_PATH=${PREFIX}/lib VERBOSE=1 make && \
+	PKG_CONFIG_PATH=/tmp/install/lib/pkgconfig CXXFLAGS="-I${PREFIX}/include" LDFLAGS="-L${PREFIX}/lib -Wl,--rpath-link=${PREFIX}/lib" cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_PREFIX_PATH=${PREFIX} && \
+	LD_LIBRARY_PATH=${PREFIX}/lib VERBOSE=1 make -j$(nproc) install && \
 	LD_LIBRARY_PATH=${PREFIX}/lib make test && \
-	make install -j$(nproc) && \
 	mkdir -p ${PREFIX}/etc/ && \
 	cp conf/fileshelter.conf ${PREFIX}/etc
 
@@ -70,7 +69,7 @@ RUN \
 	rm -rf /tmp/fakeroot/share/Wt/resources/themes/bootstrap/3
 
 ## Release Stage
-FROM		alpine:3.17 AS release
+FROM		alpine:3.22 AS release
 LABEL		maintainer="Emeric Poupon <emeric.poupon@laposte.net>"
 
 ARG	RUNTIME_PACKAGES=" \

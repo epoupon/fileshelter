@@ -29,7 +29,6 @@
 
 namespace Share
 {
-
     class Db
     {
     public:
@@ -51,5 +50,4 @@ namespace Share
         std::mutex _tlsSessionsMutex;
         std::vector<std::unique_ptr<Wt::Dbo::Session>> _tlsSessions;
     };
-
 } // namespace Share

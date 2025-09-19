@@ -12,11 +12,11 @@
 Official _Docker_ images are available, please see detailed instructions at https://hub.docker.com/r/epoupon/fileshelter.
 
 ## From Debian packages
-_Bookworm_ packages are provided for _amd64_ architectures.
+_Trixie_ packages are provided for _amd64_ architectures.
 As root, trust the following debian package provider and add it in your list of repositories:
 ```sh
 wget https://debian.poupon.dev/apt/debian/epoupon.gpg -P /usr/share/keyrings
-echo "deb [signed-by=/usr/share/keyrings/epoupon.gpg] https://debian.poupon.dev/apt/debian bookworm main" > /etc/apt/sources.list.d/epoupon.list
+echo "deb [signed-by=/usr/share/keyrings/epoupon.gpg] https://debian.poupon.dev/apt/debian trixie main" > /etc/apt/sources.list.d/epoupon.list
 ```
 To install or upgrade _Fileshelter_:
 ```sh

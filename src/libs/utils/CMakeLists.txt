@@ -1,5 +1,5 @@
 
-add_library(fileshelterutils SHARED
+add_library(fileshelterutils STATIC
 	impl/Config.cpp
 	impl/FileResourceHandler.cpp
 	impl/Logger.cpp

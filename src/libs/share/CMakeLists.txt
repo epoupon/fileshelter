@@ -1,5 +1,5 @@
 
-add_library(filesheltershare SHARED
+add_library(filesheltershare STATIC
 	impl/Db.cpp
 	impl/File.cpp
 	impl/Share.cpp
