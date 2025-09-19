@@ -30,7 +30,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --yes build-essential cmake libboost-all-dev libconfig++-dev libgtest-dev libarchive-dev
-          export WT_VERSION=4.9.1
+          export WT_VERSION=4.12.0
           export WT_INSTALL_PREFIX=/usr
           git clone https://github.com/emweb/wt.git /tmp/wt
           pushd /tmp/wt
