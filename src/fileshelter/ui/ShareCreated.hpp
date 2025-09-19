@@ -21,17 +21,15 @@
 
 #include <Wt/WContainerWidget.h>
 
-namespace UserInterface {
-
-class ShareCreated : public Wt::WContainerWidget
+namespace UserInterface
 {
-	public:
-		ShareCreated();
+    class ShareCreated : public Wt::WContainerWidget
+    {
+    public:
+        ShareCreated();
 
-	private:
-		void handlePathChanged();
-		void displayShareNotFound();
-};
-
+    private:
+        void handlePathChanged();
+        void displayShareNotFound();
+    };
 } // namespace UserInterface
-

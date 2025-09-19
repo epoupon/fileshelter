@@ -20,9 +20,9 @@
 #include "DestroyCommand.hpp"
 
 #include <algorithm>
-#include <stdlib.h>
 #include <filesystem>
 #include <iostream>
+#include <stdlib.h>
 #include <vector>
 
 #include "share/CreateParameters.hpp"
@@ -30,82 +30,75 @@
 #include "utils/IConfig.hpp"
 #include "utils/Service.hpp"
 
-static
-std::vector<Share::ShareEditUUID>
+static std::vector<Share::ShareEditUUID>
 parseShareEditUUIDs(const std::vector<std::string>& shares)
 {
-	std::vector<Share::ShareEditUUID> res;
-	res.reserve(shares.size());
+    std::vector<Share::ShareEditUUID> res;
+    res.reserve(shares.size());
 
-	std::transform(std::cbegin(shares), std::cend(shares), std::back_inserter(res), [](std::string_view uuid) { return Share::ShareEditUUID {uuid}; });
-	return res;
+    std::transform(std::cbegin(shares), std::cend(shares), std::back_inserter(res), [](std::string_view uuid) { return Share::ShareEditUUID{ uuid }; });
+    return res;
 }
 
-static
-void
+static void
 processDestroyCommand(Share::IShareManager& shareManager, const std::vector<Share::ShareEditUUID>& shares)
 {
-	using namespace Share;
+    using namespace Share;
 
-	for (const Share::ShareEditUUID& shareEditUUID : shares)
-	{
-		shareManager.destroyShare(shareEditUUID);
-		std::cout << "Share '" << shareEditUUID.toString() << "' destroyed" << std::endl;
-	}
+    for (const Share::ShareEditUUID& shareEditUUID : shares)
+    {
+        shareManager.destroyShare(shareEditUUID);
+        std::cout << "Share '" << shareEditUUID.toString() << "' destroyed" << std::endl;
+    }
 }
 
 DestroyCommand::DestroyCommand(std::string_view processArg)
-	: _processArg {processArg}
+    : _processArg{ processArg }
 {
-	namespace po = boost::program_options;
+    namespace po = boost::program_options;
 
-	po::options_description options {"Options"};
-	options.add_options()
-		("conf,c", po::value<std::string>()->default_value("/etc/fileshelter.conf"), "fileshelter config file");
+    po::options_description options{ "Options" };
+    options.add_options()("conf,c", po::value<std::string>()->default_value("/etc/fileshelter.conf"), "fileshelter config file");
 
-	po::options_description hiddenOptions{"Hidden options"};
-	hiddenOptions.add_options()
-		("EditUUID", po::value<std::vector<std::string>>()->composing(), "EditUUID");
+    po::options_description hiddenOptions{ "Hidden options" };
+    hiddenOptions.add_options()("EditUUID", po::value<std::vector<std::string>>()->composing(), "EditUUID");
 
-	_allOptions.add(options).add(hiddenOptions);
-	_visibleOptions.add(options);
+    _allOptions.add(options).add(hiddenOptions);
+    _visibleOptions.add(options);
 }
 
-
-void
-DestroyCommand::displayHelp(std::ostream& os) const
+void DestroyCommand::displayHelp(std::ostream& os) const
 {
-	os << "Usage: " << _processArg << " " << getName() << " [options] EditUUID...\n";
-	os << _visibleOptions << std::endl;
+    os << "Usage: " << _processArg << " " << getName() << " [options] EditUUID...\n";
+    os << _visibleOptions << std::endl;
 }
 
-int
-DestroyCommand::process(const std::vector<std::string>& args) const
+int DestroyCommand::process(const std::vector<std::string>& args) const
 {
-	namespace po = boost::program_options;
+    namespace po = boost::program_options;
 
-	po::positional_options_description pos;
-	pos.add("EditUUID", -1);
+    po::positional_options_description pos;
+    pos.add("EditUUID", -1);
 
-	po::variables_map vm;
-	{
-		po::parsed_options parsed {po::command_line_parser(args)
-			.options(_allOptions)
-				.positional(pos)
-				.run()};
-		po::store(parsed, vm);
-	}
+    po::variables_map vm;
+    {
+        po::parsed_options parsed{ po::command_line_parser(args)
+                .options(_allOptions)
+                .positional(pos)
+                .run() };
+        po::store(parsed, vm);
+    }
 
-	if (!vm.count("EditUUID"))
-	{
-		displayHelp(std::cerr);
-		return EXIT_FAILURE;
-	}
+    if (!vm.count("EditUUID"))
+    {
+        displayHelp(std::cerr);
+        return EXIT_FAILURE;
+    }
 
-	Service<IConfig> config {createConfig(vm["conf"].as<std::string>())};
-	Service<Share::IShareManager> shareManager {Share::createShareManager(false /* enableCleaner */)};
+    Service<IConfig> config{ createConfig(vm["conf"].as<std::string>()) };
+    Service<Share::IShareManager> shareManager{ Share::createShareManager(false /* enableCleaner */) };
 
-	processDestroyCommand(*shareManager.get(), parseShareEditUUIDs(vm["EditUUID"].as<std::vector<std::string>>()));
+    processDestroyCommand(*shareManager.get(), parseShareEditUUIDs(vm["EditUUID"].as<std::vector<std::string>>()));
 
-	return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }

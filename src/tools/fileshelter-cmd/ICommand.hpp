@@ -25,11 +25,11 @@
 
 class ICommand
 {
-	public:
-		virtual ~ICommand() = default;
+public:
+    virtual ~ICommand() = default;
 
-		virtual std::string_view getName() const = 0;
-		virtual std::string_view getDescription() const = 0;
-		virtual void displayHelp(std::ostream& os) const = 0;
-		virtual int process(const std::vector<std::string>& args) const = 0;
+    virtual std::string_view getName() const = 0;
+    virtual std::string_view getDescription() const = 0;
+    virtual void displayHelp(std::ostream& os) const = 0;
+    virtual int process(const std::vector<std::string>& args) const = 0;
 };

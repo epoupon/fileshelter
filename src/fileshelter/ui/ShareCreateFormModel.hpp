@@ -28,28 +28,28 @@
 
 namespace UserInterface
 {
-	class ShareCreateFormModel : public Wt::WFormModel
-	{
-		public:
-			ShareCreateFormModel();
+    class ShareCreateFormModel : public Wt::WFormModel
+    {
+    public:
+        ShareCreateFormModel();
 
-			std::shared_ptr<Wt::WAbstractItemModel> validityPeriodModel() { return _validityPeriodModel; }
-			void updatePeriodValidator();
+        std::shared_ptr<Wt::WAbstractItemModel> validityPeriodModel() { return _validityPeriodModel; }
+        void updatePeriodValidator();
 
-			void validateValidatityFields();
+        void validateValidatityFields();
 
-			std::chrono::seconds getValidityPeriod() const;
+        std::chrono::seconds getValidityPeriod() const;
 
-			static const Field DescriptionField;
-			static const Field PasswordField;
-			static const Field ValidityPeriodField;
-			static const Field ValidityPeriodUnitField;
+        static const Field DescriptionField;
+        static const Field PasswordField;
+        static const Field ValidityPeriodField;
+        static const Field ValidityPeriodUnitField;
 
-		private:
-			void updateValidityPeriod(std::chrono::seconds duration);
-			bool validateField(Field field) override;
-			void initializeModels();
+    private:
+        void updateValidityPeriod(std::chrono::seconds duration);
+        bool validateField(Field field) override;
+        void initializeModels();
 
-			std::shared_ptr<Wt::WStringListModel>	_validityPeriodModel;
-	};
-}
+        std::shared_ptr<Wt::WStringListModel> _validityPeriodModel;
+    };
+} // namespace UserInterface

@@ -19,11 +19,11 @@
 
 #include "FileShelterApplication.hpp"
 
-#include <Wt/WEnvironment.h>
 #include <Wt/WBootstrap5Theme.h>
-#include <Wt/WStackedWidget.h>
-#include <Wt/WNavigationBar.h>
+#include <Wt/WEnvironment.h>
 #include <Wt/WMenu.h>
+#include <Wt/WNavigationBar.h>
+#include <Wt/WStackedWidget.h>
 #include <Wt/WTemplate.h>
 #include <Wt/WText.h>
 
@@ -38,187 +38,174 @@
 #include "ShareEdit.hpp"
 #include "TermsOfService.hpp"
 
-namespace UserInterface {
-
-static const char * defaultPath{ "/share-create" };
-
-std::filesystem::path
-prepareUploadDirectory()
+namespace UserInterface
 {
-	return FileShelterApplication::prepareUploadDirectory();
-}
+    static const char* defaultPath{ "/share-create" };
 
-std::unique_ptr<Wt::WApplication>
-createFileShelterApplication(const Wt::WEnvironment& env)
-{
-	return std::make_unique<FileShelterApplication>(env);
-}
+    std::filesystem::path prepareUploadDirectory()
+    {
+        return FileShelterApplication::prepareUploadDirectory();
+    }
 
-enum Idx
-{
-	IdxShareCreate		= 0,
-	IdxShareCreated		= 1,
-	IdxShareDownload	= 2,
-	IdxShareEdit		= 3,
-	IdxToS				= 4,
-};
+    std::unique_ptr<Wt::WApplication> createFileShelterApplication(const Wt::WEnvironment& env)
+    {
+        return std::make_unique<FileShelterApplication>(env);
+    }
 
-static
-void
-handlePathChange(Wt::WStackedWidget* stack)
-{
-	static std::map<std::string, int> indexes =
-	{
-		{ "/share-create",		IdxShareCreate },
-		{ "/share-created",		IdxShareCreated },
-		{ "/share-download",	IdxShareDownload },
-		{ "/share-edit",		IdxShareEdit },
-		{ "/tos",				IdxToS },
-	};
+    enum Idx
+    {
+        IdxShareCreate = 0,
+        IdxShareCreated = 1,
+        IdxShareDownload = 2,
+        IdxShareEdit = 3,
+        IdxToS = 4,
+    };
 
-	FS_LOG(UI, DEBUG) << "Internal path changed to '" << wApp->internalPath() << "'";
+    static void handlePathChange(Wt::WStackedWidget* stack)
+    {
+        static std::map<std::string, int> indexes = {
+            { "/share-create", IdxShareCreate },
+            { "/share-created", IdxShareCreated },
+            { "/share-download", IdxShareDownload },
+            { "/share-edit", IdxShareEdit },
+            { "/tos", IdxToS },
+        };
 
-	for (auto index : indexes)
-	{
-		if (wApp->internalPathMatches(index.first))
-		{
-			FsApp->updateMenuVisibility();
+        FS_LOG(UI, DEBUG) << "Internal path changed to '" << wApp->internalPath() << "'";
 
-			stack->setCurrentIndex(index.second);
+        for (auto index : indexes)
+        {
+            if (wApp->internalPathMatches(index.first))
+            {
+                FsApp->updateMenuVisibility();
 
-			return;
-		}
-	}
+                stack->setCurrentIndex(index.second);
 
-	wApp->setInternalPath(defaultPath, true);
-}
+                return;
+            }
+        }
 
-FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env)
-: Wt::WApplication {env}
-{
-	useStyleSheet("css/fileshelter.css");
-	useStyleSheet("resources/font-awesome/css/font-awesome.min.css");
+        wApp->setInternalPath(defaultPath, true);
+    }
 
-	// Resouce bundles
-	messageResourceBundle().use(appRoot() + "templates");
-	messageResourceBundle().use(appRoot() + "messages");
-	messageResourceBundle().use((Service<IConfig>::get()->getPath("working-dir") / "user_messages").string());
-	if (Service<IConfig>::get()->getPath("tos-custom").empty())
-		messageResourceBundle().use(appRoot() + "tos");
+    FileShelterApplication::FileShelterApplication(const Wt::WEnvironment& env)
+        : Wt::WApplication{ env }
+    {
+        useStyleSheet("css/fileshelter.css");
+        useStyleSheet("resources/font-awesome/css/font-awesome.min.css");
 
-	auto bootstrapTheme {std::make_unique<Wt::WBootstrap5Theme>()};
-	setTheme(std::move(bootstrapTheme));
+        // Resouce bundles
+        messageResourceBundle().use(appRoot() + "templates");
+        messageResourceBundle().use(appRoot() + "messages");
+        messageResourceBundle().use((Service<IConfig>::get()->getPath("working-dir") / "user_messages").string());
+        if (Service<IConfig>::get()->getPath("tos-custom").empty())
+            messageResourceBundle().use(appRoot() + "tos");
 
-	FS_LOG(UI, INFO) << "Client address = " << env.clientAddress() << ", UserAgent = '" << env.userAgent() << "', Locale = " << env.locale().name() << ", path = '" << env.internalPath() << "'";
+        auto bootstrapTheme{ std::make_unique<Wt::WBootstrap5Theme>() };
+        setTheme(std::move(bootstrapTheme));
 
-	setTitle(Wt::WString::tr("msg-app-name"));
+        FS_LOG(UI, INFO) << "Client address = " << env.clientAddress() << ", UserAgent = '" << env.userAgent() << "', Locale = " << env.locale().name() << ", path = '" << env.internalPath() << "'";
 
-	enableInternalPaths();
-}
+        setTitle(Wt::WString::tr("msg-app-name"));
 
-std::filesystem::path
-FileShelterApplication::prepareUploadDirectory()
-{
-	_workingDirectory = Service<IConfig>::get()->getPath("working-dir");
+        enableInternalPaths();
+    }
 
-	std::filesystem::path uploadDirectory {_workingDirectory / "uploaded-files"};
-	std::filesystem::create_directories (uploadDirectory);
+    std::filesystem::path FileShelterApplication::prepareUploadDirectory()
+    {
+        _workingDirectory = Service<IConfig>::get()->getPath("working-dir");
 
-	// Set the WT_TMP_DIR inside the working dir, used to upload files
-	setenv("WT_TMP_DIR", uploadDirectory.string().c_str(), 1);
+        std::filesystem::path uploadDirectory{ _workingDirectory / "uploaded-files" };
+        std::filesystem::create_directories(uploadDirectory);
 
-	return uploadDirectory;
-}
+        // Set the WT_TMP_DIR inside the working dir, used to upload files
+        setenv("WT_TMP_DIR", uploadDirectory.string().c_str(), 1);
 
-FileShelterApplication*
-FileShelterApplication::instance()
-{
-	return reinterpret_cast<FileShelterApplication*>(Wt::WApplication::instance());
-}
+        return uploadDirectory;
+    }
 
-void
-FileShelterApplication::initialize()
-{
-	Wt::WTemplate* main {root()->addNew<Wt::WTemplate>(Wt::WString::tr("template-main"))};
+    FileShelterApplication* FileShelterApplication::instance()
+    {
+        return reinterpret_cast<FileShelterApplication*>(Wt::WApplication::instance());
+    }
 
-	Wt::WNavigationBar* navbar {main->bindNew<Wt::WNavigationBar>("navbar-top")};
+    void FileShelterApplication::initialize()
+    {
+        Wt::WTemplate* main{ root()->addNew<Wt::WTemplate>(Wt::WString::tr("template-main")) };
 
-	navbar->setTitle(Wt::WString::tr("msg-app-name"));
+        Wt::WNavigationBar* navbar{ main->bindNew<Wt::WNavigationBar>("navbar-top") };
 
-	Wt::WMenu* menu {navbar->addMenu(std::make_unique<Wt::WMenu>())};
-	{
-		_menuItemShareCreate = menu->addItem(Wt::WString::tr("msg-share-create"));
-		_menuItemShareCreate->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/share-create"});
-		_menuItemShareCreate->setSelectable(true);
-	}
-	{
-		Wt::WMenuItem* menuItemTos = menu->addItem(Wt::WString::tr("msg-tos"));
-		menuItemTos->setLink(Wt::WLink {Wt::LinkType::InternalPath, "/tos"});
-		menuItemTos->setSelectable(true);
-	} 
-	Wt::WContainerWidget* container {main->bindNew<Wt::WContainerWidget>("contents")};
+        navbar->setTitle(Wt::WString::tr("msg-app-name"));
 
-	// Same order as Idx enum
-	Wt::WStackedWidget* mainStack {container->addNew<Wt::WStackedWidget>()};
-	mainStack->addNew<ShareCreate>(_workingDirectory);
-	mainStack->addNew<ShareCreated>();
-	mainStack->addNew<ShareDownload>();
-	mainStack->addNew<ShareEdit>();
-	mainStack->addWidget(createTermsOfService());
+        Wt::WMenu* menu{ navbar->addMenu(std::make_unique<Wt::WMenu>()) };
+        {
+            _menuItemShareCreate = menu->addItem(Wt::WString::tr("msg-share-create"));
+            _menuItemShareCreate->setLink(Wt::WLink{ Wt::LinkType::InternalPath, "/share-create" });
+            _menuItemShareCreate->setSelectable(true);
+        }
+        {
+            Wt::WMenuItem* menuItemTos = menu->addItem(Wt::WString::tr("msg-tos"));
+            menuItemTos->setLink(Wt::WLink{ Wt::LinkType::InternalPath, "/tos" });
+            menuItemTos->setSelectable(true);
+        }
+        Wt::WContainerWidget* container{ main->bindNew<Wt::WContainerWidget>("contents") };
 
-	internalPathChanged().connect(mainStack, [mainStack]
-	{
-		handlePathChange(mainStack);
-	});
+        // Same order as Idx enum
+        Wt::WStackedWidget* mainStack{ container->addNew<Wt::WStackedWidget>() };
+        mainStack->addNew<ShareCreate>(_workingDirectory);
+        mainStack->addNew<ShareCreated>();
+        mainStack->addNew<ShareDownload>();
+        mainStack->addNew<ShareEdit>();
+        mainStack->addWidget(createTermsOfService());
 
-	handlePathChange(mainStack);
-}
+        internalPathChanged().connect(mainStack, [mainStack] {
+            handlePathChange(mainStack);
+        });
 
-void 
-FileShelterApplication::updateMenuVisibility()
-{
-	if (!Service<IConfig>::get()->getBool("show-create-links-on-download", true))
-	{
-		if (wApp->internalPathMatches("/share-download"))
-		{
-			_menuItemShareCreate->hide();
-		}
-		else
-		{
-			_menuItemShareCreate->show();
-		}
-	}
-}
+        handlePathChange(mainStack);
+    }
 
-void
-FileShelterApplication::displayError(std::string_view error)
-{
-	root()->clear();
+    void FileShelterApplication::updateMenuVisibility()
+    {
+        if (!Service<IConfig>::get()->getBool("show-create-links-on-download", true))
+        {
+            if (wApp->internalPathMatches("/share-download"))
+            {
+                _menuItemShareCreate->hide();
+            }
+            else
+            {
+                _menuItemShareCreate->show();
+            }
+        }
+    }
 
-	Wt::WTemplate *t {root()->addNew<Wt::WTemplate>(Wt::WString::tr("template-error"))};
-	t->addFunction("tr", &Wt::WTemplate::Functions::tr);
-	t->bindString("error", std::string {error});
-}
+    void FileShelterApplication::displayError(std::string_view error)
+    {
+        root()->clear();
 
-void
-FileShelterApplication::notify(const Wt::WEvent& event)
-{
-	try
-	{
-		WApplication::notify(event);
-	}
-	catch (const Exception& e)
-	{
-		FS_LOG(UI, WARNING) << "Caught an UI exception: " << e.what();
-		displayError(e.what());
-	}
-	catch (const std::exception& e)
-	{
-		FS_LOG(UI, ERROR) << "Caught exception: " << e.what();
+        Wt::WTemplate* t{ root()->addNew<Wt::WTemplate>(Wt::WString::tr("template-error")) };
+        t->addFunction("tr", &Wt::WTemplate::Functions::tr);
+        t->bindString("error", std::string{ error });
+    }
 
-		 // Do not put details or rethrow the exception here at it may appear on the user rendered html
-		throw FsException {"Internal error"};
-	}
-}
+    void FileShelterApplication::notify(const Wt::WEvent& event)
+    {
+        try
+        {
+            WApplication::notify(event);
+        }
+        catch (const Exception& e)
+        {
+            FS_LOG(UI, WARNING) << "Caught an UI exception: " << e.what();
+            displayError(e.what());
+        }
+        catch (const std::exception& e)
+        {
+            FS_LOG(UI, ERROR) << "Caught exception: " << e.what();
 
+            // Do not put details or rethrow the exception here at it may appear on the user rendered html
+            throw FsException{ "Internal error" };
+        }
+    }
 } // namespace UserInterface

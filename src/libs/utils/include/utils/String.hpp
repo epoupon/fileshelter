@@ -20,63 +20,45 @@
 #pragma once
 
 #include <optional>
+#include <sstream>
 #include <string>
 #include <string_view>
-#include <sstream>
 #include <vector>
 
-namespace StringUtils {
-
-
-std::vector<std::string>
-splitString(const std::string& string, const std::string& separators);
-
-std::string
-joinStrings(const std::vector<std::string>& strings, const std::string& delimiter);
-
-std::string
-stringTrim(const std::string& str, const std::string& whitespaces = " \t");
-
-std::string
-stringTrimEnd(const std::string& str, const std::string& whitespaces = " \t");
-
-std::string
-stringToLower(std::string_view str);
-
-std::string
-stringToUpper(const std::string& str);
-
-std::string
-bufferToString(const std::vector<unsigned char>& data);
-
-template<typename T>
-std::optional<T> readAs(const std::string& str)
+namespace StringUtils
 {
-	T res;
+    std::vector<std::string> splitString(const std::string& string, const std::string& separators);
+    std::string joinStrings(const std::vector<std::string>& strings, const std::string& delimiter);
+    std::string stringTrim(const std::string& str, const std::string& whitespaces = " \t");
+    std::string stringTrimEnd(const std::string& str, const std::string& whitespaces = " \t");
 
-	std::istringstream iss ( str );
-	iss >> res;
-	if (iss.fail())
-		return std::nullopt;
+    std::string stringToLower(std::string_view str);
+    std::string stringToUpper(const std::string& str);
 
-	return res;
-}
+    std::string bufferToString(const std::vector<unsigned char>& data);
 
-template<>
-std::optional<std::string>
-readAs(const std::string& str);
+    template<typename T>
+    std::optional<T> readAs(const std::string& str)
+    {
+        T res;
 
-std::string
-replaceInString(const std::string& str, const std::string& from, const std::string& to);
+        std::istringstream iss(str);
+        iss >> res;
+        if (iss.fail())
+            return std::nullopt;
 
-std::string
-jsEscape(const std::string& str);
+        return res;
+    }
 
-bool
-stringEndsWith(const std::string& str, const std::string& ending);
+    template<>
+    std::optional<std::string> readAs(const std::string& str);
 
-std::optional<std::string>
-stringFromHex(const std::string& str);
+    std::string replaceInString(const std::string& str, const std::string& from, const std::string& to);
 
-} // StringUtils
+    std::string jsEscape(const std::string& str);
 
+    bool stringEndsWith(const std::string& str, const std::string& ending);
+
+    std::optional<std::string> stringFromHex(const std::string& str);
+
+} // namespace StringUtils

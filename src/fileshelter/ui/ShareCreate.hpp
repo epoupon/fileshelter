@@ -21,28 +21,23 @@
 
 #include <filesystem>
 
-#include <Wt/WString.h>
 #include <Wt/WContainerWidget.h>
-
-#include "utils/UUID.hpp"
+#include <Wt/WString.h>
 
 namespace UserInterface
 {
+    class ShareCreate : public Wt::WContainerWidget
+    {
+    public:
+        ShareCreate(const std::filesystem::path& workingDirectory);
 
-	class ShareCreate : public Wt::WContainerWidget
-	{
-		public:
-			ShareCreate(const std::filesystem::path& workingDirectory);
+    private:
+        void handlePathChanged();
 
-		private:
-			void handlePathChanged();
+        void displayCreate();
+        void displayPassword();
 
-			void displayCreate();
-			void displayPassword();
-
-			const std::filesystem::path& _workingDirectory;
-			bool _isPasswordVerified{};
-	};
-
+        const std::filesystem::path& _workingDirectory;
+        bool _isPasswordVerified{};
+    };
 } // namespace UserInterface
-

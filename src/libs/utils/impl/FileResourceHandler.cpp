@@ -24,125 +24,118 @@
 
 #include "utils/Logger.hpp"
 
-std::unique_ptr<IResourceHandler>
-createFileResourceHandler(const std::filesystem::path& path)
+std::unique_ptr<IResourceHandler> createFileResourceHandler(const std::filesystem::path& path)
 {
-	return std::make_unique<FileResourceHandler>(path);
+    return std::make_unique<FileResourceHandler>(path);
 }
-
 
 FileResourceHandler::FileResourceHandler(const std::filesystem::path& path)
-: _path {path}
+    : _path{ path }
 {
 }
 
-
-void
-FileResourceHandler::processRequest(const Wt::Http::Request& request, Wt::Http::Response& response)
+void FileResourceHandler::processRequest(const Wt::Http::Request& request, Wt::Http::Response& response)
 {
-	::uint64_t startByte {_offset};
-	std::ifstream ifs {_path.string().c_str(), std::ios::in | std::ios::binary};
-	if (!ifs)
-	{
-		const int err {errno};
-		FS_LOG(UTILS, ERROR) << "Cannot open input file '" << _path.string() << "': " << std::string {::strerror(err)};
-		_isFinished = true;
+    ::uint64_t startByte{ _offset };
+    std::ifstream ifs{ _path.string().c_str(), std::ios::in | std::ios::binary };
+    if (!ifs)
+    {
+        const int err{ errno };
+        FS_LOG(UTILS, ERROR) << "Cannot open input file '" << _path.string() << "': " << std::string{ ::strerror(err) };
+        _isFinished = true;
 
-		if (startByte == 0)
-			response.setStatus(404);
+        if (startByte == 0)
+            response.setStatus(404);
 
-		return;
-	}
+        return;
+    }
 
-	if (startByte == 0)
-	{
-		response.setStatus(200);
+    if (startByte == 0)
+    {
+        response.setStatus(200);
 
-		ifs.seekg(0, std::ios::end);
-		const ::uint64_t fileSize {static_cast<::uint64_t>(ifs.tellg())};
-		ifs.seekg(0, std::ios::beg);
+        ifs.seekg(0, std::ios::end);
+        const ::uint64_t fileSize{ static_cast<::uint64_t>(ifs.tellg()) };
+        ifs.seekg(0, std::ios::beg);
 
-		FS_LOG(UTILS, DEBUG) << "File '" << _path.string() << "', fileSize = " << fileSize;
+        FS_LOG(UTILS, DEBUG) << "File '" << _path.string() << "', fileSize = " << fileSize;
 
-		const Wt::Http::Request::ByteRangeSpecifier ranges {request.getRanges(fileSize)};
-		if (!ranges.isSatisfiable())
-		{
-			std::ostringstream contentRange;
-			contentRange << "bytes */" << fileSize;
-			response.setStatus(416); // Requested range not satisfiable
-			response.addHeader("Content-Range", contentRange.str());
+        const Wt::Http::Request::ByteRangeSpecifier ranges{ request.getRanges(fileSize) };
+        if (!ranges.isSatisfiable())
+        {
+            std::ostringstream contentRange;
+            contentRange << "bytes */" << fileSize;
+            response.setStatus(416); // Requested range not satisfiable
+            response.addHeader("Content-Range", contentRange.str());
 
-			FS_LOG(UTILS, DEBUG) << "Range not satisfiable";
-			_isFinished = true;
-			return;
-		}
+            FS_LOG(UTILS, DEBUG) << "Range not satisfiable";
+            _isFinished = true;
+            return;
+        }
 
-		if (ranges.size() == 1)
-		{
-			FS_LOG(UTILS, DEBUG) << "Range requested = " << ranges[0].firstByte() << "/" << ranges[0].lastByte();
+        if (ranges.size() == 1)
+        {
+            FS_LOG(UTILS, DEBUG) << "Range requested = " << ranges[0].firstByte() << "/" << ranges[0].lastByte();
 
-			response.setStatus(206);
-			startByte = ranges[0].firstByte();
-			_beyondLastByte = ranges[0].lastByte() + 1;
+            response.setStatus(206);
+            startByte = ranges[0].firstByte();
+            _beyondLastByte = ranges[0].lastByte() + 1;
 
-			std::ostringstream contentRange;
-			contentRange << "bytes " << startByte << "-"
-				<< _beyondLastByte - 1 << "/" << fileSize;
+            std::ostringstream contentRange;
+            contentRange << "bytes " << startByte << "-"
+                         << _beyondLastByte - 1 << "/" << fileSize;
 
-			response.addHeader("Content-Range", contentRange.str());
-			response.setContentLength(_beyondLastByte - startByte);
-		}
-		else
-		{
-			FS_LOG(UTILS, DEBUG) << "No range requested";
+            response.addHeader("Content-Range", contentRange.str());
+            response.setContentLength(_beyondLastByte - startByte);
+        }
+        else
+        {
+            FS_LOG(UTILS, DEBUG) << "No range requested";
 
-			_beyondLastByte = fileSize;
-			response.setContentLength(_beyondLastByte);
-		}
-	}
+            _beyondLastByte = fileSize;
+            response.setContentLength(_beyondLastByte);
+        }
+    }
 
-	if (!ifs.seekg(static_cast<std::istream::pos_type>(startByte)))
-	{
-		const int err {errno};
-		FS_LOG(UTILS, ERROR) << "Failed to seek in file '" << _path.string() << "' at " << startByte << ": " << std::string {::strerror(err)};
-		_isFinished = true;
-		return;
-	}
+    if (!ifs.seekg(static_cast<std::istream::pos_type>(startByte)))
+    {
+        const int err{ errno };
+        FS_LOG(UTILS, ERROR) << "Failed to seek in file '" << _path.string() << "' at " << startByte << ": " << std::string{ ::strerror(err) };
+        _isFinished = true;
+        return;
+    }
 
-	std::vector<char> buf;
-	buf.resize(_chunkSize);
+    std::vector<char> buf;
+    buf.resize(_chunkSize);
 
-	::uint64_t restSize = _beyondLastByte - startByte;
-	::uint64_t pieceSize = buf.size() > restSize ? restSize : buf.size();
+    ::uint64_t restSize = _beyondLastByte - startByte;
+    ::uint64_t pieceSize = buf.size() > restSize ? restSize : buf.size();
 
-	if (!ifs.read(&buf[0], pieceSize))
-	{
-		const int err {errno};
-		FS_LOG(UTILS, ERROR) << "Read failed in file '" << _path.string() << "': " << std::string {::strerror(err)};
-		_isFinished = true;
-		return;
-	}
-	const ::uint64_t actualPieceSize {static_cast<::uint64_t>(ifs.gcount())};
-	response.out().write(&buf[0], actualPieceSize);
+    if (!ifs.read(&buf[0], pieceSize))
+    {
+        const int err{ errno };
+        FS_LOG(UTILS, ERROR) << "Read failed in file '" << _path.string() << "': " << std::string{ ::strerror(err) };
+        _isFinished = true;
+        return;
+    }
+    const ::uint64_t actualPieceSize{ static_cast<::uint64_t>(ifs.gcount()) };
+    response.out().write(&buf[0], actualPieceSize);
 
-	if (ifs.good() && actualPieceSize < restSize)
-	{
-		_offset = startByte + actualPieceSize;
-		return;
-	}
+    if (ifs.good() && actualPieceSize < restSize)
+    {
+        _offset = startByte + actualPieceSize;
+        return;
+    }
 
-	_isFinished = true;
+    _isFinished = true;
 }
 
-bool
-FileResourceHandler::isComplete() const
+bool FileResourceHandler::isComplete() const
 {
-	return _isFinished;
+    return _isFinished;
 }
 
-void
-FileResourceHandler::abort()
+void FileResourceHandler::abort()
 {
-	_isFinished = true;
+    _isFinished = true;
 }
-

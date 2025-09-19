@@ -19,38 +19,30 @@
 
 #include "PasswordUtils.hpp"
 
-#include <unordered_set>
-
 #include "utils/IConfig.hpp"
 #include "utils/Service.hpp"
 
 namespace UserInterface::PasswordUtils
 {
+    bool isUploadPassordRequired()
+    {
+        bool hasStrings{};
+        Service<IConfig>::get()->visitStrings("upload-passwords", [&](std::string_view str) {
+            if (!str.empty())
+                hasStrings = true;
+        });
 
-	bool
-	isUploadPassordRequired()
-	{
-		bool hasStrings {};
-		Service<IConfig>::get()->visitStrings("upload-passwords", [&](std::string_view str)
-		{
-			if (!str.empty())
-				hasStrings = true;
-		});
+        return hasStrings;
+    }
 
-		return hasStrings;
-	}
+    bool checkUploadPassord(std::string_view uploadPassword)
+    {
+        bool res{};
+        Service<IConfig>::get()->visitStrings("upload-passwords", [&](std::string_view password) {
+            if (password == uploadPassword)
+                res = true;
+        });
 
-	bool
-	checkUploadPassord(std::string_view uploadPassword)
-	{
-		bool res{};
-		Service<IConfig>::get()->visitStrings("upload-passwords", [&](std::string_view password)
-		{
-			if (password == uploadPassword)
-				res = true;
-		});
-
-		return res;
-	}
-
-}
+        return res;
+    }
+} // namespace UserInterface::PasswordUtils

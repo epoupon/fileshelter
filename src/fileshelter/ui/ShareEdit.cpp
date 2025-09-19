@@ -21,116 +21,106 @@
 
 #include <Wt/WApplication.h>
 #include <Wt/WEnvironment.h>
-#include <Wt/WTemplate.h>
-#include <Wt/WPushButton.h>
 #include <Wt/WMessageBox.h>
+#include <Wt/WPushButton.h>
+#include <Wt/WTemplate.h>
 
-#include "utils/Logger.hpp"
-#include "utils/Service.hpp"
 #include "share/Exception.hpp"
 #include "share/IShareManager.hpp"
 #include "share/Types.hpp"
+#include "utils/Logger.hpp"
+#include "utils/Service.hpp"
 
 #include "ShareUtils.hpp"
 
 namespace UserInterface
 {
+    ShareEdit::ShareEdit()
+    {
+        wApp->internalPathChanged().connect(this, [this] {
+            handlePathChanged();
+        });
 
-	ShareEdit::ShareEdit()
-	{
-		wApp->internalPathChanged().connect(this, [this]
-		{
-			handlePathChanged();
-		});
+        handlePathChanged();
+    }
 
-		handlePathChanged();
-	}
+    void ShareEdit::handlePathChanged()
+    {
+        clear();
 
-	void
-	ShareEdit::handlePathChanged()
-	{
-		clear();
+        if (!wApp->internalPathMatches("/share-edit"))
+            return;
 
-		if (!wApp->internalPathMatches("/share-edit"))
-			return;
+        try
+        {
+            const Share::ShareEditUUID editUUID{ wApp->internalPathNextPart("/share-edit/") };
+            displayEdit(editUUID);
+        }
+        catch (const Share::ShareNotFoundException& e)
+        {
+            displayShareNotFound();
+        }
+        catch (const UUIDException& e)
+        {
+            displayShareNotFound();
+        }
+    }
 
-		try
-		{
-			const Share::ShareEditUUID editUUID {wApp->internalPathNextPart("/share-edit/")};
-			displayEdit(editUUID);
-		}
-		catch (const Share::ShareNotFoundException& e)
-		{
-			displayShareNotFound();
-		}
-		catch (const UUIDException& e)
-		{
-			displayShareNotFound();
-		}
-	}
+    void ShareEdit::displayEdit(const Share::ShareEditUUID& editUUID)
+    {
+        const Share::ShareDesc share{ Service<Share::IShareManager>::get()->getShareDesc(editUUID) };
 
-	void
-	ShareEdit::displayEdit(const Share::ShareEditUUID& editUUID)
-	{
-		const Share::ShareDesc share {Service<Share::IShareManager>::get()->getShareDesc(editUUID)};
+        FS_LOG(UI, INFO) << "[" << share.uuid.toString() << "] Editing share from " << wApp->environment().clientAddress();
 
-		FS_LOG(UI, INFO) << "[" << share.uuid.toString() << "] Editing share from " << wApp->environment().clientAddress();
+        Wt::WTemplate* t{ addNew<Wt::WTemplate>(tr("template-share-edit")) };
+        t->addFunction("tr", &Wt::WTemplate::Functions::tr);
 
-		Wt::WTemplate *t {addNew<Wt::WTemplate>(tr("template-share-edit"))};
-		t->addFunction("tr", &Wt::WTemplate::Functions::tr);
+        t->bindNew<Wt::WText>("download-count", std::to_string(share.readCount), Wt::TextFormat::Plain);
+        t->bindNew<Wt::WText>("expiry-date-time", share.expiryTime.toString() + " UTC", Wt::TextFormat::Plain);
 
-		t->bindNew<Wt::WText>("download-count", std::to_string(share.readCount), Wt::TextFormat::Plain);
-		t->bindNew<Wt::WText>("expiry-date-time", share.expiryTime.toString() + " UTC", Wt::TextFormat::Plain);
+        t->bindWidget("download-link", ShareUtils::createShareDownloadAnchor(share.uuid));
 
-		t->bindWidget("download-link", ShareUtils::createShareDownloadAnchor(share.uuid));
+        Wt::WPushButton* deleteBtn{ t->bindNew<Wt::WPushButton>("delete-btn", tr("msg-delete")) };
 
-		Wt::WPushButton* deleteBtn {t->bindNew<Wt::WPushButton>("delete-btn", tr("msg-delete"))};
+        deleteBtn->clicked().connect([=] {
+            auto messageBox = deleteBtn->addChild(std::make_unique<Wt::WMessageBox>(tr("msg-share-delete"),
+                tr("msg-confirm-action"),
+                Wt::Icon::Question,
+                Wt::StandardButton::Yes | Wt::StandardButton::No));
 
-		deleteBtn->clicked().connect([=]
-		{
-			auto messageBox = deleteBtn->addChild(std::make_unique<Wt::WMessageBox>(tr("msg-share-delete"),
-						tr("msg-confirm-action"),
-						Wt::Icon::Question,
-						Wt::StandardButton::Yes | Wt::StandardButton::No));
+            messageBox->setModal(true);
 
-			messageBox->setModal(true);
+            messageBox->buttonClicked().connect([=](Wt::StandardButton btn) {
+                try
+                {
+                    if (btn == Wt::StandardButton::Yes)
+                    {
+                        Service<Share::IShareManager>::get()->destroyShare(editUUID);
+                        displayRemoved();
+                    }
+                    else
+                        deleteBtn->removeChild(messageBox);
+                }
+                catch (const Share::ShareNotFoundException& e)
+                {
+                    FS_LOG(UI, DEBUG) << "Share already removed!";
+                    displayShareNotFound();
+                }
+            });
 
-			messageBox->buttonClicked().connect([=] (Wt::StandardButton btn)
-			{
-				try
-				{
-					if (btn == Wt::StandardButton::Yes)
-					{
-						Service<Share::IShareManager>::get()->destroyShare(editUUID);
-						displayRemoved();
-					}
-					else
-						deleteBtn->removeChild(messageBox);
-				}
-				catch (const Share::ShareNotFoundException& e)
-				{
-					FS_LOG(UI, DEBUG) << "Share already removed!";
-					displayShareNotFound();
-				}
-			});
+            messageBox->show();
+        });
+    }
 
-			messageBox->show();
-		});
-	}
+    void ShareEdit::displayRemoved()
+    {
+        clear();
+        addNew<Wt::WTemplate>(tr("template-share-removed"))->addFunction("tr", &Wt::WTemplate::Functions::tr);
+    }
 
-	void
-	ShareEdit::displayRemoved()
-	{
-		clear();
-		addNew<Wt::WTemplate>(tr("template-share-removed"))->addFunction("tr", &Wt::WTemplate::Functions::tr);
-	}
-
-	void
-	ShareEdit::displayShareNotFound()
-	{
-		clear();
-		addNew<Wt::WTemplate>(tr("template-share-not-found"))->addFunction("tr", &Wt::WTemplate::Functions::tr);
-	}
-
+    void ShareEdit::displayShareNotFound()
+    {
+        clear();
+        addNew<Wt::WTemplate>(tr("template-share-not-found"))->addFunction("tr", &Wt::WTemplate::Functions::tr);
+    }
 } // namespace UserInterface
-

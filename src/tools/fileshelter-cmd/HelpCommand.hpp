@@ -19,24 +19,23 @@
 
 #pragma once
 
+#include "ICommand.hpp"
 #include <memory>
 #include <vector>
-#include "ICommand.hpp"
 
 class HelpCommand : public ICommand
 {
-	public:
-		HelpCommand(std::string_view processArg, const std::vector<std::unique_ptr<ICommand>>& commands);
+public:
+    HelpCommand(std::string_view processArg, const std::vector<std::unique_ptr<ICommand>>& commands);
 
-		std::string_view getName() const { return "help"; }
-		std::string_view getDescription() const { return "Show this help or display command specific help"; }
-		void displayHelp(std::ostream& os) const override;
-		int process(const std::vector<std::string>& args) const override;
+    std::string_view getName() const { return "help"; }
+    std::string_view getDescription() const { return "Show this help or display command specific help"; }
+    void displayHelp(std::ostream& os) const override;
+    int process(const std::vector<std::string>& args) const override;
 
-	private:
-		std::string generateCommandDesc(const std::vector<std::unique_ptr<ICommand>>& commands) const;
+private:
+    std::string generateCommandDesc(const std::vector<std::unique_ptr<ICommand>>& commands) const;
 
-		const std::string _processArg;
-		const std::vector<std::unique_ptr<ICommand>>& _commands;
+    const std::string _processArg;
+    const std::vector<std::unique_ptr<ICommand>>& _commands;
 };
-

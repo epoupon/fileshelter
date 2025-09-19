@@ -20,9 +20,12 @@
 #pragma once
 
 #include <filesystem>
+#include <memory>
+
+#include <Wt/WApplication.h>
 
 namespace UserInterface
 {
-	std::filesystem::path prepareUploadDirectory();
-	std::unique_ptr<Wt::WApplication> createFileShelterApplication(const Wt::WEnvironment& env);
-}
+    std::filesystem::path prepareUploadDirectory();
+    std::unique_ptr<Wt::WApplication> createFileShelterApplication(const Wt::WEnvironment& env);
+} // namespace UserInterface

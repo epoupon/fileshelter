@@ -23,11 +23,10 @@
 
 namespace Share
 {
-	using IdType = Wt::Dbo::dbo_default_traits::IdType;
+    using IdType = Wt::Dbo::dbo_default_traits::IdType;
 
-	static inline bool IdIsValid(IdType id)
-	{
-		return id != Wt::Dbo::dbo_default_traits::invalidId();
-	}
-}
-
+    static inline bool IdIsValid(IdType id)
+    {
+        return id != Wt::Dbo::dbo_default_traits::invalidId();
+    }
+} // namespace Share

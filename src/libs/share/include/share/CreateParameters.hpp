@@ -25,17 +25,17 @@
 
 namespace Share
 {
-	struct FileCreateParameters
-	{
-		std::filesystem::path path;
-		std::string name;
-	};
+    struct FileCreateParameters
+    {
+        std::filesystem::path path;
+        std::string name;
+    };
 
-	struct ShareCreateParameters
-	{
-		std::chrono::seconds validityPeriod; // 0 if infinite
-		std::string description;
-		std::string creatorAddress;
-		std::string password;
-	};
-}
+    struct ShareCreateParameters
+    {
+        std::chrono::seconds validityPeriod; // 0 if infinite
+        std::string description;
+        std::string creatorAddress;
+        std::string password;
+    };
+} // namespace Share

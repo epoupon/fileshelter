@@ -25,4 +25,3 @@
 #include "utils/IZipper.hpp"
 
 std::unique_ptr<IResourceHandler> createZipperResourceHandler(std::unique_ptr<Zip::IZipper> zipper);
-

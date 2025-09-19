@@ -19,30 +19,29 @@
 
 #include "File.hpp"
 
-#include "utils/Logger.hpp"
 #include "Share.hpp"
 #include "Types.hpp"
+#include "utils/Logger.hpp"
 
 namespace Share
 {
-	File::pointer
-	File::create(Wt::Dbo::Session& session, const FileCreateParameters& parameters, Share::pointer share)
-	{
-		pointer res {session.add(std::make_unique<File>())};
+    File::pointer
+    File::create(Wt::Dbo::Session& session, const FileCreateParameters& parameters, Share::pointer share)
+    {
+        pointer res{ session.add(std::make_unique<File>()) };
 
-		res.modify()->_path = parameters.path;
-		res.modify()->_name = parameters.name;
-		res.modify()->_share = share;
+        res.modify()->_path = parameters.path;
+        res.modify()->_name = parameters.name;
+        res.modify()->_share = share;
 
-		session.flush();
-		return res;
-	}
+        session.flush();
+        return res;
+    }
 
-	File::pointer
-	File::getByPath(Wt::Dbo::Session& session, const std::filesystem::path& filePath)
-	{
-		return session.find<File>().where("path = ?").bind(filePath);
-	}
+    File::pointer
+    File::getByPath(Wt::Dbo::Session& session, const std::filesystem::path& filePath)
+    {
+        return session.find<File>().where("path = ?").bind(filePath);
+    }
 
-}
-
+} // namespace Share

@@ -21,6 +21,7 @@
 
 #include <Wt/WApplication.h>
 #include <Wt/WStackedWidget.h>
+
 #include "share/IShareManager.hpp"
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
@@ -33,99 +34,91 @@
 namespace UserInterface
 {
 
-	class ShareCreateProgress : public Wt::WTemplate
-	{
-		public:
-			ShareCreateProgress() : Wt::WTemplate {tr("template-share-create-progress")}
-			{
-				addFunction("tr", &Wt::WTemplate::Functions::tr);
-				_progress = bindNew<ProgressBar>("progress");
-			}
+    class ShareCreateProgress : public Wt::WTemplate
+    {
+    public:
+        ShareCreateProgress()
+            : Wt::WTemplate{ tr("template-share-create-progress") }
+        {
+            addFunction("tr", &Wt::WTemplate::Functions::tr);
+            _progress = bindNew<ProgressBar>("progress");
+        }
 
-			void handleProgressUpdate(unsigned progress)
-			{
-				_progress->setValue(progress);
-			}
+        void handleProgressUpdate(unsigned progress)
+        {
+            _progress->setValue(progress);
+        }
 
-		private:
-			ProgressBar*	_progress {};
-	};
+    private:
+        ProgressBar* _progress{};
+    };
 
+    ShareCreate::ShareCreate(const std::filesystem::path& workingDirectory)
+        : _workingDirectory{ workingDirectory }
+    {
+        wApp->internalPathChanged().connect(this, [this] {
+            handlePathChanged();
+        });
 
-	ShareCreate::ShareCreate(const std::filesystem::path& workingDirectory)
-	: _workingDirectory {workingDirectory}
-	{
-		wApp->internalPathChanged().connect(this, [this]
-		{
-			handlePathChanged();
-		});
+        handlePathChanged();
+    }
 
-		handlePathChanged();
-	}
+    void ShareCreate::handlePathChanged()
+    {
+        clear();
 
+        if (!wApp->internalPathMatches("/share-create"))
+            return;
 
-	void
-	ShareCreate::handlePathChanged()
-	{
-		clear();
+        if (!_isPasswordVerified && PasswordUtils::isUploadPassordRequired())
+            displayPassword();
+        else
+            displayCreate();
+    }
 
-		if (!wApp->internalPathMatches("/share-create"))
-			return;
+    void ShareCreate::displayPassword()
+    {
+        ShareCreatePassword* view{ addNew<ShareCreatePassword>() };
+        view->success().connect([=] {
+            _isPasswordVerified = true;
+            clear();
+            displayCreate();
+        });
+    }
 
-		if (!_isPasswordVerified && PasswordUtils::isUploadPassordRequired())
-			displayPassword();
-		else
-			displayCreate();
-	}
+    void ShareCreate::displayCreate()
+    {
+        using namespace Share;
 
-	void
-	ShareCreate::displayPassword()
-	{
-		ShareCreatePassword* view {addNew<ShareCreatePassword>()};
-		view->success().connect([=]
-		{
-			_isPasswordVerified = true;
-			clear();
-			displayCreate();
-		});
-	}
+        enum CreateStack
+        {
+            Form = 0,
+            Progress = 1,
+        };
 
-	void
-	ShareCreate::displayCreate()
-	{
-		using namespace Share;
+        Wt::WStackedWidget* stack{ addNew<Wt::WStackedWidget>() };
 
-		enum CreateStack
-		{
-			Form = 0,
-			Progress = 1,
-		};
+        ShareCreateFormView* form{ stack->addNew<ShareCreateFormView>(_workingDirectory) };
+        ShareCreateProgress* progress{ stack->addNew<ShareCreateProgress>() };
 
-		Wt::WStackedWidget* stack {addNew<Wt::WStackedWidget>()};
+        form->progressUpdate().connect(progress, [=](unsigned progressPerCent) { progress->handleProgressUpdate(progressPerCent); });
 
-		ShareCreateFormView* form {stack->addNew<ShareCreateFormView>(_workingDirectory)};
-		ShareCreateProgress* progress {stack->addNew<ShareCreateProgress>()};
+        form->validated().connect([=] {
+            stack->setCurrentIndex(CreateStack::Progress);
+        });
 
-		form->progressUpdate().connect(progress, [=](unsigned progressPerCent) { progress->handleProgressUpdate(progressPerCent); });
+        form->complete().connect([=](const ShareCreateParameters& shareParameters, const std::vector<FileCreateParameters>& filesParameters) {
+            FS_LOG(UI, DEBUG) << "Upload complete!";
+            const Share::ShareDesc shareDesc{ Service<IShareManager>::get()->createShare(shareParameters, filesParameters, true /* transfer file ownership */) };
 
-		form->validated().connect([=]
-		{
-			stack->setCurrentIndex(CreateStack::Progress);
-		});
+            FS_LOG(UI, DEBUG) << "Redirecting...";
+            wApp->setInternalPath("/share-created/" + shareDesc.editUuid.toString(), true);
 
-		form->complete().connect([=](const ShareCreateParameters& shareParameters, const std::vector<FileCreateParameters>& filesParameters)
-		{
-			FS_LOG(UI, DEBUG) << "Upload complete!";
-			const Share::ShareDesc shareDesc {Service<IShareManager>::get()->createShare(shareParameters, filesParameters, true /* transfer file ownership */)};
-
-			FS_LOG(UI, DEBUG) << "Redirecting...";
-			wApp->setInternalPath("/share-created/" + shareDesc.editUuid.toString(), true);
-
-			// Clear the widget in order to flush the temporary uploaded files
-			FS_LOG(UI, DEBUG) << "Clearing...";
-			clear();
-			FS_LOG(UI, DEBUG) << "Clearing done";
-		});
-	}
+            // Clear the widget in order to flush the temporary uploaded files
+            FS_LOG(UI, DEBUG) << "Clearing...";
+            clear();
+            FS_LOG(UI, DEBUG) << "Clearing done";
+        });
+    }
 
 } // namespace UserInterface

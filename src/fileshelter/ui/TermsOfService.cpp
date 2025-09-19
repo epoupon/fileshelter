@@ -20,6 +20,7 @@
 #include "TermsOfService.hpp"
 
 #include <fstream>
+
 #include <Wt/WTemplate.h>
 
 #include "utils/IConfig.hpp"
@@ -27,26 +28,25 @@
 
 namespace UserInterface
 {
-	std::unique_ptr<Wt::WWidget>
-	createTermsOfService()
-	{
-		auto tos {std::make_unique<Wt::WTemplate>()};
+    std::unique_ptr<Wt::WWidget> createTermsOfService()
+    {
+        auto tos{ std::make_unique<Wt::WTemplate>() };
 
-		// Override the ToS with a custom version is specified
-		if (const auto path {Service<IConfig>::get()->getPath("tos-custom")}; !path.empty())
-		{
-			std::ifstream ifs {path.string().c_str()};
-			std::stringstream buffer;
-			buffer << ifs.rdbuf();
+        // Override the ToS with a custom version is specified
+        if (const auto path{ Service<IConfig>::get()->getPath("tos-custom") }; !path.empty())
+        {
+            std::ifstream ifs{ path.string().c_str() };
+            std::stringstream buffer;
+            buffer << ifs.rdbuf();
 
-			tos->setTemplateText(buffer.str());
-		}
-		else
-		{
-			tos->setTemplateText(Wt::WString::tr("template-tos"));
-			tos->addFunction("tr", &Wt::WTemplate::Functions::tr);
-		}
+            tos->setTemplateText(buffer.str());
+        }
+        else
+        {
+            tos->setTemplateText(Wt::WString::tr("template-tos"));
+            tos->addFunction("tr", &Wt::WTemplate::Functions::tr);
+        }
 
-		return tos;
-	}
-}
+        return tos;
+    }
+} // namespace UserInterface

@@ -19,41 +19,41 @@
 
 #pragma once
 
+#include <Wt/WLink.h>
+#include <Wt/WResource.h>
 #include <filesystem>
 #include <optional>
 #include <string_view>
-#include <Wt/WResource.h>
-#include <Wt/WLink.h>
 
 #include "share/Types.hpp"
 
 namespace Share
 {
-	class IShare;
+    class IShare;
 }
 
 namespace Zip
 {
-	class IZipper;
+    class IZipper;
 }
 
 class ShareResource : public Wt::WResource
 {
-	public:
-		~ShareResource();
+public:
+    ~ShareResource();
 
-		void					setWorkingDirectory(std::filesystem::path workingDirectory);
+    void setWorkingDirectory(std::filesystem::path workingDirectory);
 
-		static void				setDeployPath(std::string_view deployPath) { _deployPath = deployPath; }
-		static std::string_view	getDeployPath() { return _deployPath; }
-		static Wt::WLink		createLink(const Share::ShareUUID& shareId, std::optional<std::string_view> password);
+    static void setDeployPath(std::string_view deployPath) { _deployPath = deployPath; }
+    static std::string_view getDeployPath() { return _deployPath; }
+    static Wt::WLink createLink(const Share::ShareUUID& shareId, std::optional<std::string_view> password);
 
-	private:
-		std::filesystem::path getAbsolutePath(const std::filesystem::path& p);
-		std::unique_ptr<Zip::IZipper> createZipper(const Share::ShareDesc& share);
+private:
+    std::filesystem::path getAbsolutePath(const std::filesystem::path& p);
+    std::unique_ptr<Zip::IZipper> createZipper(const Share::ShareDesc& share);
 
-		std::filesystem::path		_workingDirectory;
-		static inline std::string	_deployPath;
-		void handleRequest(const Wt::Http::Request& request, Wt::Http::Response& response) override;
-		void handleAbort(const Wt::Http::Request& request) override;
+    std::filesystem::path _workingDirectory;
+    static inline std::string _deployPath;
+    void handleRequest(const Wt::Http::Request& request, Wt::Http::Response& response) override;
+    void handleAbort(const Wt::Http::Request& request) override;
 };

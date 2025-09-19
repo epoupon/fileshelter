@@ -22,27 +22,24 @@
 #include <Wt/WSignal.h>
 #include <Wt/WTemplateFormView.h>
 
-#include "utils/UUID.hpp"
 #include "share/Types.hpp"
 
 namespace Share
 {
-	struct ShareDesc;
+    struct ShareDesc;
 }
 
 namespace UserInterface
 {
-	class ShareDownloadPassword : public Wt::WTemplateFormView
-	{
-		public:
-			using SigSuccess = Wt::Signal<const Share::ShareDesc&, std::string>;
-			SigSuccess& success() { return _sigSuccess;}
+    class ShareDownloadPassword : public Wt::WTemplateFormView
+    {
+    public:
+        using SigSuccess = Wt::Signal<const Share::ShareDesc&, std::string>;
+        SigSuccess& success() { return _sigSuccess; }
 
-			ShareDownloadPassword(const Share::ShareUUID& shareUUID);
+        ShareDownloadPassword(const Share::ShareUUID& shareUUID);
 
-		private:
-			SigSuccess _sigSuccess;
-	};
-
+    private:
+        SigSuccess _sigSuccess;
+    };
 } // namespace UserInterface
-

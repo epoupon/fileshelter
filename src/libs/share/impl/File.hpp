@@ -24,60 +24,59 @@
 #include <Wt/Dbo/Dbo.h>
 #include <Wt/Dbo/WtSqlTraits.h>
 
+#include "Traits.hpp"
 #include "share/CreateParameters.hpp"
 #include "share/Types.hpp"
-#include "Traits.hpp"
 
 namespace Share
 {
-	class Share;
+    class Share;
 
-	class File
-	{
-		public:
-			using pointer = Wt::Dbo::ptr<File>;
+    class File
+    {
+    public:
+        using pointer = Wt::Dbo::ptr<File>;
 
-			// Helpers
-			static pointer	create(Wt::Dbo::Session& session, const FileCreateParameters& parameters, Wt::Dbo::ptr<Share> share);
-			static pointer	getByPath(Wt::Dbo::Session& session, const std::filesystem::path& path);
+        // Helpers
+        static pointer create(Wt::Dbo::Session& session, const FileCreateParameters& parameters, Wt::Dbo::ptr<Share> share);
+        static pointer getByPath(Wt::Dbo::Session& session, const std::filesystem::path& path);
 
-			// Getters
-			const FileUUID&					getUUID() const { return _uuid; }
-			const std::filesystem::path&	getClientPath() const { return _name; }
-			FileSize						getSize() const { return _size; }
-			const std::filesystem::path&	getPath() const { return _path; }
-			bool							isOwned() const { return _isOwned; }
+        // Getters
+        const FileUUID& getUUID() const { return _uuid; }
+        const std::filesystem::path& getClientPath() const { return _name; }
+        FileSize getSize() const { return _size; }
+        const std::filesystem::path& getPath() const { return _path; }
+        bool isOwned() const { return _isOwned; }
 
-			// Setters
-			void setUUID(const FileUUID& uuid) { _uuid = uuid; }
-			void setIsOwned(bool value) { _isOwned = value; }
-			void setSize(FileSize size) { _size = size; }
+        // Setters
+        void setUUID(const FileUUID& uuid) { _uuid = uuid; }
+        void setIsOwned(bool value) { _isOwned = value; }
+        void setSize(FileSize size) { _size = size; }
 
-			template<class Action>
-			void persist(Action& a)
-			{
-				Wt::Dbo::field(a, _name,			"name");
-				Wt::Dbo::field(a, _size,			"size");
-				Wt::Dbo::field(a, _path,			"path");
-				Wt::Dbo::field(a, _isOwned,			"is_owned");
+        template<class Action>
+        void persist(Action& a)
+        {
+            Wt::Dbo::field(a, _name, "name");
+            Wt::Dbo::field(a, _size, "size");
+            Wt::Dbo::field(a, _path, "path");
+            Wt::Dbo::field(a, _isOwned, "is_owned");
 
-				Wt::Dbo::field(a, _uuid,			"uuid");	// not used yet
+            Wt::Dbo::field(a, _uuid, "uuid"); // not used yet
 
-				Wt::Dbo::belongsTo(a, _share, "share",	Wt::Dbo::OnDeleteCascade);
-			}
+            Wt::Dbo::belongsTo(a, _share, "share", Wt::Dbo::OnDeleteCascade);
+        }
 
-		private:
-			friend class ShareManager;
+    private:
+        friend class ShareManager;
 
-			std::filesystem::path	_name;
-			FileSize				_size {};
-			std::filesystem::path	_path;
-			bool					_isOwned {};
+        std::filesystem::path _name;
+        FileSize _size{};
+        std::filesystem::path _path;
+        bool _isOwned{};
 
-			FileUUID				_uuid;
+        FileUUID _uuid;
 
-			Wt::Dbo::ptr<Share> _share;
-	};
+        Wt::Dbo::ptr<Share> _share;
+    };
 
 } // namespace Share
-

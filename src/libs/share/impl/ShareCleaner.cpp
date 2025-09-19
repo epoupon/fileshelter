@@ -21,114 +21,112 @@
 
 #include <Wt/WLocalDateTime.h>
 
-#include "utils/Logger.hpp"
-#include "utils/Service.hpp"
 #include "Db.hpp"
 #include "File.hpp"
 #include "Share.hpp"
+#include "utils/Logger.hpp"
+#include "utils/Service.hpp"
 
 namespace Share
 {
-	ShareCleaner::ShareCleaner(Db& db, const std::filesystem::path& workingDirectory)
-	: _db {db}
-	, _workingDirectory {workingDirectory}
-	, _timer {_ioService}
-	{
-		FS_LOG(SHARE, DEBUG) << "Started cleaner";
-		checkExpiredShares();
+    ShareCleaner::ShareCleaner(Db& db, const std::filesystem::path& workingDirectory)
+        : _db{ db }
+        , _workingDirectory{ workingDirectory }
+        , _timer{ _ioService }
+    {
+        FS_LOG(SHARE, DEBUG) << "Started cleaner";
+        checkExpiredShares();
 
-		_ioService.start();
+        _ioService.start();
 
-		scheduleNextCheck();
-	}
+        scheduleNextCheck();
+    }
 
-	ShareCleaner::~ShareCleaner()
-	{
-		_timer.cancel();
-		_ioService.stop();
-		FS_LOG(SHARE, DEBUG) << "Stopped cleaner";
-	}
+    ShareCleaner::~ShareCleaner()
+    {
+        _timer.cancel();
+        _ioService.stop();
+        FS_LOG(SHARE, DEBUG) << "Stopped cleaner";
+    }
 
-	void
-	ShareCleaner::removeOrphanFiles(const std::filesystem::path& directory)
-	{
-		FS_LOG(SHARE, DEBUG) << "Removing orphan files in directory '" << directory.string() << "'";
+    void
+    ShareCleaner::removeOrphanFiles(const std::filesystem::path& directory)
+    {
+        FS_LOG(SHARE, DEBUG) << "Removing orphan files in directory '" << directory.string() << "'";
 
-		for (const std::filesystem::path& directoryEntry: std::filesystem::directory_iterator {directory})
-		{
-			if (!std::filesystem::is_regular_file(directoryEntry))
-			{
-				FS_LOG(SHARE, DEBUG) << "Skipping '" << directoryEntry.string() << "': not regular";
-				continue;
-			}
+        for (const std::filesystem::path& directoryEntry : std::filesystem::directory_iterator{ directory })
+        {
+            if (!std::filesystem::is_regular_file(directoryEntry))
+            {
+                FS_LOG(SHARE, DEBUG) << "Skipping '" << directoryEntry.string() << "': not regular";
+                continue;
+            }
 
-			if (isOrphanFile(directoryEntry))
-			{
-				std::error_code ec;
-				std::filesystem::remove(directoryEntry, ec);
-				if (ec)
-				{
-					FS_LOG(SHARE, ERROR) << "Cannot remove file '" << directoryEntry.string() << "'";
-				}
-				else
-				{
-					FS_LOG(SHARE, INFO) << "Removed orphan file '" << directoryEntry.string() << "'";
-				}
-			}
-		}
-	}
+            if (isOrphanFile(directoryEntry))
+            {
+                std::error_code ec;
+                std::filesystem::remove(directoryEntry, ec);
+                if (ec)
+                {
+                    FS_LOG(SHARE, ERROR) << "Cannot remove file '" << directoryEntry.string() << "'";
+                }
+                else
+                {
+                    FS_LOG(SHARE, INFO) << "Removed orphan file '" << directoryEntry.string() << "'";
+                }
+            }
+        }
+    }
 
-	bool
-	ShareCleaner::isOrphanFile(const std::filesystem::path& filePath)
-	{
-		const std::filesystem::path relativeFilePath {std::filesystem::relative(filePath, _workingDirectory)};
-		assert(!relativeFilePath.empty());
+    bool
+    ShareCleaner::isOrphanFile(const std::filesystem::path& filePath)
+    {
+        const std::filesystem::path relativeFilePath{ std::filesystem::relative(filePath, _workingDirectory) };
+        assert(!relativeFilePath.empty());
 
-		Wt::Dbo::Session& session {_db.getTLSSession()};
-		Wt::Dbo::Transaction transaction {session};
+        Wt::Dbo::Session& session{ _db.getTLSSession() };
+        Wt::Dbo::Transaction transaction{ session };
 
-		return !File::getByPath(session, relativeFilePath)
-			&& !File::getByPath(session, filePath);
-	}
+        return !File::getByPath(session, relativeFilePath)
+            && !File::getByPath(session, filePath);
+    }
 
-	void
-	ShareCleaner::scheduleNextCheck()
-	{
-		_timer.expires_after(_checkPeriod);
+    void
+    ShareCleaner::scheduleNextCheck()
+    {
+        _timer.expires_after(_checkPeriod);
 
-		_timer.async_wait([this](const boost::system::error_code& ec)
-		{
-			if (ec == boost::asio::error::operation_aborted)
-				return;
+        _timer.async_wait([this](const boost::system::error_code& ec) {
+            if (ec == boost::asio::error::operation_aborted)
+                return;
 
-			checkExpiredShares();
-			scheduleNextCheck();
-		});
-	}
+            checkExpiredShares();
+            scheduleNextCheck();
+        });
+    }
 
-	void
-	ShareCleaner::checkExpiredShares()
-	{
-		FS_LOG(SHARE, DEBUG) << "Checking expired shares...";
+    void
+    ShareCleaner::checkExpiredShares()
+    {
+        FS_LOG(SHARE, DEBUG) << "Checking expired shares...";
 
-		const auto now {Wt::WLocalDateTime::currentServerDateTime().toUTC()};
+        const auto now{ Wt::WLocalDateTime::currentServerDateTime().toUTC() };
 
-		Wt::Dbo::Session& session {_db.getTLSSession()};
-		Wt::Dbo::Transaction transaction {session};
+        Wt::Dbo::Session& session{ _db.getTLSSession() };
+        Wt::Dbo::Transaction transaction{ session };
 
-		Share::visitAll(session, [&now](Share::pointer& share)
-		{
-			// give some extra time for the share before actually removing it
-			// -> make any ongoing downloads a chance to complete before deleting the share
-			if (now > share->getExpiryTime().addSecs(3600*2))
-			{
-				FS_LOG(SHARE, INFO) << "Removing expired share '" << share->getUUID().toString() << "'";
-				Share::destroy(share);
-			}
-			else
-			{
-				FS_LOG(SHARE, DEBUG) << "Share '" << share->getUUID().toString() << "' not due to removal";
-			}
-		});
-	}
+        Share::visitAll(session, [&now](Share::pointer& share) {
+            // give some extra time for the share before actually removing it
+            // -> make any ongoing downloads a chance to complete before deleting the share
+            if (now > share->getExpiryTime().addSecs(3600 * 2))
+            {
+                FS_LOG(SHARE, INFO) << "Removing expired share '" << share->getUUID().toString() << "'";
+                Share::destroy(share);
+            }
+            else
+            {
+                FS_LOG(SHARE, DEBUG) << "Share '" << share->getUUID().toString() << "' not due to removal";
+            }
+        });
+    }
 } // namespace Share

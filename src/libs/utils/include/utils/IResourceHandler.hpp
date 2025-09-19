@@ -25,11 +25,10 @@
 // Helper class to serve a resource (must be saved as continuation data if not complete)
 class IResourceHandler
 {
-	public:
-		virtual ~IResourceHandler() = default;
+public:
+    virtual ~IResourceHandler() = default;
 
-		virtual void processRequest(const Wt::Http::Request& request, Wt::Http::Response& response) = 0;
-		[[nodiscard]] virtual bool isComplete() const = 0;
-		virtual void abort() = 0;
+    virtual void processRequest(const Wt::Http::Request& request, Wt::Http::Response& response) = 0;
+    [[nodiscard]] virtual bool isComplete() const = 0;
+    virtual void abort() = 0;
 };
-

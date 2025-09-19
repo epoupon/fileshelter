@@ -19,31 +19,29 @@
 
 #include "Common.hpp"
 
-#include <iostream>
 #include "share/Types.hpp"
+#include <iostream>
 
-void
-displayShareDesc(const Share::ShareDesc& share, bool details, std::string_view deployURL)
+void displayShareDesc(const Share::ShareDesc& share, bool details, std::string_view deployURL)
 {
-	std::cout << "Share '" << share.uuid.toString()
-		<< "', EditUUID = '" << share.editUuid.toString()
-		<< "', expires " << share.expiryTime.toString() << " UTC, "
-		<< "created by '" << share.creatorAddress << "', "
-		<< share.size << " bytes" << ", "
-		<< share.files.size() << " file" << (share.files.size() == 1 ? "" : "s") << ", "
-		<< share.readCount << " download" << (share.readCount > 1 ? "s" : "") << std::endl;
-	if (!details)
-		return;
+    std::cout << "Share '" << share.uuid.toString()
+              << "', EditUUID = '" << share.editUuid.toString()
+              << "', expires " << share.expiryTime.toString() << " UTC, "
+              << "created by '" << share.creatorAddress << "', "
+              << share.size << " bytes" << ", "
+              << share.files.size() << " file" << (share.files.size() == 1 ? "" : "s") << ", "
+              << share.readCount << " download" << (share.readCount > 1 ? "s" : "") << std::endl;
+    if (!details)
+        return;
 
-	if (!deployURL.empty())
-	{
-		std::cout << "\tDownload URL: " << deployURL << "/share-download/" << share.uuid.toString() << std::endl;
-		std::cout << "\tEdit URL: " << deployURL << "/share-edit/" << share.editUuid.toString() << std::endl;
-	}
+    if (!deployURL.empty())
+    {
+        std::cout << "\tDownload URL: " << deployURL << "/share-download/" << share.uuid.toString() << std::endl;
+        std::cout << "\tEdit URL: " << deployURL << "/share-edit/" << share.editUuid.toString() << std::endl;
+    }
 
-	for (const Share::FileDesc& file : share.files)
-	{
-		std::cout << "\tFile '" << file.path.string() << "'" << (file.isOwned ? " (owned)" : "") << ", '" << file.clientPath.string() << "', " << file.size << " bytes" << std::endl;
-	}
+    for (const Share::FileDesc& file : share.files)
+    {
+        std::cout << "\tFile '" << file.path.string() << "'" << (file.isOwned ? " (owned)" : "") << ", '" << file.clientPath.string() << "', " << file.size << " bytes" << std::endl;
+    }
 }
-

@@ -25,7 +25,7 @@
 
 class FsException : public std::runtime_error
 {
-	public:
-		FsException(std::string_view error = "") : std::runtime_error {std::string {error}} {}
+public:
+    FsException(std::string_view error = "")
+        : std::runtime_error{ std::string{ error } } {}
 };
-

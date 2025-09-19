@@ -21,53 +21,53 @@
 
 #include <cstdint>
 #include <filesystem>
+
 #include <Wt/WDateTime.h>
+
 #include "utils/UUID.hpp"
 
 namespace Share
 {
-	using FileSize = std::uint64_t;
+    using FileSize = std::uint64_t;
 
-	class ShareUUID : public UUID
-	{
-		public:
-			using UUID::UUID;
-	};
+    class ShareUUID : public UUID
+    {
+    public:
+        using UUID::UUID;
+    };
 
-	class ShareEditUUID : public UUID
-	{
-		public:
-			using UUID::UUID;
-	};
+    class ShareEditUUID : public UUID
+    {
+    public:
+        using UUID::UUID;
+    };
 
-	class FileUUID : public UUID
-	{
-		public:
-			using UUID::UUID;
-	};
+    class FileUUID : public UUID
+    {
+    public:
+        using UUID::UUID;
+    };
 
+    struct FileDesc
+    {
+        FileUUID uuid;
+        std::filesystem::path path;
+        std::filesystem::path clientPath;
+        FileSize size{};
+        bool isOwned{};
+    };
 
-	struct FileDesc
-	{
-		FileUUID				uuid;
-		std::filesystem::path	path;
-		std::filesystem::path	clientPath;
-		FileSize				size {};
-		bool					isOwned {};
-	};
-
-	struct ShareDesc
-	{
-		ShareUUID				uuid;
-		ShareEditUUID			editUuid;
-		std::size_t				readCount {};
-		FileSize				size {};
-		bool					hasPassword {};
-		std::string				description;
-		Wt::WDateTime			creationTime;
-		Wt::WDateTime			expiryTime;
-		std::string				creatorAddress;
-		std::vector<FileDesc>	files;
-	};
-}
-
+    struct ShareDesc
+    {
+        ShareUUID uuid;
+        ShareEditUUID editUuid;
+        std::size_t readCount{};
+        FileSize size{};
+        bool hasPassword{};
+        std::string description;
+        Wt::WDateTime creationTime;
+        Wt::WDateTime expiryTime;
+        std::string creatorAddress;
+        std::vector<FileDesc> files;
+    };
+} // namespace Share

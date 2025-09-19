@@ -23,7 +23,6 @@
 
 namespace UserInterface::PasswordUtils
 {
-	bool isUploadPassordRequired();
-	bool checkUploadPassord(std::string_view uploadPassword);
-}
-
+    bool isUploadPassordRequired();
+    bool checkUploadPassord(std::string_view uploadPassword);
+} // namespace UserInterface::PasswordUtils

@@ -24,59 +24,57 @@
 #include <iostream>
 
 HelpCommand::HelpCommand(std::string_view processArg, const std::vector<std::unique_ptr<ICommand>>& commands)
-	: _processArg {processArg}
-	, _commands {commands}
+    : _processArg{ processArg }
+    , _commands{ commands }
 {
 }
 
-void
-HelpCommand::displayHelp(std::ostream& os) const
+void HelpCommand::displayHelp(std::ostream& os) const
 {
-	os << "Usage : " << _processArg << " " << getName() << " <command>\n\n"
-		<< generateCommandDesc(_commands) << std::endl;;
+    os << "Usage : " << _processArg << " " << getName() << " <command>\n\n"
+       << generateCommandDesc(_commands) << std::endl;
+    ;
 }
 
-int
-HelpCommand::process(const std::vector<std::string>& args) const
+int HelpCommand::process(const std::vector<std::string>& args) const
 {
-	if (args.size() == 0)
-	{
-		displayHelp(std::cout);
-		return EXIT_SUCCESS;
-	}
-	else if (args.size() > 1)
-	{
-		displayHelp(std::cerr);
-		return EXIT_FAILURE;
-	}
+    if (args.size() == 0)
+    {
+        displayHelp(std::cout);
+        return EXIT_SUCCESS;
+    }
+    else if (args.size() > 1)
+    {
+        displayHelp(std::cerr);
+        return EXIT_FAILURE;
+    }
 
-	std::string_view commandName {args[0]};
-	if (auto itCommand {std::find_if(std::cbegin(_commands), std::cend(_commands), [=](const auto& command) { return command->getName() == commandName; })}; itCommand != std::cend(_commands) && itCommand->get() != this)
-	{
-		(*itCommand)->displayHelp(std::cout);
-		return EXIT_SUCCESS;
-	}
-	else
-	{
-		std::cerr << "Unknown command name '" << commandName << "'" << std::endl;
-		return EXIT_FAILURE;
-	}
+    std::string_view commandName{ args[0] };
+    if (auto itCommand{ std::find_if(std::cbegin(_commands), std::cend(_commands), [=](const auto& command) { return command->getName() == commandName; }) }; itCommand != std::cend(_commands) && itCommand->get() != this)
+    {
+        (*itCommand)->displayHelp(std::cout);
+        return EXIT_SUCCESS;
+    }
+    else
+    {
+        std::cerr << "Unknown command name '" << commandName << "'" << std::endl;
+        return EXIT_FAILURE;
+    }
 }
 
 std::string
 HelpCommand::generateCommandDesc(const std::vector<std::unique_ptr<ICommand>>& commands) const
 {
-	std::string commandList;
-	for (const auto& command : commands)
-	{
-		if (command.get() == this)
-			continue;
+    std::string commandList;
+    for (const auto& command : commands)
+    {
+        if (command.get() == this)
+            continue;
 
-		if (!commandList.empty())
-			commandList += ", ";
-		commandList += command->getName();
-	}
+        if (!commandList.empty())
+            commandList += ", ";
+        commandList += command->getName();
+    }
 
-	return "Command name. Can be one of: " + commandList;
+    return "Command name. Can be one of: " + commandList;
 }
-

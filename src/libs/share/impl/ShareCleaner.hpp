@@ -19,38 +19,38 @@
 
 #pragma once
 
+#include <Wt/WIOService.h>
+#include <boost/asio/steady_timer.hpp>
 #include <chrono>
 #include <filesystem>
-#include <boost/asio/steady_timer.hpp>
-#include <Wt/WIOService.h>
 
 namespace Share
 {
-	class Db;
-	class Share;
-	class ShareCleaner
-	{
-		public:
-			ShareCleaner(Db& _db, const std::filesystem::path& workingDirectory);
-			~ShareCleaner();
+    class Db;
+    class Share;
+    class ShareCleaner
+    {
+    public:
+        ShareCleaner(Db& _db, const std::filesystem::path& workingDirectory);
+        ~ShareCleaner();
 
-			ShareCleaner(const ShareCleaner&) = delete;
-			ShareCleaner(ShareCleaner&&) = delete;
-			ShareCleaner& operator=(const ShareCleaner&) = delete;
-			ShareCleaner& operator=(ShareCleaner&&) = delete;
+        ShareCleaner(const ShareCleaner&) = delete;
+        ShareCleaner(ShareCleaner&&) = delete;
+        ShareCleaner& operator=(const ShareCleaner&) = delete;
+        ShareCleaner& operator=(ShareCleaner&&) = delete;
 
-			void removeOrphanFiles(const std::filesystem::path& directory);
+        void removeOrphanFiles(const std::filesystem::path& directory);
 
-		private:
-			bool	isOrphanFile(const std::filesystem::path& file);
-			void	scheduleNextCheck();
-			void	checkExpiredShares();
+    private:
+        bool isOrphanFile(const std::filesystem::path& file);
+        void scheduleNextCheck();
+        void checkExpiredShares();
 
-			Db&							_db;
-			const std::filesystem::path	_workingDirectory;
-			const std::chrono::seconds	_checkPeriod {std::chrono::hours {1}};
-			Wt::WIOService				_ioService;
-			boost::asio::steady_timer	_timer;
-	};
+        Db& _db;
+        const std::filesystem::path _workingDirectory;
+        const std::chrono::seconds _checkPeriod{ std::chrono::hours{ 1 } };
+        Wt::WIOService _ioService;
+        boost::asio::steady_timer _timer;
+    };
 
 } // namespace Share

@@ -20,23 +20,20 @@
 #pragma once
 
 #include <Wt/WContainerWidget.h>
+
 #include "share/Types.hpp"
 
 namespace UserInterface
 {
+    class ShareEdit : public Wt::WContainerWidget
+    {
+    public:
+        ShareEdit();
 
-	class ShareEdit : public Wt::WContainerWidget
-	{
-		public:
-			ShareEdit();
-
-		private:
-			void handlePathChanged();
-			void displayEdit(const Share::ShareEditUUID& editUUID);
-			void displayRemoved();
-			void displayShareNotFound();
-
-	};
-
+    private:
+        void handlePathChanged();
+        void displayEdit(const Share::ShareEditUUID& editUUID);
+        void displayRemoved();
+        void displayShareNotFound();
+    };
 } // namespace UserInterface
-
