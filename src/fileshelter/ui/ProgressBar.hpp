@@ -25,16 +25,14 @@
 
 namespace UserInterface
 {
+    class ProgressBar : public Wt::WTemplate
+    {
+    public:
+        ProgressBar();
+        void setValue(unsigned value);
 
-	class ProgressBar : public Wt::WTemplate
-	{
-		public:
-			ProgressBar();
-			void setValue(unsigned value);
-
-		private:
-			Wt::WContainerWidget* _progress {};
-			Wt::WText* _text {};
-	};
-
-}
+    private:
+        Wt::WContainerWidget* _progress{};
+        Wt::WText* _text{};
+    };
+} // namespace UserInterface

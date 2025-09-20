@@ -19,25 +19,23 @@
 
 #pragma once
 
-#include <filesystem>
 #include "utils/IResourceHandler.hpp"
+#include <filesystem>
 
 class FileResourceHandler final : public IResourceHandler
 {
-	public:
-		FileResourceHandler(const std::filesystem::path& filePath);
+public:
+    FileResourceHandler(const std::filesystem::path& filePath);
 
-	private:
-		void processRequest(const Wt::Http::Request& request, Wt::Http::Response& response) override;
-		bool isComplete() const override;
-		void abort() override;
+private:
+    void processRequest(const Wt::Http::Request& request, Wt::Http::Response& response) override;
+    bool isComplete() const override;
+    void abort() override;
 
-		static constexpr std::size_t _chunkSize {65536};
+    static constexpr std::size_t _chunkSize{ 65536 };
 
-		std::filesystem::path	_path;
-		::uint64_t		_beyondLastByte {};
-		::uint64_t		_offset {};
-		bool			_isFinished {};
-
+    std::filesystem::path _path;
+    ::uint64_t _beyondLastByte{};
+    ::uint64_t _offset{};
+    bool _isFinished{};
 };
-

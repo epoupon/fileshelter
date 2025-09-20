@@ -29,28 +29,25 @@
 
 namespace Share
 {
+    class Db
+    {
+    public:
+        Db(const std::filesystem::path& db);
 
-	class Db
-	{
-		public:
-			Db(const std::filesystem::path& db);
+        Db(const Db&) = delete;
+        Db(Db&&) = delete;
+        Db& operator=(const Db&) = delete;
+        Db& operator=(Db&&) = delete;
 
-			Db(const Db&) = delete;
-			Db(Db&&) = delete;
-			Db& operator=(const Db&) = delete;
-			Db& operator=(Db&&) = delete;
+        Wt::Dbo::Session& getTLSSession();
 
-			Wt::Dbo::Session& getTLSSession();
+    private:
+        void prepare();
+        void doMigrationIfNeeded(Wt::Dbo::Session& session);
+        std::unique_ptr<Wt::Dbo::Session> createSession();
 
-		private:
-
-			void prepare();
-			void doMigrationIfNeeded(Wt::Dbo::Session& session);
-			std::unique_ptr<Wt::Dbo::Session> createSession();
-
-			std::unique_ptr<Wt::Dbo::SqlConnectionPool> _connectionPool;
-			std::mutex _tlsSessionsMutex;
-			std::vector<std::unique_ptr<Wt::Dbo::Session>> _tlsSessions;
-	};
-
-}
+        std::unique_ptr<Wt::Dbo::SqlConnectionPool> _connectionPool;
+        std::mutex _tlsSessionsMutex;
+        std::vector<std::unique_ptr<Wt::Dbo::Session>> _tlsSessions;
+    };
+} // namespace Share

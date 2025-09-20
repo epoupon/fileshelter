@@ -20,33 +20,38 @@
 #pragma once
 
 #include <filesystem>
+
 #include "utils/Exception.hpp"
 
 namespace Share
 {
-	class Exception : public FsException
-	{
-		using FsException::FsException;
-	};
-	class ShareNotFoundException : public Exception
-	{
-		public:
-			ShareNotFoundException() : Exception {"Share not found"} {}
-	};
-	class FileException : public Exception
-	{
-		public:
-			FileException(const std::filesystem::path& p, std::string_view message) : Exception {"File error on '" + p.string() + "': " + std::string {message}} {}
-	};
-	class ShareTooLargeException : public Exception
-	{
-		public:
-			ShareTooLargeException() : Exception {"Share too large"} {}
-	};
+    class Exception : public FsException
+    {
+        using FsException::FsException;
+    };
+    class ShareNotFoundException : public Exception
+    {
+    public:
+        ShareNotFoundException()
+            : Exception{ "Share not found" } {}
+    };
+    class FileException : public Exception
+    {
+    public:
+        FileException(const std::filesystem::path& p, std::string_view message)
+            : Exception{ "File error on '" + p.string() + "': " + std::string{ message } } {}
+    };
+    class ShareTooLargeException : public Exception
+    {
+    public:
+        ShareTooLargeException()
+            : Exception{ "Share too large" } {}
+    };
 
-	class OutOfRangeValidityPeriod : public Exception
-	{
-		public:
-			OutOfRangeValidityPeriod() : Exception {"Validity period out of range"} {}
-	};
-}
+    class OutOfRangeValidityPeriod : public Exception
+    {
+    public:
+        OutOfRangeValidityPeriod()
+            : Exception{ "Validity period out of range" } {}
+    };
+} // namespace Share

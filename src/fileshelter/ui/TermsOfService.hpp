@@ -19,10 +19,11 @@
 
 #pragma once
 
-#include <Wt/WWidget.h>
+#include <memory>
 
+#include <Wt/WWidget.h>
 
 namespace UserInterface
 {
-	std::unique_ptr<Wt::WWidget> createTermsOfService();
+    std::unique_ptr<Wt::WWidget> createTermsOfService();
 }

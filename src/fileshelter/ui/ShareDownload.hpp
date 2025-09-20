@@ -20,25 +20,23 @@
 #pragma once
 
 #include <optional>
+
 #include <Wt/WContainerWidget.h>
+
 #include "share/Types.hpp"
-#include <optional>
 
 namespace UserInterface
 {
+    class ShareDownload : public Wt::WContainerWidget
+    {
+    public:
+        ShareDownload();
 
-	class ShareDownload : public Wt::WContainerWidget
-	{
-		public:
-			ShareDownload();
+    private:
+        void handlePathChanged();
 
-		private:
-			void handlePathChanged();
-
-			void displayPassword(const Share::ShareUUID& shareUUID);
-			void displayDownload(const Share::ShareDesc& share, std::optional<std::string_view> password = std::nullopt);
-			void displayShareNotFound();
-	};
-
+        void displayPassword(const Share::ShareUUID& shareUUID);
+        void displayDownload(const Share::ShareDesc& share, std::optional<std::string_view> password = std::nullopt);
+        void displayShareNotFound();
+    };
 } // namespace UserInterface
-

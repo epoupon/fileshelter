@@ -20,40 +20,37 @@
 #pragma once
 
 #include <filesystem>
-#include <memory>
 #include <string_view>
+
 #include <Wt/WApplication.h>
 
 namespace Wt::Dbo
 {
-	class Session;
+    class Session;
 }
 
 namespace UserInterface
 {
+    class FileShelterApplication : public Wt::WApplication
+    {
+    public:
+        FileShelterApplication(const Wt::WEnvironment& env);
+        void updateMenuVisibility();
+        static std::filesystem::path prepareUploadDirectory();
+        static FileShelterApplication* instance();
+        const std::filesystem::path& getWorkingDirectory() const { return _workingDirectory; }
 
-	class FileShelterApplication : public Wt::WApplication
-	{
-		public:
-			FileShelterApplication(const Wt::WEnvironment& env);
-			void updateMenuVisibility();
-			static std::filesystem::path	prepareUploadDirectory();
-			static FileShelterApplication*	instance();
-			const std::filesystem::path&	getWorkingDirectory() const { return _workingDirectory; }
+    private:
+        void initialize() override;
+        void notify(const Wt::WEvent& event) override;
 
-		private:
-			void initialize() override;
-			void notify(const Wt::WEvent& event) override;
+        void displayError(std::string_view error);
 
-			void displayError(std::string_view error);
+        Wt::WMenuItem* _menuItemShareCreate;
 
-			Wt::WMenuItem* _menuItemShareCreate;
-
-			static inline std::filesystem::path _workingDirectory;
-	};
+        static inline std::filesystem::path _workingDirectory;
+    };
 
 #define FsApp FileShelterApplication::instance()
 
 } // namespace UserInterface
-
-

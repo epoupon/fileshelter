@@ -26,7 +26,7 @@
 
 namespace UserInterface::ShareUtils
 {
-	std::unique_ptr<Wt::WAnchor>	createShareDownloadAnchor(const Share::ShareUUID& shareUUID);
-	std::unique_ptr<Wt::WAnchor>	createShareEditAnchor(const Share::ShareEditUUID& shareEditUUID);
-	Wt::WString						fileSizeToString(Share::FileSize size);
-}
+    std::unique_ptr<Wt::WAnchor> createShareDownloadAnchor(const Share::ShareUUID& shareUUID);
+    std::unique_ptr<Wt::WAnchor> createShareEditAnchor(const Share::ShareEditUUID& shareEditUUID);
+    Wt::WString fileSizeToString(Share::FileSize size);
+} // namespace UserInterface::ShareUtils

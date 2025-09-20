@@ -19,17 +19,17 @@
 
 #pragma once
 
-#include "utils/Exception.hpp"
+#include <Wt/WString.h>
 
+#include "utils/Exception.hpp"
 
 namespace UserInterface
 {
-
-	// Signaled to users
-	class Exception : public FsException
-	{
-		public:
-			Exception(const Wt::WString& error) : FsException {error.toUTF8()} {}
-	};
-
-} // ns UserInterface
+    // Signaled to users
+    class Exception : public FsException
+    {
+    public:
+        Exception(const Wt::WString& error)
+            : FsException{ error.toUTF8() } {}
+    };
+} // namespace UserInterface

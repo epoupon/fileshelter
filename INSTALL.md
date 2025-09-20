@@ -12,11 +12,11 @@
 Official _Docker_ images are available, please see detailed instructions at https://hub.docker.com/r/epoupon/fileshelter.
 
 ## From Debian packages
-_Bookworm_ packages are provided for _amd64_ architectures.
+_Trixie_ packages are provided for _amd64_ architectures.
 As root, trust the following debian package provider and add it in your list of repositories:
 ```sh
 wget https://debian.poupon.dev/apt/debian/epoupon.gpg -P /usr/share/keyrings
-echo "deb [signed-by=/usr/share/keyrings/epoupon.gpg] https://debian.poupon.dev/apt/debian bookworm main" > /etc/apt/sources.list.d/epoupon.list
+echo "deb [signed-by=/usr/share/keyrings/epoupon.gpg] https://debian.poupon.dev/apt/debian trixie main" > /etc/apt/sources.list.d/epoupon.list
 ```
 To install or upgrade _Fileshelter_:
 ```sh
@@ -26,7 +26,7 @@ apt install fileshelter
 The `fileshelter` service is started just after the package installation, run by a dedicated `fileshelter` system user.</br>
 Please refer to [Deployment](#deployment) for further configuration options.
 ## From source
-__Note__: this installation process and the default values of the configuration files have been written for _Debian Bookworm_. Therefore, you may have to adapt commands and/or paths in order to fit to your distribution.
+__Note__: this installation process and the default values of the configuration files have been written for _Debian Trixie. Therefore, you may have to adapt commands and/or paths in order to fit to your distribution.
 ### Debian/Ubuntu dependencies
 __Note__: a C++17 compiler is needed to compile _Fileshelter_
 ```sh
@@ -41,7 +41,7 @@ git clone https://github.com/epoupon/fileshelter.git fileshelter
 cd fileshelter
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release
+cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE
 ```
 cmake will complain if a mandatory library is missing.
 

@@ -19,62 +19,56 @@
 
 #include "ShareUtils.hpp"
 
+#include <iomanip>
+#include <sstream>
+
 #include <Wt/WApplication.h>
 #include <Wt/WEnvironment.h>
-#include <sstream>
-#include <iomanip>
 
 namespace UserInterface::ShareUtils
 {
+    static std::string computeURL(const std::string& internalPath)
+    {
+        return wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + (wApp->environment().deploymentPath() == "/" ? "" : wApp->environment().deploymentPath()) + internalPath;
+    }
 
-	static
-	std::string
-	computeURL(const std::string& internalPath)
-	{
-		return wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + (wApp->environment().deploymentPath() == "/" ? "" : wApp->environment().deploymentPath()) + internalPath;
-	}
+    std::unique_ptr<Wt::WAnchor> createShareDownloadAnchor(const Share::ShareUUID& shareUUID)
+    {
+        const std::string downloadPath{ "/share-download/" + shareUUID.toString() };
 
-	std::unique_ptr<Wt::WAnchor>
-	createShareDownloadAnchor(const Share::ShareUUID& shareUUID)
-	{
-		const std::string downloadPath {"/share-download/" + shareUUID.toString()};
+        return std::make_unique<Wt::WAnchor>(Wt::WLink{ Wt::LinkType::InternalPath, downloadPath }, computeURL(downloadPath));
+    }
 
-		return std::make_unique<Wt::WAnchor>(Wt::WLink {Wt::LinkType::InternalPath, downloadPath}, computeURL(downloadPath));
-	}
+    std::unique_ptr<Wt::WAnchor> createShareEditAnchor(const Share::ShareEditUUID& shareEditUUID)
+    {
+        const std::string editPath{ "/share-edit/" + shareEditUUID.toString() };
 
-	std::unique_ptr<Wt::WAnchor>
-	createShareEditAnchor(const Share::ShareEditUUID& shareEditUUID)
-	{
-		const std::string editPath {"/share-edit/" + shareEditUUID.toString()};
+        return std::make_unique<Wt::WAnchor>(Wt::WLink{ Wt::LinkType::InternalPath, editPath }, computeURL(editPath));
+    }
 
-		return std::make_unique<Wt::WAnchor>(Wt::WLink {Wt::LinkType::InternalPath, editPath}, computeURL(editPath));
-	}
+    template<typename T>
+    std::string to_string_with_precision(const T a_value, const int n)
+    {
+        std::ostringstream out;
+        out << std::setprecision(n) << std::fixed << a_value;
+        return out.str();
+    }
 
-	template <typename T>
-	std::string to_string_with_precision(const T a_value, const int n)
-	{
-		std::ostringstream out;
-		out << std::setprecision(n) << std::fixed << a_value;
-		return out.str();
-	}
-
-	Wt::WString
-	fileSizeToString(Share::FileSize size)
-	{
-		if (size >= 1024 * 1024 * 1024)
-		{
-			return Wt::WString::tr("msg-size-gb").arg(to_string_with_precision(size / 1024 / 1024 / 1024., 1));
-		}
-		if (size >= 1024 * 1024)
-		{
-			return Wt::WString::tr("msg-size-mb").arg(to_string_with_precision(size / 1024 / 1024., 0));
-		}
-		else if (size >= 1024)
-		{
-			return Wt::WString::tr("msg-size-kb").arg(to_string_with_precision(size / 1024., 0));
-		}
-		else
-			return Wt::WString::tr("msg-size-b").arg(size);
-	}
-
-} // ns UserInterface::ShareUtils
+    Wt::WString fileSizeToString(Share::FileSize size)
+    {
+        if (size >= 1024 * 1024 * 1024)
+        {
+            return Wt::WString::tr("msg-size-gb").arg(to_string_with_precision(size / 1024 / 1024 / 1024., 1));
+        }
+        if (size >= 1024 * 1024)
+        {
+            return Wt::WString::tr("msg-size-mb").arg(to_string_with_precision(size / 1024 / 1024., 0));
+        }
+        else if (size >= 1024)
+        {
+            return Wt::WString::tr("msg-size-kb").arg(to_string_with_precision(size / 1024., 0));
+        }
+        else
+            return Wt::WString::tr("msg-size-b").arg(size);
+    }
+} // namespace UserInterface::ShareUtils

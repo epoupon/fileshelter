@@ -19,95 +19,90 @@
 
 #include "ShareCreatePassword.hpp"
 
-#include <thread>
 #include <Wt/WFormModel.h>
 #include <Wt/WLineEdit.h>
 #include <Wt/WPushButton.h>
+#include <thread>
 
-#include "utils/Logger.hpp"
 #include "PasswordUtils.hpp"
+#include "utils/Logger.hpp"
 
 namespace UserInterface
 {
-	class ShareCreatePasswordValidator : public Wt::WValidator
-	{
-		public:
-			ShareCreatePasswordValidator(Wt::WObject *parent = 0)
-				: Wt::WValidator(parent)
-			{
-				setMandatory(true);
-			}
+    class ShareCreatePasswordValidator : public Wt::WValidator
+    {
+    public:
+        ShareCreatePasswordValidator(Wt::WObject* parent = 0)
+            : Wt::WValidator(parent)
+        {
+            setMandatory(true);
+        }
 
-			Result validate(const Wt::WString& input) const
-			{
-				auto res = Wt::WValidator::validate(input);
-				if (res.state() != Wt::ValidationState::Valid)
-					return res;
+        Result validate(const Wt::WString& input) const
+        {
+            auto res = Wt::WValidator::validate(input);
+            if (res.state() != Wt::ValidationState::Valid)
+                return res;
 
-				if (PasswordUtils::checkUploadPassord(input.toUTF8()))
-					return Result {Wt::ValidationState::Valid};
+            if (PasswordUtils::checkUploadPassord(input.toUTF8()))
+                return Result{ Wt::ValidationState::Valid };
 
-				return Result {Wt::ValidationState::Invalid, Wt::WString::tr("msg-bad-password")};
-			}
+            return Result{ Wt::ValidationState::Invalid, Wt::WString::tr("msg-bad-password") };
+        }
+    };
 
-	};
+    class ShareCreatePasswordFormModel : public Wt::WFormModel
+    {
+    public:
+        static const Field PasswordField;
 
-	class ShareCreatePasswordFormModel : public Wt::WFormModel
-	{
-		public:
-			static const Field PasswordField;
+        ShareCreatePasswordFormModel()
+        {
+            addField(PasswordField);
 
-			ShareCreatePasswordFormModel()
-			{
-				addField(PasswordField);
+            setValidator(PasswordField, std::make_unique<ShareCreatePasswordValidator>());
+        }
+    };
 
-				setValidator(PasswordField, std::make_unique<ShareCreatePasswordValidator>());
-			}
-	};
+    const Wt::WFormModel::Field ShareCreatePasswordFormModel::PasswordField = "password";
 
-	const Wt::WFormModel::Field ShareCreatePasswordFormModel::PasswordField = "password";
+    ShareCreatePassword::ShareCreatePassword()
+    {
+        auto model{ std::make_shared<ShareCreatePasswordFormModel>() };
 
-	ShareCreatePassword::ShareCreatePassword()
-	{
-		auto model {std::make_shared<ShareCreatePasswordFormModel>()};
+        auto validateForm{ [this, model] {
+            updateModel(model.get());
 
-		auto validateForm {[this, model]
-		{
-			updateModel(model.get());
+            if (model->validate())
+            {
+                FS_LOG(UI, DEBUG) << "Create password validation OK";
+                success().emit();
+                return;
+            }
 
-			if (model->validate())
-			{
-				FS_LOG(UI, DEBUG) << "Create password validation OK";
-				success().emit();
-				return;
-			}
+            FS_LOG(UI, DEBUG) << "Create password validation failed";
 
-			FS_LOG(UI, DEBUG) << "Create password validation failed";
+            // Mitigate brute force attemps
+            // TODO per peer/share
+            std::this_thread::sleep_for(std::chrono::seconds{ 1 });
 
-			// Mitigate brute force attemps
-			// TODO per peer/share
-			std::this_thread::sleep_for(std::chrono::seconds {1});
+            updateView(model.get());
+        } };
 
-			updateView(model.get());
-		}};
+        setTemplateText(tr("template-share-create-password"));
+        addFunction("id", &WTemplate::Functions::id);
+        addFunction("block", &WTemplate::Functions::block);
 
-		setTemplateText(tr("template-share-create-password"));
-		addFunction("id", &WTemplate::Functions::id);
-		addFunction("block", &WTemplate::Functions::block);
+        // Password
+        auto password = std::make_unique<Wt::WLineEdit>();
+        password->setEchoMode(Wt::EchoMode::Password);
+        password->enterPressed().connect([=] { validateForm(); });
+        setFormWidget(ShareCreatePasswordFormModel::PasswordField, std::move(password));
 
-		// Password
-		auto password = std::make_unique<Wt::WLineEdit>();
-		password->setEchoMode(Wt::EchoMode::Password);
-		password->enterPressed().connect([=]{ validateForm(); });
-		setFormWidget(ShareCreatePasswordFormModel::PasswordField, std::move(password));
+        // Buttons
+        Wt::WPushButton* unlockBtn{ bindNew<Wt::WPushButton>("unlock-btn", tr("msg-unlock")) };
+        unlockBtn->clicked().connect([=] { validateForm(); });
 
-		// Buttons
-		Wt::WPushButton* unlockBtn {bindNew<Wt::WPushButton>("unlock-btn", tr("msg-unlock"))};
-		unlockBtn->clicked().connect([=] { validateForm(); });
-
-		updateView(model.get());
-	}
-
-
+        updateView(model.get());
+    }
 } // namespace UserInterface
-

@@ -19,24 +19,23 @@
 
 #pragma once
 
-#include <boost/program_options.hpp>
 #include "ICommand.hpp"
+#include <boost/program_options.hpp>
 
 class CreateCommand : public ICommand
 {
-	public:
-		CreateCommand(std::string_view processArg);
+public:
+    CreateCommand(std::string_view processArg);
 
-	private:
-		std::string_view getName() const { return "create"; }
-		std::string_view getDescription() const { return "Create a share"; }
+private:
+    std::string_view getName() const { return "create"; }
+    std::string_view getDescription() const { return "Create a share"; }
 
-		void displayHelp(std::ostream& os) const override;
-		int process(const std::vector<std::string>& args) const override;
+    void displayHelp(std::ostream& os) const override;
+    int process(const std::vector<std::string>& args) const override;
 
-		const std::string _processArg;
-		boost::program_options::options_description _allOptions;
-		boost::program_options::options_description _visibleOptions;
-		boost::program_options::options_description _hiddenOptions;
+    const std::string _processArg;
+    boost::program_options::options_description _allOptions;
+    boost::program_options::options_description _visibleOptions;
+    boost::program_options::options_description _hiddenOptions;
 };
-

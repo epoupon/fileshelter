@@ -1,5 +1,5 @@
 
-add_library(fileshelterutils SHARED
+add_library(fileshelterutils STATIC
 	impl/Config.cpp
 	impl/FileResourceHandler.cpp
 	impl/Logger.cpp
@@ -27,5 +27,5 @@ target_link_libraries(fileshelterutils PUBLIC
 	Wt::Wt
 	)
 
-install(TARGETS fileshelterutils DESTINATION lib)
+install(TARGETS fileshelterutils DESTINATION ${CMAKE_INSTALL_LIBDIR})
 

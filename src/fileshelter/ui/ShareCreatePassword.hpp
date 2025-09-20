@@ -24,18 +24,14 @@
 
 namespace UserInterface
 {
+    class ShareCreatePassword : public Wt::WTemplateFormView
+    {
+    public:
+        Wt::Signal<>& success() { return _sigSuccess; }
 
-class ShareCreatePassword : public Wt::WTemplateFormView
-{
-	public:
-		Wt::Signal<>& success() { return _sigSuccess;}
+        ShareCreatePassword();
 
-		ShareCreatePassword();
-
-	private:
-		Wt::Signal<> _sigSuccess;
-
-};
-
+    private:
+        Wt::Signal<> _sigSuccess;
+    };
 } // namespace UserInterface
-

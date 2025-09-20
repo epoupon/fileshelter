@@ -21,27 +21,25 @@
 
 namespace UserInterface
 {
+    ProgressBar::ProgressBar()
+        : Wt::WTemplate{ tr("template-progress-bar") }
+    {
+        _progress = bindNew<Wt::WContainerWidget>("progress");
+        _progress->setStyleClass("progress-bar");
+        _progress->setAttributeValue("role", "progressbar");
+        _progress->setAttributeValue("aria-valuenow", "0");
+        _progress->setAttributeValue("aria-valuemin", "0");
+        _progress->setAttributeValue("aria-valuemax", "100");
+        _progress->setAttributeValue("style", "min-width: 2em;");
 
-	ProgressBar::ProgressBar()
-		: Wt::WTemplate {tr("template-progress-bar")}
-	{
-		_progress = bindNew<Wt::WContainerWidget>("progress");
-		_progress->setStyleClass("progress-bar");
-		_progress->setAttributeValue("role", "progressbar");
-		_progress->setAttributeValue("aria-valuenow", "0");
-		_progress->setAttributeValue("aria-valuemin", "0");
-		_progress->setAttributeValue("aria-valuemax", "100");
-		_progress->setAttributeValue("style", "min-width: 2em;");
+        _text = _progress->addNew<Wt::WText>("0%");
+    }
 
-		_text = _progress->addNew<Wt::WText>("0%");
-	}
+    void ProgressBar::setValue(unsigned value)
+    {
+        _progress->setAttributeValue("aria-valuenow", std::to_string(value));
+        _progress->resize(Wt::WLength{ static_cast<double>(value), Wt::LengthUnit::Percentage }, Wt::WLength{ 100, Wt::LengthUnit::Percentage });
+        _text->setText(std::to_string(value) + "%");
+    }
 
-	void
-	ProgressBar::setValue(unsigned value)
-	{
-		_progress->setAttributeValue("aria-valuenow", std::to_string(value));
-		_progress->resize(Wt::WLength {static_cast<double>(value), Wt::LengthUnit::Percentage}, Wt::WLength {100, Wt::LengthUnit::Percentage});
-		_text->setText(std::to_string(value) + "%");
-	}
-
-} // UserInterface
+} // namespace UserInterface

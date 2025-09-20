@@ -1,5 +1,5 @@
 
-add_library(filesheltershare SHARED
+add_library(filesheltershare STATIC
 	impl/Db.cpp
 	impl/File.cpp
 	impl/Share.cpp
@@ -28,5 +28,5 @@ target_link_libraries(filesheltershare PUBLIC
 	Wt::Wt
 	)
 
-install(TARGETS filesheltershare DESTINATION lib)
+install(TARGETS filesheltershare DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
