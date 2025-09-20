@@ -26,7 +26,7 @@ apt install fileshelter
 The `fileshelter` service is started just after the package installation, run by a dedicated `fileshelter` system user.</br>
 Please refer to [Deployment](#deployment) for further configuration options.
 ## From source
-__Note__: this installation process and the default values of the configuration files have been written for _Debian Bookworm_. Therefore, you may have to adapt commands and/or paths in order to fit to your distribution.
+__Note__: this installation process and the default values of the configuration files have been written for _Debian Trixie. Therefore, you may have to adapt commands and/or paths in order to fit to your distribution.
 ### Debian/Ubuntu dependencies
 __Note__: a C++17 compiler is needed to compile _Fileshelter_
 ```sh
@@ -41,7 +41,7 @@ git clone https://github.com/epoupon/fileshelter.git fileshelter
 cd fileshelter
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release
+cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE
 ```
 cmake will complain if a mandatory library is missing.
 
