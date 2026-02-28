@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
         // Construct WT configuration and get the argc/argv back
         std::vector<std::string> wtServerArgs{ generateWtConfig(argv[0]) };
 
-        const char* wtArgv[wtServerArgs.size()];
+        std::vector<const char*> wtArgv(wtServerArgs.size(), nullptr);
         for (std::size_t i = 0; i < wtServerArgs.size(); ++i)
         {
             std::cout << "ARG = " << wtServerArgs[i] << std::endl;
@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
 
         // Create server first to handle log config etc.
         Wt::WServer server{ argv[0] };
-        server.setServerConfiguration(wtServerArgs.size(), const_cast<char**>(wtArgv));
+        server.setServerConfiguration(wtServerArgs.size(), const_cast<char**>(wtArgv.data()));
 
         const std::string deployPath{ Service<IConfig>::get()->getString("deploy-path", "/") };
 

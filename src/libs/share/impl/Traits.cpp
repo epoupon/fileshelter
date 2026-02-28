@@ -94,7 +94,7 @@ namespace Wt::Dbo
     }
 
     void
-    sql_value_traits<Share::FileSize, void>::bind(Share::FileSize v, SqlStatement* statement, int column, int size)
+    sql_value_traits<Share::FileSize, void>::bind(Share::FileSize v, SqlStatement* statement, int column, int)
     {
         if (v > Share::FileSize{ std::numeric_limits<long long>::max() })
             throw FsException{ "File size too big to fit in db" };
@@ -103,7 +103,7 @@ namespace Wt::Dbo
     }
 
     bool
-    sql_value_traits<Share::FileSize, void>::read(Share::FileSize& fileSize, SqlStatement* statement, int column, int size)
+    sql_value_traits<Share::FileSize, void>::read(Share::FileSize& fileSize, SqlStatement* statement, int column, int)
     {
         long long readData;
         if (statement->getResult(column, &readData))

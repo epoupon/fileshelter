@@ -31,7 +31,7 @@ ZipperResourceHandler::ZipperResourceHandler(std::unique_ptr<Zip::IZipper> zippe
 {
 }
 
-void ZipperResourceHandler::processRequest(const Wt::Http::Request& request, Wt::Http::Response& response)
+void ZipperResourceHandler::processRequest(const Wt::Http::Request&, Wt::Http::Response& response)
 {
     try
     {

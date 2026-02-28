@@ -19,17 +19,18 @@
 
 #pragma once
 
-#include "ICommand.hpp"
 #include <memory>
 #include <vector>
+
+#include "ICommand.hpp"
 
 class HelpCommand : public ICommand
 {
 public:
     HelpCommand(std::string_view processArg, const std::vector<std::unique_ptr<ICommand>>& commands);
 
-    std::string_view getName() const { return "help"; }
-    std::string_view getDescription() const { return "Show this help or display command specific help"; }
+    std::string_view getName() const override { return "help"; }
+    std::string_view getDescription() const override { return "Show this help or display command specific help"; }
     void displayHelp(std::ostream& os) const override;
     int process(const std::vector<std::string>& args) const override;
 

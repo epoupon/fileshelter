@@ -19,8 +19,9 @@
 
 #pragma once
 
-#include "ICommand.hpp"
 #include <boost/program_options.hpp>
+
+#include "ICommand.hpp"
 
 class DestroyCommand : public ICommand
 {
@@ -28,8 +29,8 @@ public:
     DestroyCommand(std::string_view processArg);
 
 private:
-    std::string_view getName() const { return "destroy"; }
-    std::string_view getDescription() const { return "Destroy shares"; }
+    std::string_view getName() const override { return "destroy"; }
+    std::string_view getDescription() const override { return "Destroy shares"; }
 
     void displayHelp(std::ostream& os) const override;
     int process(const std::vector<std::string>& args) const override;

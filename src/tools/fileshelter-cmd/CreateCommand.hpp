@@ -19,8 +19,9 @@
 
 #pragma once
 
-#include "ICommand.hpp"
 #include <boost/program_options.hpp>
+
+#include "ICommand.hpp"
 
 class CreateCommand : public ICommand
 {
@@ -28,8 +29,8 @@ public:
     CreateCommand(std::string_view processArg);
 
 private:
-    std::string_view getName() const { return "create"; }
-    std::string_view getDescription() const { return "Create a share"; }
+    std::string_view getName() const override { return "create"; }
+    std::string_view getDescription() const override { return "Create a share"; }
 
     void displayHelp(std::ostream& os) const override;
     int process(const std::vector<std::string>& args) const override;

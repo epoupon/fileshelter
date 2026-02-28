@@ -19,8 +19,9 @@
 
 #pragma once
 
-#include "ICommand.hpp"
 #include <boost/program_options.hpp>
+
+#include "ICommand.hpp"
 
 class ListCommand : public ICommand
 {
@@ -28,8 +29,8 @@ public:
     ListCommand(std::string_view processArg);
 
 private:
-    std::string_view getName() const { return "list"; }
-    std::string_view getDescription() const { return "List available shares"; }
+    std::string_view getName() const override { return "list"; }
+    std::string_view getDescription() const override { return "List available shares"; }
 
     void displayHelp(std::ostream& os) const override;
     int process(const std::vector<std::string>& args) const override;
