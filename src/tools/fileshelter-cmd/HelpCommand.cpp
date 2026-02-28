@@ -62,8 +62,7 @@ int HelpCommand::process(const std::vector<std::string>& args) const
     }
 }
 
-std::string
-HelpCommand::generateCommandDesc(const std::vector<std::unique_ptr<ICommand>>& commands) const
+std::string HelpCommand::generateCommandDesc(const std::vector<std::unique_ptr<ICommand>>& commands) const
 {
     std::string commandList;
     for (const auto& command : commands)

@@ -28,6 +28,10 @@ class HelpCommand : public ICommand
 {
 public:
     HelpCommand(std::string_view processArg, const std::vector<std::unique_ptr<ICommand>>& commands);
+    ~HelpCommand() override = default;
+
+    HelpCommand(const HelpCommand&) = delete;
+    HelpCommand& operator=(const HelpCommand&) = delete;
 
     std::string_view getName() const override { return "help"; }
     std::string_view getDescription() const override { return "Show this help or display command specific help"; }

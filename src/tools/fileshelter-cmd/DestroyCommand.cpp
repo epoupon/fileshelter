@@ -30,8 +30,7 @@
 #include "utils/IConfig.hpp"
 #include "utils/Service.hpp"
 
-static std::vector<Share::ShareEditUUID>
-parseShareEditUUIDs(const std::vector<std::string>& shares)
+static std::vector<Share::ShareEditUUID> parseShareEditUUIDs(const std::vector<std::string>& shares)
 {
     std::vector<Share::ShareEditUUID> res;
     res.reserve(shares.size());
@@ -40,8 +39,7 @@ parseShareEditUUIDs(const std::vector<std::string>& shares)
     return res;
 }
 
-static void
-processDestroyCommand(Share::IShareManager& shareManager, const std::vector<Share::ShareEditUUID>& shares)
+static void processDestroyCommand(Share::IShareManager& shareManager, const std::vector<Share::ShareEditUUID>& shares)
 {
     using namespace Share;
 

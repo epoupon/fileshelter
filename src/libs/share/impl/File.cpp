@@ -21,12 +21,10 @@
 
 #include "Share.hpp"
 #include "Types.hpp"
-#include "utils/Logger.hpp"
 
 namespace Share
 {
-    File::pointer
-    File::create(Wt::Dbo::Session& session, const FileCreateParameters& parameters, Share::pointer share)
+    File::pointer File::create(Wt::Dbo::Session& session, const FileCreateParameters& parameters, Share::pointer share)
     {
         pointer res{ session.add(std::make_unique<File>()) };
 
@@ -38,10 +36,8 @@ namespace Share
         return res;
     }
 
-    File::pointer
-    File::getByPath(Wt::Dbo::Session& session, const std::filesystem::path& filePath)
+    File::pointer File::getByPath(Wt::Dbo::Session& session, const std::filesystem::path& filePath)
     {
         return session.find<File>().where("path = ?").bind(filePath);
     }
-
 } // namespace Share

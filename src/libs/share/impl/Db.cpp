@@ -78,8 +78,7 @@ namespace Share
         prepare();
     }
 
-    Wt::Dbo::Session&
-    Db::getTLSSession()
+    Wt::Dbo::Session& Db::getTLSSession()
     {
         static thread_local std::unordered_map<Db*, Wt::Dbo::Session*> tlsSessions{};
 
@@ -99,8 +98,7 @@ namespace Share
         return *tlsSession;
     }
 
-    std::unique_ptr<Wt::Dbo::Session>
-    Db::createSession()
+    std::unique_ptr<Wt::Dbo::Session> Db::createSession()
     {
         auto session{ std::make_unique<Wt::Dbo::Session>() };
 
@@ -112,8 +110,7 @@ namespace Share
         return session;
     }
 
-    void
-    Db::prepare()
+    void Db::prepare()
     {
         auto session{ createSession() };
 
@@ -146,8 +143,7 @@ namespace Share
         doMigrationIfNeeded(*session);
     }
 
-    void
-    Db::doMigrationIfNeeded(Wt::Dbo::Session& session)
+    void Db::doMigrationIfNeeded(Wt::Dbo::Session& session)
     {
         try
         {
@@ -160,5 +156,4 @@ namespace Share
             throw FsException{ "Database too old, migration not supported" };
         }
     }
-
 } // namespace Share

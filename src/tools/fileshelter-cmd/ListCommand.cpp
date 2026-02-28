@@ -26,11 +26,9 @@
 #include "Common.hpp"
 #include "share/IShareManager.hpp"
 #include "utils/IConfig.hpp"
-#include "utils/Logger.hpp"
 #include "utils/Service.hpp"
 
-static void
-processListCommand(Share::IShareManager& shareManager, bool details, std::string_view deployURL)
+static void processListCommand(Share::IShareManager& shareManager, bool details, std::string_view deployURL)
 {
     std::cout.imbue(std::locale{ "" });
 

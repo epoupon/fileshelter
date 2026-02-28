@@ -34,8 +34,7 @@
 
 /* Function used to check that 'opt1' and 'opt2' are not specified
    at the same time. */
-static void
-conflictingOptions(const boost::program_options::variables_map& vm, const char* opt1, const char* opt2)
+static void conflictingOptions(const boost::program_options::variables_map& vm, const char* opt1, const char* opt2)
 {
     if (vm.count(opt1) && !vm[opt1].defaulted() && vm.count(opt2) && !vm[opt2].defaulted())
     {
@@ -43,8 +42,7 @@ conflictingOptions(const boost::program_options::variables_map& vm, const char* 
     }
 }
 
-static void
-processCreateCommand(Share::IShareManager& shareManager,
+static void processCreateCommand(Share::IShareManager& shareManager,
     const std::vector<std::string>& files,
     std::string_view desc,
     std::chrono::seconds validityPeriod,

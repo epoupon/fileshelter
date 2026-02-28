@@ -27,6 +27,10 @@ class ListCommand : public ICommand
 {
 public:
     ListCommand(std::string_view processArg);
+    ~ListCommand() override = default;
+
+    ListCommand(const ListCommand&) = delete;
+    ListCommand& operator=(const ListCommand&) = delete;
 
 private:
     std::string_view getName() const override { return "list"; }

@@ -69,5 +69,4 @@ namespace Share
         const std::size_t _maxValidityHits{};
         const bool _canValidityPeriodBeSet{};
     };
-
 } // namespace Share

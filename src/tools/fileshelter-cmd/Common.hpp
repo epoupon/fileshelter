@@ -27,4 +27,3 @@ namespace Share
 }
 
 void displayShareDesc(const Share::ShareDesc& share, bool details, std::string_view deployURL);
-;

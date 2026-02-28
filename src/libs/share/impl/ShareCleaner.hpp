@@ -52,5 +52,4 @@ namespace Share
         Wt::WIOService _ioService;
         boost::asio::steady_timer _timer;
     };
-
 } // namespace Share

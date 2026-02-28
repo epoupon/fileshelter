@@ -48,16 +48,16 @@ namespace Share
         std::string_view getCreatorAddr() const { return _creatorAddress; }
         std::size_t getReadCount() const { return _readCount; }
 
-        void visitFiles(std::function<void(const Wt::Dbo::ptr<File>&)> func) const;
+        void visitFiles(std::function<void(const Wt::Dbo::ptr<File>&)> visitor) const;
 
         void incReadCount() { _readCount++; }
 
         // Helpers
         static pointer create(Wt::Dbo::Session& session, const ShareCreateParameters& parameters, const Wt::Auth::PasswordHash* passwordHash = nullptr);
         static pointer getByUUID(Wt::Dbo::Session& session, const ShareUUID& shareId);
-        static pointer getByEditUUID(Wt::Dbo::Session& session, const ShareEditUUID& uuid);
+        static pointer getByEditUUID(Wt::Dbo::Session& session, const ShareEditUUID& shareEditId);
 
-        static void visitAll(Wt::Dbo::Session& session, std::function<void(pointer& share)> visitor);
+        static void visitAll(Wt::Dbo::Session& session, const std::function<void(pointer& share)>& visitor);
         static void destroy(pointer& share);
 
         // Setters
