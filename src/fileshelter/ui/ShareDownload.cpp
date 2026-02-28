@@ -105,7 +105,7 @@ namespace UserInterface
     void ShareDownload::displayPassword(const Share::ShareUUID& shareUUID)
     {
         auto view = addNew<ShareDownloadPassword>(shareUUID);
-        view->success().connect([=](const Share::ShareDesc& share, std::string_view password) {
+        view->success().connect([this](const Share::ShareDesc& share, std::string_view password) {
             clear();
             displayDownload(share, password);
         });

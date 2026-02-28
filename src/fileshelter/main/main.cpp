@@ -55,17 +55,17 @@ std::vector<std::string> generateWtConfig(std::string execPath)
     if (!wtAccessLogFilePath.empty())
         args.push_back("--accesslog=" + wtAccessLogFilePath.string());
 
-	if (Service<IConfig>::get()->getBool("tls-enable", false))
-	{
-		args.push_back("--https-listen=" + std::string {Service<IConfig>::get()->getString("listen", "0.0.0.0:5091")});
-		args.push_back("--ssl-certificate=" + std::string {Service<IConfig>::get()->getString("tls-cert")});
-		args.push_back("--ssl-private-key=" + std::string {Service<IConfig>::get()->getString("tls-key")});
-		args.push_back("--ssl-tmp-dh=" + std::string {Service<IConfig>::get()->getString("tls-dh")});
-	}
-	else
-	{
-		args.push_back("--http-listen=" + std::string {Service<IConfig>::get()->getString("listen", "0.0.0.0:5091")});
-	}
+    if (Service<IConfig>::get()->getBool("tls-enable", false))
+    {
+        args.push_back("--https-listen=" + std::string{ Service<IConfig>::get()->getString("listen", "0.0.0.0:5091") });
+        args.push_back("--ssl-certificate=" + std::string{ Service<IConfig>::get()->getString("tls-cert") });
+        args.push_back("--ssl-private-key=" + std::string{ Service<IConfig>::get()->getString("tls-key") });
+        args.push_back("--ssl-tmp-dh=" + std::string{ Service<IConfig>::get()->getString("tls-dh") });
+    }
+    else
+    {
+        args.push_back("--http-listen=" + std::string{ Service<IConfig>::get()->getString("listen", "0.0.0.0:5091") });
+    }
 
     {
         // Reserve at least 2 threads since we still have some blocking IO (reading on disk)

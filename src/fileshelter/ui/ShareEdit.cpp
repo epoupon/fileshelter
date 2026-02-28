@@ -82,7 +82,7 @@ namespace UserInterface
 
         Wt::WPushButton* deleteBtn{ t->bindNew<Wt::WPushButton>("delete-btn", tr("msg-delete")) };
 
-        deleteBtn->clicked().connect([=] {
+        deleteBtn->clicked().connect([=, this] {
             auto messageBox = deleteBtn->addChild(std::make_unique<Wt::WMessageBox>(tr("msg-share-delete"),
                 tr("msg-confirm-action"),
                 Wt::Icon::Question,
@@ -90,7 +90,7 @@ namespace UserInterface
 
             messageBox->setModal(true);
 
-            messageBox->buttonClicked().connect([=](Wt::StandardButton btn) {
+            messageBox->buttonClicked().connect([=, this](Wt::StandardButton btn) {
                 try
                 {
                     if (btn == Wt::StandardButton::Yes)

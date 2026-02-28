@@ -1,4 +1,4 @@
-FROM	alpine:3.22 AS build
+FROM	alpine:3.23 AS build
 
 WORKDIR	/tmp/workdir
 
@@ -23,7 +23,7 @@ ARG	BUILD_PACKAGES=" \
 RUN	apk add --no-cache --update ${BUILD_PACKAGES}
 
 # WT
-ARG	WT_VERSION=4.12.0
+ARG	WT_VERSION=4.12.3
 RUN \
 	DIR=/tmp/wt && mkdir -p ${DIR} && cd ${DIR} && \
 	curl -sLO https://github.com/emweb/wt/archive/${WT_VERSION}.tar.gz && \
@@ -31,7 +31,7 @@ RUN \
 
 RUN \
 	DIR=/tmp/wt && mkdir -p ${DIR} && cd ${DIR} && \
-	cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${PREFIX} -DBUILD_EXAMPLES=OFF -DENABLE_LIBWTTEST=OFF -DCONNECTOR_FCGI=OFF -DINSTALL_THEMES=OFF -DCMAKE_CXX_STANDARD=17 -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE && \
+	cmake -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE -DCMAKE_CXX_STANDARD=20 -DSHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${PREFIX} -DWT_CPP20_DATE_TZ_IMPLEMENTATIO="std" -DWT_CPP17_FILESYSTEM_IMPLEMENTATION="std" -DWT_CPP17_ANY_IMPLEMENTATION="std" -DBUILD_EXAMPLES=OFF -DENABLE_LIBWTTEST=OFF -DCONNECTOR_FCGI=OFF -DUSE_SYSTEM_SQLITE3=ON -DDEBUG=${WT_DEBUG} && \
 	make -j$(nproc) && \
 	make install
 
@@ -40,7 +40,7 @@ COPY . /tmp/fileshelter/
 
 RUN \
 	DIR=/tmp/fileshelter && mkdir -p ${DIR} && cd ${DIR} && \
-	PKG_CONFIG_PATH=/tmp/install/lib/pkgconfig CXXFLAGS="-I${PREFIX}/include" LDFLAGS="-L${PREFIX}/lib -Wl,--rpath-link=${PREFIX}/lib" cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_PREFIX_PATH=${PREFIX} && \
+	PKG_CONFIG_PATH=/tmp/install/lib/pkgconfig CXXFLAGS="-I${PREFIX}/include" LDFLAGS="-L${PREFIX}/lib -Wl,--rpath-link=${PREFIX}/lib" cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_UNITY_BUILD=ON -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=TRUE -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_PREFIX_PATH=${PREFIX} && \
 	LD_LIBRARY_PATH=${PREFIX}/lib VERBOSE=1 make -j$(nproc) install && \
 	LD_LIBRARY_PATH=${PREFIX}/lib make test && \
 	mkdir -p ${PREFIX}/etc/ && \
@@ -69,7 +69,7 @@ RUN \
 	rm -rf /tmp/fakeroot/share/Wt/resources/themes/bootstrap/3
 
 ## Release Stage
-FROM		alpine:3.22 AS release
+FROM		alpine:3.23 AS release
 LABEL		maintainer="Emeric Poupon <emeric.poupon@laposte.net>"
 
 ARG	RUNTIME_PACKAGES=" \

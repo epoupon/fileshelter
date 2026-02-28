@@ -4,14 +4,13 @@ project(fileshelter)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 include(CTest)
 find_package(PkgConfig REQUIRED)
 find_package(Threads REQUIRED)
-find_package(Filesystem REQUIRED)
-find_package(Boost REQUIRED COMPONENTS system program_options)
+find_package(Boost REQUIRED COMPONENTS program_options)
 find_package(Wt REQUIRED COMPONENTS Wt Dbo DboSqlite3 HTTP)
 pkg_check_modules(Config++ REQUIRED IMPORTED_TARGET libconfig++)
 pkg_check_modules(Archive REQUIRED IMPORTED_TARGET libarchive)

@@ -24,7 +24,6 @@ target_link_libraries(filesheltershare PRIVATE
 
 target_link_libraries(filesheltershare PUBLIC
 	fileshelterutils
-	std::filesystem
 	Wt::Wt
 	)
 

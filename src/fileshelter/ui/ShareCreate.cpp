@@ -79,7 +79,7 @@ namespace UserInterface
     void ShareCreate::displayPassword()
     {
         ShareCreatePassword* view{ addNew<ShareCreatePassword>() };
-        view->success().connect([=] {
+        view->success().connect([this] {
             _isPasswordVerified = true;
             clear();
             displayCreate();
@@ -107,7 +107,7 @@ namespace UserInterface
             stack->setCurrentIndex(CreateStack::Progress);
         });
 
-        form->complete().connect([=](const ShareCreateParameters& shareParameters, const std::vector<FileCreateParameters>& filesParameters) {
+        form->complete().connect([this](const ShareCreateParameters& shareParameters, const std::vector<FileCreateParameters>& filesParameters) {
             FS_LOG(UI, DEBUG) << "Upload complete!";
             const Share::ShareDesc shareDesc{ Service<IShareManager>::get()->createShare(shareParameters, filesParameters, true /* transfer file ownership */) };
 

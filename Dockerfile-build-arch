@@ -19,6 +19,6 @@ COPY . /tmp/fileshelter/
 ARG FILESHELTER_BUILD_TYPE="Release"
 RUN \
 	DIR=/tmp/fileshelter/build && mkdir -p ${DIR} && cd ${DIR}  && \
-		cmake /tmp/fileshelter/ -DCMAKE_BUILD_TYPE=${FILESHELTER_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=/usr && \
+		cmake /tmp/fileshelter/ -DCMAKE_BUILD_TYPE=${FILESHELTER_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_UNITY_BUILD=ON && \
 		VERBOSE=1 make -j$(nproc) && \
 		make test

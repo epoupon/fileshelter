@@ -54,7 +54,7 @@ namespace UserInterface
 
         auto* filesContainer{ bindNew<Wt::WContainerWidget>("files") };
 
-        _drop->drop().connect([=](const std::vector<Wt::WFileDropWidget::File*>& files) {
+        _drop->drop().connect([filesContainer, this](const std::vector<Wt::WFileDropWidget::File*>& files) {
             for (Wt::WFileDropWidget::File* file : files)
             {
                 auto* fileEntry{ filesContainer->addNew<Wt::WTemplate>(tr("template-share-create-form-file")) };
@@ -62,7 +62,7 @@ namespace UserInterface
                 fileEntry->bindString("size", ShareUtils::fileSizeToString(file->size()), Wt::TextFormat::Plain);
 
                 auto* delBtn{ fileEntry->bindNew<Wt::WText>("del-btn", tr("template-share-create-del-btn")) };
-                delBtn->clicked().connect([=] {
+                delBtn->clicked().connect([=, this] {
                     deleteFile(*file);
                     filesContainer->removeWidget(fileEntry);
                     checkFiles();
@@ -74,7 +74,7 @@ namespace UserInterface
             checkFiles();
         });
 
-        _drop->tooLarge().connect([=](const Wt::WFileDropWidget::File* file, std::uint64_t size) {
+        _drop->tooLarge().connect([this](const Wt::WFileDropWidget::File* file, std::uint64_t size) {
             FS_LOG(UI, DEBUG) << "File '" << file->clientFileName() << "' is too large: " << size;
             checkFiles();
         });
@@ -97,7 +97,7 @@ namespace UserInterface
             validityPeriodUnit->setModel(_model->validityPeriodModel());
 
             // each time the unit is changed, make sure to update the limits
-            validityPeriodUnit->changed().connect([=] {
+            validityPeriodUnit->changed().connect([this] {
                 updateModel(_model.get());
                 _model->updatePeriodValidator();
                 _model->validateValidatityFields();
@@ -116,7 +116,7 @@ namespace UserInterface
         // Buttons
         _createBtn = bindNew<Wt::WPushButton>("create-btn", tr("msg-create"));
         _createBtn->disable();
-        _createBtn->clicked().connect([=] {
+        _createBtn->clicked().connect([this] {
             updateModel(_model.get());
 
             _validated = _model->validate();
