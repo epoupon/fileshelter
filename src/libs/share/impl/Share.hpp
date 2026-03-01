@@ -49,7 +49,7 @@ namespace fs::share
         std::string_view getCreatorAddr() const { return _creatorAddress; }
         std::size_t getReadCount() const { return _readCount; }
 
-        void visitFiles(std::function<void(const Wt::Dbo::ptr<File>&)> visitor) const;
+        void visitFiles(const std::function<void(const Wt::Dbo::ptr<File>&)>& visitor) const;
 
         void incReadCount() { _readCount++; }
 

@@ -32,24 +32,22 @@ namespace Wt::Dbo
         statement->bind(column, value);
     }
 
-    bool sql_value_traits<fs::UUID, void>::read(fs::UUID& id, SqlStatement* statement, int column, int size)
+    bool sql_value_traits<fs::UUID, void>::read(fs::UUID& uuid, SqlStatement* statement, int column, int size)
     {
         std::vector<unsigned char> data;
 
         if (statement->getResult(column, &data, size))
         {
             if (data.size() == 16)
-                std::copy(std::cbegin(data), std::cend(data), id.begin());
+                std::copy(std::cbegin(data), std::cend(data), uuid.begin());
             else
-                id = {};
+                uuid = {};
 
             return true;
         }
-        else
-        {
-            id = {};
-            return false;
-        }
+
+        uuid = {};
+        return false;
     }
 
     std::string sql_value_traits<std::filesystem::path, void>::type(SqlConnection* conn, int size)

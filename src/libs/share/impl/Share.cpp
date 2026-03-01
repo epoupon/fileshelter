@@ -48,7 +48,7 @@ namespace fs::share
         return _expiryTime < now;
     }
 
-    void Share::visitFiles(std::function<void(const File::pointer&)> visitor) const
+    void Share::visitFiles(const std::function<void(const File::pointer&)>& visitor) const
     {
         for (const File::pointer& file : _files)
             visitor(file);

@@ -44,7 +44,7 @@ namespace fs
     public:
         ~ShareResource() override;
 
-        void setWorkingDirectory(std::filesystem::path workingDirectory);
+        void setWorkingDirectory(const std::filesystem::path& workingDirectory);
 
         static void setDeployPath(std::string_view deployPath) { _deployPath = deployPath; }
         static std::string_view getDeployPath() { return _deployPath; }

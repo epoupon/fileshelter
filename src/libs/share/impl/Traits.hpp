@@ -33,8 +33,8 @@ namespace Wt::Dbo
         static const bool specialized = true;
 
         static const char* type(SqlConnection* conn, int size);
-        static void bind(const fs::UUID& v, SqlStatement* statement, int column, int size);
-        static bool read(fs::UUID& v, SqlStatement* statement, int column, int size);
+        static void bind(const fs::UUID& uuid, SqlStatement* statement, int column, int size);
+        static bool read(fs::UUID& uuid, SqlStatement* statement, int column, int size);
     };
 
     template<>

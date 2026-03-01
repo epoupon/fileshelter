@@ -52,7 +52,7 @@ namespace fs::share
         virtual bool shareHasPassword(const ShareUUID& shareUUID) = 0;
         virtual ShareDesc getShareDesc(const ShareUUID& shareUUID, std::optional<std::string_view> password = std::nullopt) = 0;
         virtual ShareDesc getShareDesc(const ShareEditUUID& shareUUID) = 0;
-        virtual void visitShares(std::function<void(const ShareDesc&)>) = 0;
+        virtual void visitShares(const std::function<void(const ShareDesc&)>& visitor) = 0;
 
         virtual void incrementReadCount(const ShareUUID& shareUUID) = 0;
         virtual void removeOrphanFiles(const std::filesystem::path& directory) = 0;

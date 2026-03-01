@@ -37,7 +37,7 @@
 
 namespace fs
 {
-    std::vector<std::string> generateWtConfig(std::string execPath)
+    std::vector<std::string> generateWtConfig(const std::string& execPath)
     {
         std::vector<std::string> args;
 
@@ -183,7 +183,7 @@ int main(int argc, char* argv[])
 
         // Create server first to handle log config etc.
         Wt::WServer server{ argv[0] };
-        server.setServerConfiguration(wtServerArgs.size(), const_cast<char**>(wtArgv.data()));
+        server.setServerConfiguration(static_cast<int>(wtServerArgs.size()), const_cast<char**>(wtArgv.data()));
 
         const std::string deployPath{ Service<IConfig>::get()->getString("deploy-path", "/") };
 

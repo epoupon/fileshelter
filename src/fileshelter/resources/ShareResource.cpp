@@ -48,7 +48,7 @@ namespace fs
         }
     } // namespace
 
-    void ShareResource::setWorkingDirectory(std::filesystem::path workingDirectory)
+    void ShareResource::setWorkingDirectory(const std::filesystem::path& workingDirectory)
     {
         if (std::filesystem::is_directory(workingDirectory))
         {
@@ -66,9 +66,9 @@ namespace fs
         beingDeleted();
     }
 
-    Wt::WLink ShareResource::createLink(const share::ShareUUID& uuid, std::optional<std::string_view> password)
+    Wt::WLink ShareResource::createLink(const share::ShareUUID& shareId, std::optional<std::string_view> password)
     {
-        return { Wt::LinkType::Url, std::string{ getDeployPath() } + "?id=" + uuid.toString() + (password ? ("&p=" + Wt::Utils::hexEncode(std::string{ *password })) : "") };
+        return { Wt::LinkType::Url, std::string{ getDeployPath() } + "?id=" + shareId.toString() + (password ? ("&p=" + Wt::Utils::hexEncode(std::string{ *password })) : "") };
     }
 
     void ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Response& response)

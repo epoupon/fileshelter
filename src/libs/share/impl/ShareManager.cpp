@@ -228,7 +228,7 @@ namespace fs::share
         return shareToDesc(*share.get());
     }
 
-    void ShareManager::visitShares(std::function<void(const ShareDesc&)> visitor)
+    void ShareManager::visitShares(const std::function<void(const ShareDesc&)>& visitor)
     {
         std::vector<ShareDesc> shares;
 
