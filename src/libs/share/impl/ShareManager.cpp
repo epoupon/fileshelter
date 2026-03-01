@@ -19,22 +19,22 @@
 
 #include "Share.hpp"
 
-#include "ShareManager.hpp"
+#include <Wt/Auth/HashFunction.h>
+#include <Wt/WLocalDateTime.h>
 
-#include "File.hpp"
-#include "Share.hpp"
-#include "ShareCleaner.hpp"
 #include "share/Exception.hpp"
 #include "utils/IConfig.hpp"
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
-#include <Wt/Auth/HashFunction.h>
-#include <Wt/WLocalDateTime.h>
 
-namespace Share
+#include "File.hpp"
+#include "Share.hpp"
+#include "ShareCleaner.hpp"
+#include "ShareManager.hpp"
+
+namespace fs::share
 {
-    static ShareDesc
-    shareToDesc(const Share& share)
+    static ShareDesc shareToDesc(const Share& share)
     {
         ShareDesc desc;
         desc.uuid = share.getUUID();
@@ -60,8 +60,7 @@ namespace Share
         return desc;
     }
 
-    static std::vector<FileSize>
-    computeFileSizes(const std::vector<FileCreateParameters>& files, const std::filesystem::path& workingDirectory)
+    static std::vector<FileSize> computeFileSizes(const std::vector<FileCreateParameters>& files, const std::filesystem::path& workingDirectory)
     {
         std::vector<FileSize> sizes(files.size(), 0);
         std::transform(std::cbegin(files), std::cend(files), std::begin(sizes),
@@ -82,8 +81,7 @@ namespace Share
         return sizes;
     }
 
-    std::unique_ptr<IShareManager>
-    createShareManager(bool enableCleaner)
+    std::unique_ptr<IShareManager> createShareManager(bool enableCleaner)
     {
         return std::make_unique<ShareManager>(enableCleaner);
     }
@@ -121,8 +119,7 @@ namespace Share
         FS_LOG(SHARE, DEBUG) << "Stopped share manager";
     }
 
-    ShareDesc
-    ShareManager::createShare(const ShareCreateParameters& shareParameters, const std::vector<FileCreateParameters>& filesParameters, bool transferFileOwnership)
+    ShareDesc ShareManager::createShare(const ShareCreateParameters& shareParameters, const std::vector<FileCreateParameters>& filesParameters, bool transferFileOwnership)
     {
         FS_LOG(SHARE, DEBUG) << "Creating share! nb files = " << filesParameters.size();
 
@@ -159,8 +156,7 @@ namespace Share
         }
     }
 
-    void
-    ShareManager::destroyShare(const ShareEditUUID& shareEditUUID)
+    void ShareManager::destroyShare(const ShareEditUUID& shareEditUUID)
     {
         FS_LOG(UI, DEBUG) << "Destroying share edit = '" << shareEditUUID.toString() << "...";
 
@@ -176,8 +172,7 @@ namespace Share
         FS_LOG(UI, DEBUG) << "Destroying share edit = '" << shareEditUUID.toString() << " destroyed!";
     }
 
-    bool
-    ShareManager::shareHasPassword(const ShareUUID& shareUUID)
+    bool ShareManager::shareHasPassword(const ShareUUID& shareUUID)
     {
         Wt::Dbo::Session& session{ _db.getTLSSession() };
         Wt::Dbo::Transaction transaction{ session };
@@ -189,8 +184,7 @@ namespace Share
         return share->hasPassword();
     }
 
-    ShareDesc
-    ShareManager::getShareDesc(const ShareUUID& shareUUID, std::optional<std::string_view> password)
+    ShareDesc ShareManager::getShareDesc(const ShareUUID& shareUUID, std::optional<std::string_view> password)
     {
         Wt::Dbo::Session& session{ _db.getTLSSession() };
 
@@ -200,7 +194,7 @@ namespace Share
         {
             Wt::Dbo::Transaction transaction{ session };
 
-            const Share::Share::pointer share{ Share::Share::getByUUID(session, shareUUID) };
+            const share::Share::pointer share{ Share::getByUUID(session, shareUUID) };
             if (!share || share->isExpired())
                 throw ShareNotFoundException{};
 
@@ -222,8 +216,7 @@ namespace Share
         return shareDesc;
     }
 
-    ShareDesc
-    ShareManager::getShareDesc(const ShareEditUUID& shareEditUUID)
+    ShareDesc ShareManager::getShareDesc(const ShareEditUUID& shareEditUUID)
     {
         Wt::Dbo::Session& session{ _db.getTLSSession() };
         Wt::Dbo::Transaction transaction{ session };
@@ -235,8 +228,7 @@ namespace Share
         return shareToDesc(*share.get());
     }
 
-    void
-    ShareManager::visitShares(std::function<void(const ShareDesc&)> visitor)
+    void ShareManager::visitShares(const std::function<void(const ShareDesc&)>& visitor)
     {
         std::vector<ShareDesc> shares;
 
@@ -254,8 +246,7 @@ namespace Share
             visitor(share);
     }
 
-    void
-    ShareManager::incrementReadCount(const ShareUUID& shareUUID)
+    void ShareManager::incrementReadCount(const ShareUUID& shareUUID)
     {
         Wt::Dbo::Session& session{ _db.getTLSSession() };
         Wt::Dbo::Transaction transaction{ session };
@@ -267,15 +258,13 @@ namespace Share
         share.modify()->incReadCount();
     }
 
-    void
-    ShareManager::removeOrphanFiles(const std::filesystem::path& directory)
+    void ShareManager::removeOrphanFiles(const std::filesystem::path& directory)
     {
         if (_shareCleaner)
             _shareCleaner->removeOrphanFiles(directory);
     }
 
-    void
-    ShareManager::validateShareSizes(const std::vector<FileCreateParameters>& files, const std::vector<FileSize>& fileSizes)
+    void ShareManager::validateShareSizes(const std::vector<FileCreateParameters>& files, const std::vector<FileSize>& fileSizes)
     {
         FileSize shareSize{};
 
@@ -285,5 +274,4 @@ namespace Share
         if (shareSize >= _maxShareSize)
             throw ShareTooLargeException{};
     }
-
-} // namespace Share
+} // namespace fs::share

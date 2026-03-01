@@ -25,30 +25,36 @@
 
 #include "utils/Exception.hpp"
 
-class UUIDException : public FsException
+namespace fs
 {
-public:
-    using FsException::FsException;
-};
 
-class UUID
-{
-public:
-    struct Generate
+    class UUIDException : public FsException
     {
+    public:
+        using FsException::FsException;
     };
 
-    UUID() {}
-    UUID(Generate);
-    UUID(std::string_view uuid);
+    class UUID
+    {
+    public:
+        struct Generate
+        {
+        };
 
-    std::string toString() const;
+        UUID() {}
+        UUID(Generate);
+        UUID(std::string_view uuid);
 
-    auto cbegin() const { return _uuid.begin(); }
-    auto cend() const { return _uuid.end(); }
-    auto begin() { return _uuid.begin(); }
-    auto end() { return _uuid.end(); }
+        std::string toString() const;
 
-protected:
-    boost::uuids::uuid _uuid;
-};
+        auto cbegin() const { return _uuid.begin(); }
+        auto cend() const { return _uuid.end(); }
+        auto begin() { return _uuid.begin(); }
+        auto end() { return _uuid.end(); }
+
+        bool operator==(const UUID& other) const = default;
+
+    protected:
+        boost::uuids::uuid _uuid;
+    };
+} // namespace fs

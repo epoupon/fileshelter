@@ -26,7 +26,7 @@
 #include "utils/IConfig.hpp"
 #include "utils/Service.hpp"
 
-namespace UserInterface
+namespace fs::ui
 {
     std::unique_ptr<Wt::WWidget> createTermsOfService()
     {
@@ -49,4 +49,4 @@ namespace UserInterface
 
         return tos;
     }
-} // namespace UserInterface
+} // namespace fs::ui

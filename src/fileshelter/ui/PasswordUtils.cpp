@@ -22,7 +22,7 @@
 #include "utils/IConfig.hpp"
 #include "utils/Service.hpp"
 
-namespace UserInterface::PasswordUtils
+namespace fs::ui::PasswordUtils
 {
     bool isUploadPassordRequired()
     {
@@ -45,4 +45,4 @@ namespace UserInterface::PasswordUtils
 
         return res;
     }
-} // namespace UserInterface::PasswordUtils
+} // namespace fs::ui::PasswordUtils

@@ -29,7 +29,7 @@
 
 #include "utils/Logger.hpp"
 
-namespace Zip
+namespace fs::zip
 {
     std::unique_ptr<IZipper> createArchiveZipper(const EntryContainer& entries)
     {
@@ -92,16 +92,16 @@ namespace Zip
         if (!_archive)
             throw Exception{ "Cannot create archive control struct" };
 
-        auto archiveOpen{ [](struct ::archive* a, void* clientData) {
+        auto archiveOpen{ [](struct ::archive*, void*) {
             return ARCHIVE_OK;
         } };
 
-        auto archiveWrite{ [](struct ::archive* a, void* clientData, const void* buff, ::size_t n) -> la_ssize_t {
+        auto archiveWrite{ [](struct ::archive*, void* clientData, const void* buff, ::size_t n) -> la_ssize_t {
             ArchiveZipper* zipper{ static_cast<ArchiveZipper*>(clientData) };
             return zipper->onWriteCallback(static_cast<const std::byte*>(buff), n);
         } };
 
-        auto archiveClose{ [](struct ::archive* a, void* clientData) {
+        auto archiveClose{ [](struct ::archive*, void*) {
             return ARCHIVE_OK;
         } };
 
@@ -270,7 +270,7 @@ namespace Zip
                 if (writtenBytes < 0)
                     throw ArchiveException{ _archive.get() };
 
-                assert(writtenBytes <= remainingBytesToWrite);
+                assert(static_cast<std::uint64_t>(writtenBytes) <= remainingBytesToWrite);
                 remainingBytesToWrite -= writtenBytes;
             }
         }
@@ -295,4 +295,4 @@ namespace Zip
 
         return bufferSize;
     }
-} // namespace Zip
+} // namespace fs::zip

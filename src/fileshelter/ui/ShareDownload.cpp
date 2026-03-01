@@ -33,7 +33,7 @@
 #include "ShareDownloadPassword.hpp"
 #include "ShareUtils.hpp"
 
-namespace UserInterface
+namespace fs::ui
 {
     ShareDownload::ShareDownload()
     {
@@ -53,14 +53,14 @@ namespace UserInterface
 
         try
         {
-            const Share::ShareUUID shareUUID{ wApp->internalPathNextPart("/share-download/") };
+            const share::ShareUUID shareUUID{ wApp->internalPathNextPart("/share-download/") };
 
-            if (Service<Share::IShareManager>::get()->shareHasPassword(shareUUID))
+            if (Service<share::IShareManager>::get()->shareHasPassword(shareUUID))
                 displayPassword(shareUUID);
             else
-                displayDownload(Service<Share::IShareManager>::get()->getShareDesc(shareUUID));
+                displayDownload(Service<share::IShareManager>::get()->getShareDesc(shareUUID));
         }
-        catch (const Share::ShareNotFoundException& e)
+        catch (const share::ShareNotFoundException& e)
         {
             displayShareNotFound();
         }
@@ -70,7 +70,7 @@ namespace UserInterface
         }
     }
 
-    void ShareDownload::displayDownload(const Share::ShareDesc& share, std::optional<std::string_view> password)
+    void ShareDownload::displayDownload(const share::ShareDesc& share, std::optional<std::string_view> password)
     {
         Wt::WTemplate* t{ addNew<Wt::WTemplate>(tr("template-share-download")) };
 
@@ -92,20 +92,26 @@ namespace UserInterface
 
         {
             auto* filesContainer{ t->bindNew<Wt::WContainerWidget>("files") };
-            for (const Share::FileDesc& file : share.files)
+            for (const share::FileDesc& file : share.files)
             {
                 Wt::WTemplate* fileTemplate{ filesContainer->addNew<Wt::WTemplate>(tr("template-share-download-file")) };
 
                 fileTemplate->bindString("name", Wt::WString::fromUTF8(std::string{ file.clientPath }), Wt::TextFormat::Plain);
                 fileTemplate->bindString("size", ShareUtils::fileSizeToString(file.size), Wt::TextFormat::Plain);
+                if (share.files.size() > 1)
+                {
+                    fileTemplate->setCondition("if-download-btn", true);
+                    auto* downloadBtn{ fileTemplate->bindNew<Wt::WPushButton>("download-btn", tr("template-share-download-download-btn"), Wt::TextFormat::XHTML) };
+                    downloadBtn->setLink(ShareResource::createLink(share.uuid, file.uuid, password));
+                }
             }
         }
     }
 
-    void ShareDownload::displayPassword(const Share::ShareUUID& shareUUID)
+    void ShareDownload::displayPassword(const share::ShareUUID& shareUUID)
     {
-        auto view = addNew<ShareDownloadPassword>(shareUUID);
-        view->success().connect([=](const Share::ShareDesc& share, std::string_view password) {
+        auto* view = addNew<ShareDownloadPassword>(shareUUID);
+        view->success().connect([this](const share::ShareDesc& share, std::string_view password) {
             clear();
             displayDownload(share, password);
         });
@@ -116,4 +122,4 @@ namespace UserInterface
         clear();
         addNew<Wt::WTemplate>(tr("template-share-not-found"))->addFunction("tr", &Wt::WTemplate::Functions::tr);
     }
-} // namespace UserInterface
+} // namespace fs::ui

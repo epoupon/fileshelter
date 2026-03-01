@@ -19,23 +19,31 @@
 
 #pragma once
 
-#include "ICommand.hpp"
 #include <memory>
 #include <vector>
 
-class HelpCommand : public ICommand
+#include "ICommand.hpp"
+
+namespace fs
 {
-public:
-    HelpCommand(std::string_view processArg, const std::vector<std::unique_ptr<ICommand>>& commands);
+    class HelpCommand : public ICommand
+    {
+    public:
+        HelpCommand(std::string_view processArg, const std::vector<std::unique_ptr<ICommand>>& commands);
+        ~HelpCommand() override = default;
 
-    std::string_view getName() const { return "help"; }
-    std::string_view getDescription() const { return "Show this help or display command specific help"; }
-    void displayHelp(std::ostream& os) const override;
-    int process(const std::vector<std::string>& args) const override;
+        HelpCommand(const HelpCommand&) = delete;
+        HelpCommand& operator=(const HelpCommand&) = delete;
 
-private:
-    std::string generateCommandDesc(const std::vector<std::unique_ptr<ICommand>>& commands) const;
+        std::string_view getName() const override { return "help"; }
+        std::string_view getDescription() const override { return "Show this help or display command specific help"; }
+        void displayHelp(std::ostream& os) const override;
+        int process(const std::vector<std::string>& args) const override;
 
-    const std::string _processArg;
-    const std::vector<std::unique_ptr<ICommand>>& _commands;
-};
+    private:
+        std::string generateCommandDesc(const std::vector<std::unique_ptr<ICommand>>& commands) const;
+
+        const std::string _processArg;
+        const std::vector<std::unique_ptr<ICommand>>& _commands;
+    };
+} // namespace fs

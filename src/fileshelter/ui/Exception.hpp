@@ -23,7 +23,7 @@
 
 #include "utils/Exception.hpp"
 
-namespace UserInterface
+namespace fs::ui
 {
     // Signaled to users
     class Exception : public FsException
@@ -32,4 +32,4 @@ namespace UserInterface
         Exception(const Wt::WString& error)
             : FsException{ error.toUTF8() } {}
     };
-} // namespace UserInterface
+} // namespace fs::ui

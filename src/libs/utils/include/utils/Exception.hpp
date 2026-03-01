@@ -23,9 +23,12 @@
 #include <string>
 #include <string_view>
 
-class FsException : public std::runtime_error
+namespace fs
 {
-public:
-    FsException(std::string_view error = "")
-        : std::runtime_error{ std::string{ error } } {}
-};
+    class FsException : public std::runtime_error
+    {
+    public:
+        FsException(std::string_view error = "")
+            : std::runtime_error{ std::string{ error } } {}
+    };
+} // namespace fs

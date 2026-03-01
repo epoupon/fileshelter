@@ -21,10 +21,11 @@
 
 #include <Wt/Auth/PasswordVerifier.h>
 
-#include "Db.hpp"
 #include "share/IShareManager.hpp"
 
-namespace Share
+#include "Db.hpp"
+
+namespace fs::share
 {
     class ShareCleaner;
 
@@ -32,12 +33,10 @@ namespace Share
     {
     public:
         ShareManager(bool enableCleaner);
-        ~ShareManager();
+        ~ShareManager() override;
 
         ShareManager(const ShareManager&) = delete;
-        ShareManager(ShareManager&&) = delete;
         ShareManager& operator=(const ShareManager&) = delete;
-        ShareManager& operator=(ShareManager&&) = delete;
 
     private:
         FileSize getMaxShareSize() const override { return _maxShareSize; }
@@ -51,7 +50,7 @@ namespace Share
         bool shareHasPassword(const ShareUUID& shareUUID) override;
         ShareDesc getShareDesc(const ShareUUID& shareUUID, std::optional<std::string_view> password) override;
         ShareDesc getShareDesc(const ShareEditUUID& shareUUID) override;
-        void visitShares(std::function<void(const ShareDesc&)>) override;
+        void visitShares(const std::function<void(const ShareDesc&)>& visitor) override;
         void incrementReadCount(const ShareUUID& shareUUID) override;
         void removeOrphanFiles(const std::filesystem::path& directory) override;
 
@@ -69,5 +68,4 @@ namespace Share
         const std::size_t _maxValidityHits{};
         const bool _canValidityPeriodBeSet{};
     };
-
-} // namespace Share
+} // namespace fs::share

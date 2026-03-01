@@ -33,7 +33,7 @@
 
 #include "ShareUtils.hpp"
 
-namespace UserInterface
+namespace fs::ui
 {
     ShareEdit::ShareEdit()
     {
@@ -53,10 +53,10 @@ namespace UserInterface
 
         try
         {
-            const Share::ShareEditUUID editUUID{ wApp->internalPathNextPart("/share-edit/") };
+            const share::ShareEditUUID editUUID{ wApp->internalPathNextPart("/share-edit/") };
             displayEdit(editUUID);
         }
-        catch (const Share::ShareNotFoundException& e)
+        catch (const share::ShareNotFoundException& e)
         {
             displayShareNotFound();
         }
@@ -66,9 +66,9 @@ namespace UserInterface
         }
     }
 
-    void ShareEdit::displayEdit(const Share::ShareEditUUID& editUUID)
+    void ShareEdit::displayEdit(const share::ShareEditUUID& editUUID)
     {
-        const Share::ShareDesc share{ Service<Share::IShareManager>::get()->getShareDesc(editUUID) };
+        const share::ShareDesc share{ Service<share::IShareManager>::get()->getShareDesc(editUUID) };
 
         FS_LOG(UI, INFO) << "[" << share.uuid.toString() << "] Editing share from " << wApp->environment().clientAddress();
 
@@ -82,7 +82,7 @@ namespace UserInterface
 
         Wt::WPushButton* deleteBtn{ t->bindNew<Wt::WPushButton>("delete-btn", tr("msg-delete")) };
 
-        deleteBtn->clicked().connect([=] {
+        deleteBtn->clicked().connect([=, this] {
             auto messageBox = deleteBtn->addChild(std::make_unique<Wt::WMessageBox>(tr("msg-share-delete"),
                 tr("msg-confirm-action"),
                 Wt::Icon::Question,
@@ -90,18 +90,18 @@ namespace UserInterface
 
             messageBox->setModal(true);
 
-            messageBox->buttonClicked().connect([=](Wt::StandardButton btn) {
+            messageBox->buttonClicked().connect([=, this](Wt::StandardButton btn) {
                 try
                 {
                     if (btn == Wt::StandardButton::Yes)
                     {
-                        Service<Share::IShareManager>::get()->destroyShare(editUUID);
+                        Service<share::IShareManager>::get()->destroyShare(editUUID);
                         displayRemoved();
                     }
                     else
                         deleteBtn->removeChild(messageBox);
                 }
-                catch (const Share::ShareNotFoundException& e)
+                catch (const share::ShareNotFoundException& e)
                 {
                     FS_LOG(UI, DEBUG) << "Share already removed!";
                     displayShareNotFound();
@@ -123,4 +123,4 @@ namespace UserInterface
         clear();
         addNew<Wt::WTemplate>(tr("template-share-not-found"))->addFunction("tr", &Wt::WTemplate::Functions::tr);
     }
-} // namespace UserInterface
+} // namespace fs::ui

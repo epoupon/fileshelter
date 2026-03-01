@@ -24,9 +24,9 @@
 
 #include "share/Types.hpp"
 
-namespace UserInterface::ShareUtils
+namespace fs::ui::ShareUtils
 {
-    std::unique_ptr<Wt::WAnchor> createShareDownloadAnchor(const Share::ShareUUID& shareUUID);
-    std::unique_ptr<Wt::WAnchor> createShareEditAnchor(const Share::ShareEditUUID& shareEditUUID);
-    Wt::WString fileSizeToString(Share::FileSize size);
-} // namespace UserInterface::ShareUtils
+    std::unique_ptr<Wt::WAnchor> createShareDownloadAnchor(const share::ShareUUID& shareUUID);
+    std::unique_ptr<Wt::WAnchor> createShareEditAnchor(const share::ShareEditUUID& shareEditUUID);
+    Wt::WString fileSizeToString(share::FileSize size);
+} // namespace fs::ui::ShareUtils

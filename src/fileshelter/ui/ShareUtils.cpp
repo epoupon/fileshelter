@@ -25,21 +25,21 @@
 #include <Wt/WApplication.h>
 #include <Wt/WEnvironment.h>
 
-namespace UserInterface::ShareUtils
+namespace fs::ui::ShareUtils
 {
     static std::string computeURL(const std::string& internalPath)
     {
         return wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + (wApp->environment().deploymentPath() == "/" ? "" : wApp->environment().deploymentPath()) + internalPath;
     }
 
-    std::unique_ptr<Wt::WAnchor> createShareDownloadAnchor(const Share::ShareUUID& shareUUID)
+    std::unique_ptr<Wt::WAnchor> createShareDownloadAnchor(const share::ShareUUID& shareUUID)
     {
         const std::string downloadPath{ "/share-download/" + shareUUID.toString() };
 
         return std::make_unique<Wt::WAnchor>(Wt::WLink{ Wt::LinkType::InternalPath, downloadPath }, computeURL(downloadPath));
     }
 
-    std::unique_ptr<Wt::WAnchor> createShareEditAnchor(const Share::ShareEditUUID& shareEditUUID)
+    std::unique_ptr<Wt::WAnchor> createShareEditAnchor(const share::ShareEditUUID& shareEditUUID)
     {
         const std::string editPath{ "/share-edit/" + shareEditUUID.toString() };
 
@@ -54,7 +54,7 @@ namespace UserInterface::ShareUtils
         return out.str();
     }
 
-    Wt::WString fileSizeToString(Share::FileSize size)
+    Wt::WString fileSizeToString(share::FileSize size)
     {
         if (size >= 1024 * 1024 * 1024)
         {
@@ -71,4 +71,4 @@ namespace UserInterface::ShareUtils
         else
             return Wt::WString::tr("msg-size-b").arg(size);
     }
-} // namespace UserInterface::ShareUtils
+} // namespace fs::ui::ShareUtils

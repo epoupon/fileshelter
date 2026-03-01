@@ -24,15 +24,18 @@
 #include "utils/IResourceHandler.hpp"
 #include "utils/IZipper.hpp"
 
-class ZipperResourceHandler final : public IResourceHandler
+namespace fs
 {
-public:
-    ZipperResourceHandler(std::unique_ptr<Zip::IZipper> zipper);
+    class ZipperResourceHandler final : public IResourceHandler
+    {
+    public:
+        ZipperResourceHandler(std::unique_ptr<zip::IZipper> zipper);
 
-private:
-    void processRequest(const Wt::Http::Request& request, Wt::Http::Response& response) override;
-    bool isComplete() const override;
-    void abort() override;
+    private:
+        void processRequest(const Wt::Http::Request& request, Wt::Http::Response& response) override;
+        bool isComplete() const override;
+        void abort() override;
 
-    std::unique_ptr<Zip::IZipper> _zipper;
-};
+        std::unique_ptr<zip::IZipper> _zipper;
+    };
+} // namespace fs

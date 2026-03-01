@@ -31,7 +31,7 @@ ARG FILESHELTER_BUILD_TYPE="Release"
 RUN \
 	DIR=/tmp/fileshelter/build && mkdir -p ${DIR} && cd ${DIR}  && \
 		xx-info is-cross && export BUILD_TESTS=OFF || export BUILD_TESTS=ON && \
-		PKG_CONFIG_PATH=/$(xx-info)/usr/lib/pkgconfig cmake /tmp/fileshelter/ -DCMAKE_INCLUDE_PATH=${PREFIX}/include -DCMAKE_BUILD_TYPE=${FILESHELTER_BUILD_TYPE} $(xx-clang --print-cmake-defines) -DCMAKE_PREFIX_PATH=/$(xx-info)/usr/lib/cmake -DBUILD_TESTING=${BUILD_TESTS} && \
+		PKG_CONFIG_PATH=/$(xx-info)/usr/lib/pkgconfig cmake /tmp/fileshelter/ -DCMAKE_INCLUDE_PATH=${PREFIX}/include -DCMAKE_BUILD_TYPE=${FILESHELTER_BUILD_TYPE} $(xx-clang --print-cmake-defines) -DCMAKE_PREFIX_PATH=/$(xx-info)/usr/lib/cmake -DBUILD_TESTING=${BUILD_TESTS} -DCMAKE_UNITY_BUILD=ON && \
 		VERBOSE=1 make -j$(nproc) && \
 		xx-verify src/fileshelter/fileshelter && \
 		(xx-info is-cross || make test)

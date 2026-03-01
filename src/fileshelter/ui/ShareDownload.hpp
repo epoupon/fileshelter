@@ -25,7 +25,7 @@
 
 #include "share/Types.hpp"
 
-namespace UserInterface
+namespace fs::ui
 {
     class ShareDownload : public Wt::WContainerWidget
     {
@@ -35,8 +35,8 @@ namespace UserInterface
     private:
         void handlePathChanged();
 
-        void displayPassword(const Share::ShareUUID& shareUUID);
-        void displayDownload(const Share::ShareDesc& share, std::optional<std::string_view> password = std::nullopt);
+        void displayPassword(const share::ShareUUID& shareUUID);
+        void displayDownload(const share::ShareDesc& share, std::optional<std::string_view> password = std::nullopt);
         void displayShareNotFound();
     };
-} // namespace UserInterface
+} // namespace fs::ui

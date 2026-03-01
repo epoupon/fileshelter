@@ -26,7 +26,7 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/split.hpp>
 
-namespace StringUtils
+namespace fs::stringUtils
 {
     bool readList(const std::string& str, const std::string& separators, std::list<std::string>& results)
     {
@@ -203,4 +203,4 @@ namespace StringUtils
 
         return res;
     }
-} // namespace StringUtils
+} // namespace fs::stringUtils

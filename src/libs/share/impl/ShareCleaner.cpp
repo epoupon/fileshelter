@@ -21,13 +21,13 @@
 
 #include <Wt/WLocalDateTime.h>
 
+#include "utils/Logger.hpp"
+
 #include "Db.hpp"
 #include "File.hpp"
 #include "Share.hpp"
-#include "utils/Logger.hpp"
-#include "utils/Service.hpp"
 
-namespace Share
+namespace fs::share
 {
     ShareCleaner::ShareCleaner(Db& db, const std::filesystem::path& workingDirectory)
         : _db{ db }
@@ -49,8 +49,7 @@ namespace Share
         FS_LOG(SHARE, DEBUG) << "Stopped cleaner";
     }
 
-    void
-    ShareCleaner::removeOrphanFiles(const std::filesystem::path& directory)
+    void ShareCleaner::removeOrphanFiles(const std::filesystem::path& directory)
     {
         FS_LOG(SHARE, DEBUG) << "Removing orphan files in directory '" << directory.string() << "'";
 
@@ -78,8 +77,7 @@ namespace Share
         }
     }
 
-    bool
-    ShareCleaner::isOrphanFile(const std::filesystem::path& filePath)
+    bool ShareCleaner::isOrphanFile(const std::filesystem::path& filePath)
     {
         const std::filesystem::path relativeFilePath{ std::filesystem::relative(filePath, _workingDirectory) };
         assert(!relativeFilePath.empty());
@@ -91,8 +89,7 @@ namespace Share
             && !File::getByPath(session, filePath);
     }
 
-    void
-    ShareCleaner::scheduleNextCheck()
+    void ShareCleaner::scheduleNextCheck()
     {
         _timer.expires_after(_checkPeriod);
 
@@ -105,8 +102,7 @@ namespace Share
         });
     }
 
-    void
-    ShareCleaner::checkExpiredShares()
+    void ShareCleaner::checkExpiredShares()
     {
         FS_LOG(SHARE, DEBUG) << "Checking expired shares...";
 
@@ -129,4 +125,4 @@ namespace Share
             }
         });
     }
-} // namespace Share
+} // namespace fs::share

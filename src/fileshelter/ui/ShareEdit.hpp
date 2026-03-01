@@ -23,7 +23,7 @@
 
 #include "share/Types.hpp"
 
-namespace UserInterface
+namespace fs::ui
 {
     class ShareEdit : public Wt::WContainerWidget
     {
@@ -32,8 +32,8 @@ namespace UserInterface
 
     private:
         void handlePathChanged();
-        void displayEdit(const Share::ShareEditUUID& editUUID);
+        void displayEdit(const share::ShareEditUUID& editUUID);
         void displayRemoved();
         void displayShareNotFound();
     };
-} // namespace UserInterface
+} // namespace fs::ui

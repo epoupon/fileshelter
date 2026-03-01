@@ -34,7 +34,7 @@
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
 
-namespace UserInterface
+namespace fs::ui
 {
     unsigned ShareCreateFormView::getProgress() const
     {
@@ -54,15 +54,15 @@ namespace UserInterface
 
         auto* filesContainer{ bindNew<Wt::WContainerWidget>("files") };
 
-        _drop->drop().connect([=](const std::vector<Wt::WFileDropWidget::File*>& files) {
+        _drop->drop().connect([filesContainer, this](const std::vector<Wt::WFileDropWidget::File*>& files) {
             for (Wt::WFileDropWidget::File* file : files)
             {
                 auto* fileEntry{ filesContainer->addNew<Wt::WTemplate>(tr("template-share-create-form-file")) };
                 fileEntry->bindString("name", file->clientFileName(), Wt::TextFormat::Plain);
                 fileEntry->bindString("size", ShareUtils::fileSizeToString(file->size()), Wt::TextFormat::Plain);
 
-                auto* delBtn{ fileEntry->bindNew<Wt::WText>("del-btn", tr("template-share-create-del-btn")) };
-                delBtn->clicked().connect([=] {
+                auto* delBtn{ fileEntry->bindNew<Wt::WPushButton>("del-btn", tr("template-share-create-del-btn"), Wt::TextFormat::XHTML) };
+                delBtn->clicked().connect([=, this] {
                     deleteFile(*file);
                     filesContainer->removeWidget(fileEntry);
                     checkFiles();
@@ -74,7 +74,7 @@ namespace UserInterface
             checkFiles();
         });
 
-        _drop->tooLarge().connect([=](const Wt::WFileDropWidget::File* file, std::uint64_t size) {
+        _drop->tooLarge().connect([this](const Wt::WFileDropWidget::File* file, std::uint64_t size) {
             FS_LOG(UI, DEBUG) << "File '" << file->clientFileName() << "' is too large: " << size;
             checkFiles();
         });
@@ -86,7 +86,7 @@ namespace UserInterface
         // Desc
         setFormWidget(ShareCreateFormModel::DescriptionField, std::make_unique<Wt::WLineEdit>());
 
-        if (Service<Share::IShareManager>::get()->canValidityPeriodBeSet())
+        if (Service<share::IShareManager>::get()->canValidityPeriodBeSet())
         {
             setCondition("if-validity-period", true);
             // Validity period
@@ -97,7 +97,7 @@ namespace UserInterface
             validityPeriodUnit->setModel(_model->validityPeriodModel());
 
             // each time the unit is changed, make sure to update the limits
-            validityPeriodUnit->changed().connect([=] {
+            validityPeriodUnit->changed().connect([this] {
                 updateModel(_model.get());
                 _model->updatePeriodValidator();
                 _model->validateValidatityFields();
@@ -116,7 +116,7 @@ namespace UserInterface
         // Buttons
         _createBtn = bindNew<Wt::WPushButton>("create-btn", tr("msg-create"));
         _createBtn->disable();
-        _createBtn->clicked().connect([=] {
+        _createBtn->clicked().connect([this] {
             updateModel(_model.get());
 
             _validated = _model->validate();
@@ -191,7 +191,7 @@ namespace UserInterface
 
     void ShareCreateFormView::emitDone()
     {
-        using namespace Share;
+        using namespace fs::share;
 
         ShareCreateParameters params;
 
@@ -200,10 +200,10 @@ namespace UserInterface
         params.password = _model->valueText(ShareCreateFormModel::PasswordField).toUTF8();
         params.creatorAddress = wApp->environment().clientAddress();
 
-        std::vector<Share::FileCreateParameters> filesParameters;
+        std::vector<share::FileCreateParameters> filesParameters;
 
         visitUploadedFiles([&](const Wt::WFileDropWidget::File& file) {
-            Share::FileCreateParameters fileParameters;
+            share::FileCreateParameters fileParameters;
 
             fileParameters.path = getRelativeToWorkingDirectoryPath(file.uploadedFile().spoolFileName());
             fileParameters.name = file.uploadedFile().clientFileName();
@@ -239,7 +239,7 @@ namespace UserInterface
 
     bool ShareCreateFormView::isShareSizeOverflow() const
     {
-        return getTotalFileSize() > Service<Share::IShareManager>::get()->getMaxShareSize();
+        return getTotalFileSize() > Service<share::IShareManager>::get()->getMaxShareSize();
     }
 
     bool ShareCreateFormView::hasDuplicateNames() const
@@ -276,7 +276,7 @@ namespace UserInterface
 
         const bool overflow{ isShareSizeOverflow() };
         if (overflow)
-            errorMsg = Wt::WString::tr("msg-max-share-size").arg(ShareUtils::fileSizeToString(Service<Share::IShareManager>::get()->getMaxShareSize()));
+            errorMsg = Wt::WString::tr("msg-max-share-size").arg(ShareUtils::fileSizeToString(Service<share::IShareManager>::get()->getMaxShareSize()));
 
         const bool duplicateNames{ hasDuplicateNames() };
         if (duplicateNames)
@@ -328,4 +328,4 @@ namespace UserInterface
 
         return res;
     }
-} // namespace UserInterface
+} // namespace fs::ui

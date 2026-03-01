@@ -26,58 +26,59 @@
 #include "Common.hpp"
 #include "share/IShareManager.hpp"
 #include "utils/IConfig.hpp"
-#include "utils/Logger.hpp"
 #include "utils/Service.hpp"
 
-static void
-processListCommand(Share::IShareManager& shareManager, bool details, std::string_view deployURL)
+namespace fs
 {
-    std::cout.imbue(std::locale{ "" });
-
-    std::size_t nbShares{};
-    std::size_t totalShareSize{};
-
-    shareManager.visitShares([&](const Share::ShareDesc& share) {
-        nbShares++;
-        totalShareSize += share.size;
-        displayShareDesc(share, details, deployURL);
-    });
-
-    std::cout << std::endl
-              << "Share count: " << nbShares << ", " << totalShareSize << " bytes" << std::endl;
-}
-
-ListCommand::ListCommand(std::string_view processArg)
-    : _processArg{ processArg }
-    , _options{ "Options" }
-{
-    namespace po = boost::program_options;
-
-    _options.add_options()("conf,c", po::value<std::string>()->default_value("/etc/fileshelter.conf"), "fileshelter config file")("url,u", po::value<std::string>()->default_value(""), "deploy URL")("details,d", "Show details");
-}
-
-void ListCommand::displayHelp(std::ostream& os) const
-{
-    os << "Usage: " << _processArg << " " << getName() << " [options]\n\n";
-    os << _options << std::endl;
-}
-
-int ListCommand::process(const std::vector<std::string>& args) const
-{
-    namespace po = boost::program_options;
-
-    po::variables_map vm;
+    static void processListCommand(share::IShareManager& shareManager, bool details, std::string_view deployURL)
     {
-        po::parsed_options parsed{ po::command_line_parser(args)
-                .options(_options)
-                .run() };
-        po::store(parsed, vm);
+        std::cout.imbue(std::locale{ "" });
+
+        std::size_t nbShares{};
+        std::size_t totalShareSize{};
+
+        shareManager.visitShares([&](const share::ShareDesc& share) {
+            nbShares++;
+            totalShareSize += share.size;
+            displayShareDesc(share, details, deployURL);
+        });
+
+        std::cout << std::endl
+                  << "Share count: " << nbShares << ", " << totalShareSize << " bytes" << std::endl;
     }
 
-    Service<IConfig> config{ createConfig(vm["conf"].as<std::string>()) };
-    Service<Share::IShareManager> shareManager{ Share::createShareManager(false /* enableCleaner */) };
+    ListCommand::ListCommand(std::string_view processArg)
+        : _processArg{ processArg }
+        , _options{ "Options" }
+    {
+        namespace po = boost::program_options;
 
-    processListCommand(*shareManager.get(), vm.count("details"), vm["url"].as<std::string>());
+        _options.add_options()("conf,c", po::value<std::string>()->default_value("/etc/fileshelter.conf"), "fileshelter config file")("url,u", po::value<std::string>()->default_value(""), "deploy URL")("details,d", "Show details");
+    }
 
-    return EXIT_SUCCESS;
-}
+    void ListCommand::displayHelp(std::ostream& os) const
+    {
+        os << "Usage: " << _processArg << " " << getName() << " [options]\n\n";
+        os << _options << std::endl;
+    }
+
+    int ListCommand::process(const std::vector<std::string>& args) const
+    {
+        namespace po = boost::program_options;
+
+        po::variables_map vm;
+        {
+            po::parsed_options parsed{ po::command_line_parser(args)
+                    .options(_options)
+                    .run() };
+            po::store(parsed, vm);
+        }
+
+        Service<IConfig> config{ createConfig(vm["conf"].as<std::string>()) };
+        Service<share::IShareManager> shareManager{ share::createShareManager(false /* enableCleaner */) };
+
+        processListCommand(*shareManager.get(), vm.count("details"), vm["url"].as<std::string>());
+
+        return EXIT_SUCCESS;
+    }
+} // namespace fs

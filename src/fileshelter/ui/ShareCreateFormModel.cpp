@@ -24,7 +24,7 @@
 #include "share/IShareManager.hpp"
 #include "utils/Service.hpp"
 
-namespace UserInterface
+namespace fs::ui
 {
     const ShareCreateFormModel::Field ShareCreateFormModel::DescriptionField{ "desc" };
     const ShareCreateFormModel::Field ShareCreateFormModel::ValidityPeriodField{ "validity-period" };
@@ -49,13 +49,13 @@ namespace UserInterface
         durationValidator->setBottom(1);
         setValidator(ValidityPeriodField, std::move(durationValidator));
 
-        updateValidityPeriod(Service<Share::IShareManager>::get()->getDefaultValidityPeriod());
+        updateValidityPeriod(Service<share::IShareManager>::get()->getDefaultValidityPeriod());
         updatePeriodValidator();
     }
 
     void ShareCreateFormModel::updatePeriodValidator()
     {
-        const auto maxValidityPeriod{ Service<Share::IShareManager>::get()->getMaxValidityPeriod() };
+        const auto maxValidityPeriod{ Service<share::IShareManager>::get()->getMaxValidityPeriod() };
         auto durationValidator{ std::dynamic_pointer_cast<Wt::WIntValidator>(validator(ValidityPeriodField)) };
 
         const auto maxValidityPeriodHours{ std::chrono::duration_cast<std::chrono::hours>(maxValidityPeriod).count() };
@@ -113,7 +113,7 @@ namespace UserInterface
 
     void ShareCreateFormModel::updateValidityPeriod(std::chrono::seconds duration)
     {
-        auto maxValidityPeriod = Service<Share::IShareManager>::get()->getMaxValidityPeriod();
+        auto maxValidityPeriod = Service<share::IShareManager>::get()->getMaxValidityPeriod();
         if (duration > maxValidityPeriod)
             duration = maxValidityPeriod;
 
@@ -153,7 +153,7 @@ namespace UserInterface
 
     void ShareCreateFormModel::initializeModels()
     {
-        const auto maxPeriod{ std::chrono::duration_cast<std::chrono::hours>(Service<Share::IShareManager>::get()->getMaxValidityPeriod()) };
+        const auto maxPeriod{ std::chrono::duration_cast<std::chrono::hours>(Service<share::IShareManager>::get()->getMaxValidityPeriod()) };
 
         _validityPeriodModel = std::make_shared<Wt::WStringListModel>();
 
@@ -186,4 +186,4 @@ namespace UserInterface
 
         return {};
     }
-} // namespace UserInterface
+} // namespace fs::ui

@@ -21,10 +21,12 @@
 
 #include <string_view>
 
-namespace Share
+namespace fs
 {
-    struct ShareDesc;
-}
+    namespace share
+    {
+        struct ShareDesc;
+    }
 
-void displayShareDesc(const Share::ShareDesc& share, bool details, std::string_view deployURL);
-;
+    void displayShareDesc(const share::ShareDesc& share, bool details, std::string_view deployURL);
+} // namespace fs

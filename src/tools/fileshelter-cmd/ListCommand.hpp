@@ -19,21 +19,29 @@
 
 #pragma once
 
-#include "ICommand.hpp"
 #include <boost/program_options.hpp>
 
-class ListCommand : public ICommand
+#include "ICommand.hpp"
+
+namespace fs
 {
-public:
-    ListCommand(std::string_view processArg);
+    class ListCommand : public ICommand
+    {
+    public:
+        ListCommand(std::string_view processArg);
+        ~ListCommand() override = default;
 
-private:
-    std::string_view getName() const { return "list"; }
-    std::string_view getDescription() const { return "List available shares"; }
+        ListCommand(const ListCommand&) = delete;
+        ListCommand& operator=(const ListCommand&) = delete;
 
-    void displayHelp(std::ostream& os) const override;
-    int process(const std::vector<std::string>& args) const override;
+    private:
+        std::string_view getName() const override { return "list"; }
+        std::string_view getDescription() const override { return "List available shares"; }
 
-    const std::string _processArg;
-    boost::program_options::options_description _options;
-};
+        void displayHelp(std::ostream& os) const override;
+        int process(const std::vector<std::string>& args) const override;
+
+        const std::string _processArg;
+        boost::program_options::options_description _options;
+    };
+} // namespace fs

@@ -26,7 +26,7 @@
 #include <Wt/WFormModel.h>
 #include <Wt/WStringListModel.h>
 
-namespace UserInterface
+namespace fs::ui
 {
     class ShareCreateFormModel : public Wt::WFormModel
     {
@@ -52,4 +52,4 @@ namespace UserInterface
 
         std::shared_ptr<Wt::WStringListModel> _validityPeriodModel;
     };
-} // namespace UserInterface
+} // namespace fs::ui

@@ -21,15 +21,14 @@
 
 #include <Wt/WLocalDateTime.h>
 
-#include "File.hpp"
-#include "Types.hpp"
 #include "utils/Logger.hpp"
 
-namespace Share
-{
+#include "File.hpp"
+#include "Types.hpp"
 
-    FileSize
-    Share::getShareSize() const
+namespace fs::share
+{
+    FileSize Share::getShareSize() const
     {
         assert(self());
         assert(IdIsValid(self()->id()));
@@ -38,28 +37,24 @@ namespace Share
         return session()->query<long long>("SELECT COALESCE(SUM(size), 0) from file WHERE file.share_id = ?").bind(self()->id());
     }
 
-    Wt::Auth::PasswordHash
-    Share::getPasswordHash() const
+    Wt::Auth::PasswordHash Share::getPasswordHash() const
     {
         return { _passwordHashFunc, _passwordSalt, _passwordHash };
     }
 
-    bool
-    Share::isExpired() const
+    bool Share::isExpired() const
     {
         const auto now{ Wt::WLocalDateTime::currentServerDateTime().toUTC() };
         return _expiryTime < now;
     }
 
-    void
-    Share::visitFiles(std::function<void(const File::pointer&)> visitor) const
+    void Share::visitFiles(const std::function<void(const File::pointer&)>& visitor) const
     {
         for (const File::pointer& file : _files)
             visitor(file);
     }
 
-    Share::pointer
-    Share::create(Wt::Dbo::Session& session, const ShareCreateParameters& parameters, const Wt::Auth::PasswordHash* passwordHash)
+    Share::pointer Share::create(Wt::Dbo::Session& session, const ShareCreateParameters& parameters, const Wt::Auth::PasswordHash* passwordHash)
     {
         pointer res{ session.add(std::make_unique<Share>()) };
 
@@ -80,20 +75,17 @@ namespace Share
         return res;
     }
 
-    Share::pointer
-    Share::getByEditUUID(Wt::Dbo::Session& session, const ShareEditUUID& uuid)
+    Share::pointer Share::getByEditUUID(Wt::Dbo::Session& session, const ShareEditUUID& shareEditId)
     {
-        return session.find<Share>().where("edit_UUID = ?").bind(uuid);
+        return session.find<Share>().where("edit_UUID = ?").bind(shareEditId);
     }
 
-    Share::pointer
-    Share::getByUUID(Wt::Dbo::Session& session, const ShareUUID& uuid)
+    Share::pointer Share::getByUUID(Wt::Dbo::Session& session, const ShareUUID& shareId)
     {
-        return session.find<Share>().where("uuid = ?").bind(uuid);
+        return session.find<Share>().where("uuid = ?").bind(shareId);
     }
 
-    void
-    Share::visitAll(Wt::Dbo::Session& session, std::function<void(pointer& share)> visitor)
+    void Share::visitAll(Wt::Dbo::Session& session, const std::function<void(pointer& share)>& visitor)
     {
         Wt::Dbo::collection<pointer> res = session.find<Share>();
 
@@ -101,8 +93,7 @@ namespace Share
             visitor(share);
     }
 
-    void
-    Share::destroy(pointer& share)
+    void Share::destroy(pointer& share)
     {
         share->visitFiles([&](const File::pointer& file) {
             if (file->isOwned())
@@ -123,12 +114,10 @@ namespace Share
         share.remove();
     }
 
-    void
-    Share::setPasswordHash(const Wt::Auth::PasswordHash& passwordHash)
+    void Share::setPasswordHash(const Wt::Auth::PasswordHash& passwordHash)
     {
         _passwordHash = passwordHash.value();
         _passwordSalt = passwordHash.salt();
         _passwordHashFunc = passwordHash.function();
     }
-
-} // namespace Share
+} // namespace fs::share

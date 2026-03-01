@@ -21,7 +21,7 @@
 
 #include <Wt/WContainerWidget.h>
 
-namespace UserInterface
+namespace fs::ui
 {
     class ShareCreated : public Wt::WContainerWidget
     {
@@ -32,4 +32,4 @@ namespace UserInterface
         void handlePathChanged();
         void displayShareNotFound();
     };
-} // namespace UserInterface
+} // namespace fs::ui

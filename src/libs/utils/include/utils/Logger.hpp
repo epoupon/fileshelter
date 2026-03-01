@@ -25,27 +25,31 @@
 #include <Wt/WLogger.h>
 #include <Wt/WServer.h>
 
-enum class Severity
+namespace fs
 {
-    FATAL,
-    ERROR,
-    WARNING,
-    INFO,
-    DEBUG,
-};
 
-enum class Module
-{
-    DB,
-    RESOURCE,
-    MAIN,
-    SHARE,
-    SHARE_CLEANER,
-    UI,
-    UTILS,
-};
+    enum class Severity
+    {
+        FATAL,
+        ERROR,
+        WARNING,
+        INFO,
+        DEBUG,
+    };
 
-std::string getModuleName(Module mod);
-std::string getSeverityName(Severity sev);
+    enum class Module
+    {
+        DB,
+        RESOURCE,
+        MAIN,
+        SHARE,
+        SHARE_CLEANER,
+        UI,
+        UTILS,
+    };
+
+    std::string getModuleName(Module mod);
+    std::string getSeverityName(Severity sev);
 
 #define FS_LOG(module, level) Wt::log(getSeverityName(Severity::level)) << Wt::WLogger::sep << "[" << getModuleName(Module::module) << "]" << Wt::WLogger::sep
+} // namespace fs

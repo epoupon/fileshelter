@@ -29,13 +29,13 @@
 
 #include "ShareCreateFormModel.hpp"
 
-namespace Share
+namespace fs::share
 {
     struct ShareCreateParameters;
     struct FileCreateParameters;
-} // namespace Share
+} // namespace fs::share
 
-namespace UserInterface
+namespace fs::ui
 {
     class ShareCreateFormView : public Wt::WTemplateFormView
     {
@@ -47,7 +47,7 @@ namespace UserInterface
         Wt::Signal<>& validated() { return _sigValidated; }
         Wt::Signal<unsigned>& progressUpdate() { return _sigProgressUpdate; }
 
-        using ShareCreateCompleteSignal = Wt::Signal<const Share::ShareCreateParameters&, std::vector<Share::FileCreateParameters>&>;
+        using ShareCreateCompleteSignal = Wt::Signal<const share::ShareCreateParameters&, std::vector<share::FileCreateParameters>&>;
 
         ShareCreateCompleteSignal& complete() { return _sigComplete; }
 
@@ -88,4 +88,4 @@ namespace UserInterface
         std::uint64_t _currentReceivedSize{};
         std::uint64_t _totalSize{};
     };
-} // namespace UserInterface
+} // namespace fs::ui

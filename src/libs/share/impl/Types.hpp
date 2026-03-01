@@ -21,7 +21,7 @@
 
 #include <Wt/Dbo/ptr.h>
 
-namespace Share
+namespace fs::share
 {
     using IdType = Wt::Dbo::dbo_default_traits::IdType;
 
@@ -29,4 +29,4 @@ namespace Share
     {
         return id != Wt::Dbo::dbo_default_traits::invalidId();
     }
-} // namespace Share
+} // namespace fs::share

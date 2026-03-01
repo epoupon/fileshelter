@@ -19,12 +19,13 @@
 
 #pragma once
 
-#include <Wt/WIOService.h>
-#include <boost/asio/steady_timer.hpp>
 #include <chrono>
 #include <filesystem>
 
-namespace Share
+#include <Wt/WIOService.h>
+#include <boost/asio/steady_timer.hpp>
+
+namespace fs::share
 {
     class Db;
     class Share;
@@ -52,5 +53,4 @@ namespace Share
         Wt::WIOService _ioService;
         boost::asio::steady_timer _timer;
     };
-
-} // namespace Share
+} // namespace fs::share

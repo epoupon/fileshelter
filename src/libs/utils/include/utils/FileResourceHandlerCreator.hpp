@@ -24,4 +24,7 @@
 
 #include "utils/IResourceHandler.hpp"
 
-std::unique_ptr<IResourceHandler> createFileResourceHandler(const std::filesystem::path& path);
+namespace fs
+{
+    std::unique_ptr<IResourceHandler> createFileResourceHandler(const std::filesystem::path& path);
+}

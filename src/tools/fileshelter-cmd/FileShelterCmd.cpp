@@ -18,40 +18,39 @@
  */
 
 #include <algorithm>
-#include <boost/program_options.hpp>
 #include <cstdlib>
-#include <filesystem>
 #include <iostream>
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#include <boost/program_options.hpp>
 
 #include "CreateCommand.hpp"
 #include "DestroyCommand.hpp"
 #include "HelpCommand.hpp"
 #include "ListCommand.hpp"
-#include "share/CreateParameters.hpp"
-#include "share/IShareManager.hpp"
-#include "utils/IConfig.hpp"
-#include "utils/Logger.hpp"
-#include "utils/Service.hpp"
 
-using Commands = std::vector<std::unique_ptr<ICommand>>;
-
-void displayGlobalUsage(std::string_view cmd, std::ostream& os, const Commands& commands)
+namespace fs
 {
-    os << "Usage: " << cmd << " <command> [<args>]\n\n"
-                              "Available commands:"
-       << std::endl;
+    using Commands = std::vector<std::unique_ptr<ICommand>>;
 
-    for (const auto& command : commands)
-        os << "\t" << command->getName() << "\t\t" << command->getDescription() << std::endl;
-}
+    void displayGlobalUsage(std::string_view cmd, std::ostream& os, const Commands& commands)
+    {
+        os << "Usage: " << cmd << " <command> [<args>]\n\n"
+                                  "Available commands:"
+           << std::endl;
+
+        for (const auto& command : commands)
+            os << "\t" << command->getName() << "\t\t" << command->getDescription() << std::endl;
+    }
+} // namespace fs
 
 int main(int argc, char* argv[])
 {
+    using namespace fs;
+
     try
     {
         Commands commands;

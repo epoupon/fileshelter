@@ -11,7 +11,6 @@ add_executable(fileshelter-cmd
 target_link_libraries(fileshelter-cmd PRIVATE
 	filesheltershare
 	fileshelterutils
-	std::filesystem
 	Boost::program_options
 	)
 

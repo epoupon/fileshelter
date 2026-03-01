@@ -24,118 +24,121 @@
 
 #include "utils/Logger.hpp"
 
-std::unique_ptr<IResourceHandler> createFileResourceHandler(const std::filesystem::path& path)
+namespace fs
 {
-    return std::make_unique<FileResourceHandler>(path);
-}
-
-FileResourceHandler::FileResourceHandler(const std::filesystem::path& path)
-    : _path{ path }
-{
-}
-
-void FileResourceHandler::processRequest(const Wt::Http::Request& request, Wt::Http::Response& response)
-{
-    ::uint64_t startByte{ _offset };
-    std::ifstream ifs{ _path.string().c_str(), std::ios::in | std::ios::binary };
-    if (!ifs)
+    std::unique_ptr<IResourceHandler> createFileResourceHandler(const std::filesystem::path& path)
     {
-        const int err{ errno };
-        FS_LOG(UTILS, ERROR) << "Cannot open input file '" << _path.string() << "': " << std::string{ ::strerror(err) };
-        _isFinished = true;
-
-        if (startByte == 0)
-            response.setStatus(404);
-
-        return;
+        return std::make_unique<FileResourceHandler>(path);
     }
 
-    if (startByte == 0)
+    FileResourceHandler::FileResourceHandler(const std::filesystem::path& path)
+        : _path{ path }
     {
-        response.setStatus(200);
+    }
 
-        ifs.seekg(0, std::ios::end);
-        const ::uint64_t fileSize{ static_cast<::uint64_t>(ifs.tellg()) };
-        ifs.seekg(0, std::ios::beg);
-
-        FS_LOG(UTILS, DEBUG) << "File '" << _path.string() << "', fileSize = " << fileSize;
-
-        const Wt::Http::Request::ByteRangeSpecifier ranges{ request.getRanges(fileSize) };
-        if (!ranges.isSatisfiable())
+    void FileResourceHandler::processRequest(const Wt::Http::Request& request, Wt::Http::Response& response)
+    {
+        ::uint64_t startByte{ _offset };
+        std::ifstream ifs{ _path.string().c_str(), std::ios::in | std::ios::binary };
+        if (!ifs)
         {
-            std::ostringstream contentRange;
-            contentRange << "bytes */" << fileSize;
-            response.setStatus(416); // Requested range not satisfiable
-            response.addHeader("Content-Range", contentRange.str());
+            const int err{ errno };
+            FS_LOG(UTILS, ERROR) << "Cannot open input file '" << _path.string() << "': " << std::string{ ::strerror(err) };
+            _isFinished = true;
 
-            FS_LOG(UTILS, DEBUG) << "Range not satisfiable";
+            if (startByte == 0)
+                response.setStatus(404);
+
+            return;
+        }
+
+        if (startByte == 0)
+        {
+            response.setStatus(200);
+
+            ifs.seekg(0, std::ios::end);
+            const ::uint64_t fileSize{ static_cast<::uint64_t>(ifs.tellg()) };
+            ifs.seekg(0, std::ios::beg);
+
+            FS_LOG(UTILS, DEBUG) << "File '" << _path.string() << "', fileSize = " << fileSize;
+
+            const Wt::Http::Request::ByteRangeSpecifier ranges{ request.getRanges(fileSize) };
+            if (!ranges.isSatisfiable())
+            {
+                std::ostringstream contentRange;
+                contentRange << "bytes */" << fileSize;
+                response.setStatus(416); // Requested range not satisfiable
+                response.addHeader("Content-Range", contentRange.str());
+
+                FS_LOG(UTILS, DEBUG) << "Range not satisfiable";
+                _isFinished = true;
+                return;
+            }
+
+            if (ranges.size() == 1)
+            {
+                FS_LOG(UTILS, DEBUG) << "Range requested = " << ranges[0].firstByte() << "/" << ranges[0].lastByte();
+
+                response.setStatus(206);
+                startByte = ranges[0].firstByte();
+                _beyondLastByte = ranges[0].lastByte() + 1;
+
+                std::ostringstream contentRange;
+                contentRange << "bytes " << startByte << "-"
+                             << _beyondLastByte - 1 << "/" << fileSize;
+
+                response.addHeader("Content-Range", contentRange.str());
+                response.setContentLength(_beyondLastByte - startByte);
+            }
+            else
+            {
+                FS_LOG(UTILS, DEBUG) << "No range requested";
+
+                _beyondLastByte = fileSize;
+                response.setContentLength(_beyondLastByte);
+            }
+        }
+
+        if (!ifs.seekg(static_cast<std::istream::pos_type>(startByte)))
+        {
+            const int err{ errno };
+            FS_LOG(UTILS, ERROR) << "Failed to seek in file '" << _path.string() << "' at " << startByte << ": " << std::string{ ::strerror(err) };
             _isFinished = true;
             return;
         }
 
-        if (ranges.size() == 1)
+        std::vector<char> buf;
+        buf.resize(_chunkSize);
+
+        ::uint64_t restSize = _beyondLastByte - startByte;
+        ::uint64_t pieceSize = buf.size() > restSize ? restSize : buf.size();
+
+        if (!ifs.read(&buf[0], pieceSize))
         {
-            FS_LOG(UTILS, DEBUG) << "Range requested = " << ranges[0].firstByte() << "/" << ranges[0].lastByte();
-
-            response.setStatus(206);
-            startByte = ranges[0].firstByte();
-            _beyondLastByte = ranges[0].lastByte() + 1;
-
-            std::ostringstream contentRange;
-            contentRange << "bytes " << startByte << "-"
-                         << _beyondLastByte - 1 << "/" << fileSize;
-
-            response.addHeader("Content-Range", contentRange.str());
-            response.setContentLength(_beyondLastByte - startByte);
+            const int err{ errno };
+            FS_LOG(UTILS, ERROR) << "Read failed in file '" << _path.string() << "': " << std::string{ ::strerror(err) };
+            _isFinished = true;
+            return;
         }
-        else
+        const ::uint64_t actualPieceSize{ static_cast<::uint64_t>(ifs.gcount()) };
+        response.out().write(&buf[0], actualPieceSize);
+
+        if (ifs.good() && actualPieceSize < restSize)
         {
-            FS_LOG(UTILS, DEBUG) << "No range requested";
-
-            _beyondLastByte = fileSize;
-            response.setContentLength(_beyondLastByte);
+            _offset = startByte + actualPieceSize;
+            return;
         }
-    }
 
-    if (!ifs.seekg(static_cast<std::istream::pos_type>(startByte)))
-    {
-        const int err{ errno };
-        FS_LOG(UTILS, ERROR) << "Failed to seek in file '" << _path.string() << "' at " << startByte << ": " << std::string{ ::strerror(err) };
         _isFinished = true;
-        return;
     }
 
-    std::vector<char> buf;
-    buf.resize(_chunkSize);
-
-    ::uint64_t restSize = _beyondLastByte - startByte;
-    ::uint64_t pieceSize = buf.size() > restSize ? restSize : buf.size();
-
-    if (!ifs.read(&buf[0], pieceSize))
+    bool FileResourceHandler::isComplete() const
     {
-        const int err{ errno };
-        FS_LOG(UTILS, ERROR) << "Read failed in file '" << _path.string() << "': " << std::string{ ::strerror(err) };
+        return _isFinished;
+    }
+
+    void FileResourceHandler::abort()
+    {
         _isFinished = true;
-        return;
     }
-    const ::uint64_t actualPieceSize{ static_cast<::uint64_t>(ifs.gcount()) };
-    response.out().write(&buf[0], actualPieceSize);
-
-    if (ifs.good() && actualPieceSize < restSize)
-    {
-        _offset = startByte + actualPieceSize;
-        return;
-    }
-
-    _isFinished = true;
-}
-
-bool FileResourceHandler::isComplete() const
-{
-    return _isFinished;
-}
-
-void FileResourceHandler::abort()
-{
-    _isFinished = true;
-}
+} // namespace fs

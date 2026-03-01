@@ -20,7 +20,6 @@
 #pragma once
 
 #include <filesystem>
-#include <string_view>
 
 #include <Wt/Dbo/WtSqlTraits.h>
 
@@ -29,43 +28,43 @@
 namespace Wt::Dbo
 {
     template<>
-    struct sql_value_traits<UUID, void>
+    struct sql_value_traits<fs::UUID, void>
     {
         static const bool specialized = true;
 
         static const char* type(SqlConnection* conn, int size);
-        static void bind(const UUID& v, SqlStatement* statement, int column, int size);
-        static bool read(UUID& v, SqlStatement* statement, int column, int size);
+        static void bind(const fs::UUID& uuid, SqlStatement* statement, int column, int size);
+        static bool read(fs::UUID& uuid, SqlStatement* statement, int column, int size);
     };
 
     template<>
-    struct sql_value_traits<Share::ShareUUID, void>
+    struct sql_value_traits<fs::share::ShareUUID, void>
     {
         static const bool specialized = true;
 
-        static const char* type(SqlConnection* conn, int size) { return sql_value_traits<UUID, void>::type(conn, size); }
-        static void bind(const Share::ShareUUID& v, SqlStatement* statement, int column, int size) { sql_value_traits<UUID, void>::bind(v, statement, column, size); }
-        static bool read(Share::ShareUUID& v, SqlStatement* statement, int column, int size) { return sql_value_traits<UUID, void>::read(v, statement, column, size); }
+        static const char* type(SqlConnection* conn, int size) { return sql_value_traits<fs::UUID, void>::type(conn, size); }
+        static void bind(const fs::share::ShareUUID& v, SqlStatement* statement, int column, int size) { sql_value_traits<fs::UUID, void>::bind(v, statement, column, size); }
+        static bool read(fs::share::ShareUUID& v, SqlStatement* statement, int column, int size) { return sql_value_traits<fs::UUID, void>::read(v, statement, column, size); }
     };
 
     template<>
-    struct sql_value_traits<Share::ShareEditUUID, void>
+    struct sql_value_traits<fs::share::ShareEditUUID, void>
     {
         static const bool specialized = true;
 
-        static const char* type(SqlConnection* conn, int size) { return sql_value_traits<UUID, void>::type(conn, size); }
-        static void bind(const Share::ShareEditUUID& v, SqlStatement* statement, int column, int size) { sql_value_traits<UUID, void>::bind(v, statement, column, size); }
-        static bool read(Share::ShareEditUUID& v, SqlStatement* statement, int column, int size) { return sql_value_traits<UUID, void>::read(v, statement, column, size); }
+        static const char* type(SqlConnection* conn, int size) { return sql_value_traits<fs::UUID, void>::type(conn, size); }
+        static void bind(const fs::share::ShareEditUUID& v, SqlStatement* statement, int column, int size) { sql_value_traits<fs::UUID, void>::bind(v, statement, column, size); }
+        static bool read(fs::share::ShareEditUUID& v, SqlStatement* statement, int column, int size) { return sql_value_traits<fs::UUID, void>::read(v, statement, column, size); }
     };
 
     template<>
-    struct sql_value_traits<Share::FileUUID, void>
+    struct sql_value_traits<fs::share::FileUUID, void>
     {
         static const bool specialized = true;
 
-        static const char* type(SqlConnection* conn, int size) { return sql_value_traits<UUID, void>::type(conn, size); }
-        static void bind(const Share::FileUUID& v, SqlStatement* statement, int column, int size) { sql_value_traits<UUID, void>::bind(v, statement, column, size); }
-        static bool read(Share::FileUUID& v, SqlStatement* statement, int column, int size) { return sql_value_traits<UUID, void>::read(v, statement, column, size); }
+        static const char* type(SqlConnection* conn, int size) { return sql_value_traits<fs::UUID, void>::type(conn, size); }
+        static void bind(const fs::share::FileUUID& v, SqlStatement* statement, int column, int size) { sql_value_traits<fs::UUID, void>::bind(v, statement, column, size); }
+        static bool read(fs::share::FileUUID& v, SqlStatement* statement, int column, int size) { return sql_value_traits<fs::UUID, void>::read(v, statement, column, size); }
     };
 
     template<>
@@ -79,13 +78,13 @@ namespace Wt::Dbo
     };
 
     template<>
-    struct sql_value_traits<Share::FileSize, void>
+    struct sql_value_traits<fs::share::FileSize, void>
     {
         static const bool specialized = true;
 
         static std::string type(SqlConnection* conn, int size);
-        static void bind(Share::FileSize v, SqlStatement* statement, int column, int size);
-        static bool read(Share::FileSize& v, SqlStatement* statement, int column, int size);
+        static void bind(fs::share::FileSize v, SqlStatement* statement, int column, int size);
+        static bool read(fs::share::FileSize& v, SqlStatement* statement, int column, int size);
     };
 
 } // namespace Wt::Dbo

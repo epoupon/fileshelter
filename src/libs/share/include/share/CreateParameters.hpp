@@ -23,7 +23,7 @@
 #include <filesystem>
 #include <string>
 
-namespace Share
+namespace fs::share
 {
     struct FileCreateParameters
     {
@@ -38,4 +38,4 @@ namespace Share
         std::string creatorAddress;
         std::string password;
     };
-} // namespace Share
+} // namespace fs::share

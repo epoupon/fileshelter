@@ -19,7 +19,7 @@
 
 #include "ProgressBar.hpp"
 
-namespace UserInterface
+namespace fs::ui
 {
     ProgressBar::ProgressBar()
         : Wt::WTemplate{ tr("template-progress-bar") }
@@ -42,4 +42,4 @@ namespace UserInterface
         _text->setText(std::to_string(value) + "%");
     }
 
-} // namespace UserInterface
+} // namespace fs::ui

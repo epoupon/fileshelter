@@ -27,33 +27,37 @@
 
 #include "share/Types.hpp"
 
-namespace Share
+namespace fs
 {
-    class IShare;
-}
+    namespace share
+    {
+        class IShare;
+    }
 
-namespace Zip
-{
-    class IZipper;
-}
+    namespace zip
+    {
+        class IZipper;
+    }
 
-class ShareResource : public Wt::WResource
-{
-public:
-    ~ShareResource();
+    class ShareResource : public Wt::WResource
+    {
+    public:
+        ~ShareResource() override;
 
-    void setWorkingDirectory(std::filesystem::path workingDirectory);
+        void setWorkingDirectory(const std::filesystem::path& workingDirectory);
 
-    static void setDeployPath(std::string_view deployPath) { _deployPath = deployPath; }
-    static std::string_view getDeployPath() { return _deployPath; }
-    static Wt::WLink createLink(const Share::ShareUUID& shareId, std::optional<std::string_view> password);
+        static void setDeployPath(std::string_view deployPath) { _deployPath = deployPath; }
+        static std::string_view getDeployPath() { return _deployPath; }
+        static Wt::WLink createLink(const share::ShareUUID& shareId, std::optional<std::string_view> password);
+        static Wt::WLink createLink(const share::ShareUUID& shareId, const share::FileUUID& fileId, std::optional<std::string_view> password);
 
-private:
-    std::filesystem::path getAbsolutePath(const std::filesystem::path& p);
-    std::unique_ptr<Zip::IZipper> createZipper(const Share::ShareDesc& share);
+    private:
+        std::filesystem::path getAbsolutePath(const std::filesystem::path& p);
+        std::unique_ptr<zip::IZipper> createZipper(const share::ShareDesc& share);
 
-    std::filesystem::path _workingDirectory;
-    static inline std::string _deployPath;
-    void handleRequest(const Wt::Http::Request& request, Wt::Http::Response& response) override;
-    void handleAbort(const Wt::Http::Request& request) override;
-};
+        std::filesystem::path _workingDirectory;
+        static inline std::string _deployPath;
+        void handleRequest(const Wt::Http::Request& request, Wt::Http::Response& response) override;
+        void handleAbort(const Wt::Http::Request& request) override;
+    };
+} // namespace fs

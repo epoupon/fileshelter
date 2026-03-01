@@ -25,7 +25,6 @@ target_include_directories(fileshelter PRIVATE
 target_link_libraries(fileshelter PRIVATE
 	filesheltershare
 	fileshelterutils
-	std::filesystem
 	Wt::Wt
 	Wt::HTTP
 	)

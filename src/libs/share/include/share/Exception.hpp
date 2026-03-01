@@ -23,7 +23,7 @@
 
 #include "utils/Exception.hpp"
 
-namespace Share
+namespace fs::share
 {
     class Exception : public FsException
     {
@@ -54,4 +54,4 @@ namespace Share
         OutOfRangeValidityPeriod()
             : Exception{ "Validity period out of range" } {}
     };
-} // namespace Share
+} // namespace fs::share

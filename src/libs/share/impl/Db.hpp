@@ -27,7 +27,7 @@
 #include <Wt/Dbo/Session.h>
 #include <Wt/Dbo/SqlConnectionPool.h>
 
-namespace Share
+namespace fs::share
 {
     class Db
     {
@@ -50,4 +50,4 @@ namespace Share
         std::mutex _tlsSessionsMutex;
         std::vector<std::unique_ptr<Wt::Dbo::Session>> _tlsSessions;
     };
-} // namespace Share
+} // namespace fs::share

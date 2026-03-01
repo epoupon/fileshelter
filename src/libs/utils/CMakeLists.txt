@@ -23,7 +23,6 @@ target_link_libraries(fileshelterutils PRIVATE
 	)
 
 target_link_libraries(fileshelterutils PUBLIC
-	std::filesystem
 	Wt::Wt
 	)
 

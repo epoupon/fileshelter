@@ -24,8 +24,8 @@
 
 #include <Wt/WApplication.h>
 
-namespace UserInterface
+namespace fs::ui
 {
     std::filesystem::path prepareUploadDirectory();
     std::unique_ptr<Wt::WApplication> createFileShelterApplication(const Wt::WEnvironment& env);
-} // namespace UserInterface
+} // namespace fs::ui
