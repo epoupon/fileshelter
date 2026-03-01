@@ -21,13 +21,13 @@
 
 #include <Wt/WLocalDateTime.h>
 
-#include "File.hpp"
-#include "Types.hpp"
 #include "utils/Logger.hpp"
 
-namespace Share
-{
+#include "File.hpp"
+#include "Types.hpp"
 
+namespace fs::share
+{
     FileSize Share::getShareSize() const
     {
         assert(self());
@@ -120,5 +120,4 @@ namespace Share
         _passwordSalt = passwordHash.salt();
         _passwordHashFunc = passwordHash.function();
     }
-
-} // namespace Share
+} // namespace fs::share

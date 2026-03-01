@@ -21,18 +21,18 @@
 
 namespace Wt::Dbo
 {
-    const char* sql_value_traits<UUID, void>::type(SqlConnection* conn, int)
+    const char* sql_value_traits<fs::UUID, void>::type(SqlConnection* conn, int)
     {
         return conn->blobType();
     }
 
-    void sql_value_traits<UUID, void>::bind(const UUID& uuid, SqlStatement* statement, int column, int /* size */)
+    void sql_value_traits<fs::UUID, void>::bind(const fs::UUID& uuid, SqlStatement* statement, int column, int /* size */)
     {
         const std::vector<unsigned char> value(uuid.cbegin(), uuid.cend());
         statement->bind(column, value);
     }
 
-    bool sql_value_traits<UUID, void>::read(UUID& id, SqlStatement* statement, int column, int size)
+    bool sql_value_traits<fs::UUID, void>::read(fs::UUID& id, SqlStatement* statement, int column, int size)
     {
         std::vector<unsigned char> data;
 
@@ -78,20 +78,20 @@ namespace Wt::Dbo
         }
     }
 
-    std::string sql_value_traits<Share::FileSize, void>::type(SqlConnection* conn, int)
+    std::string sql_value_traits<fs::share::FileSize, void>::type(SqlConnection* conn, int)
     {
         return conn->longLongType();
     }
 
-    void sql_value_traits<Share::FileSize, void>::bind(Share::FileSize v, SqlStatement* statement, int column, int)
+    void sql_value_traits<fs::share::FileSize, void>::bind(fs::share::FileSize v, SqlStatement* statement, int column, int)
     {
-        if (v > Share::FileSize{ std::numeric_limits<long long>::max() })
-            throw FsException{ "File size too big to fit in db" };
+        if (v > fs::share::FileSize{ std::numeric_limits<long long>::max() })
+            throw fs::FsException{ "File size too big to fit in db" };
 
         statement->bind(column, static_cast<long long>(v));
     }
 
-    bool sql_value_traits<Share::FileSize, void>::read(Share::FileSize& fileSize, SqlStatement* statement, int column, int)
+    bool sql_value_traits<fs::share::FileSize, void>::read(fs::share::FileSize& fileSize, SqlStatement* statement, int column, int)
     {
         long long readData{};
         if (statement->getResult(column, &readData))

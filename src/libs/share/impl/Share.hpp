@@ -19,14 +19,15 @@
 
 #pragma once
 
-#include "Traits.hpp"
-#include "share/CreateParameters.hpp"
 #include <Wt/Auth/PasswordHash.h>
 #include <Wt/Dbo/Dbo.h>
 
-namespace Share
-{
+#include "share/CreateParameters.hpp"
 
+#include "Traits.hpp"
+
+namespace fs::share
+{
     class File;
 
     class Share : public Wt::Dbo::Dbo<Share>
@@ -102,5 +103,4 @@ namespace Share
 
         Wt::Dbo::collection<Wt::Dbo::ptr<File>> _files;
     };
-
-} // namespace Share
+} // namespace fs::share

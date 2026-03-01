@@ -23,7 +23,7 @@
 #include <Wt/WTemplate.h>
 #include <Wt/WText.h>
 
-namespace UserInterface
+namespace fs::ui
 {
     class ProgressBar : public Wt::WTemplate
     {
@@ -35,4 +35,4 @@ namespace UserInterface
         Wt::WContainerWidget* _progress{};
         Wt::WText* _text{};
     };
-} // namespace UserInterface
+} // namespace fs::ui

@@ -29,7 +29,7 @@
 
 #include "ShareUtils.hpp"
 
-namespace UserInterface
+namespace fs::ui
 {
     ShareCreated::ShareCreated()
     {
@@ -49,9 +49,9 @@ namespace UserInterface
 
         try
         {
-            const Share::ShareEditUUID shareEditUUID{ wApp->internalPathNextPart("/share-created/") };
+            const share::ShareEditUUID shareEditUUID{ wApp->internalPathNextPart("/share-created/") };
 
-            const Share::ShareDesc share{ Service<Share::IShareManager>::get()->getShareDesc(shareEditUUID) };
+            const share::ShareDesc share{ Service<share::IShareManager>::get()->getShareDesc(shareEditUUID) };
 
             Wt::WTemplate* t{ addNew<Wt::WTemplate>(tr("template-share-created")) };
             t->addFunction("tr", &Wt::WTemplate::Functions::tr);
@@ -59,7 +59,7 @@ namespace UserInterface
             t->bindWidget("download-link", ShareUtils::createShareDownloadAnchor(share.uuid));
             t->bindWidget("edit-link", ShareUtils::createShareEditAnchor(shareEditUUID));
         }
-        catch (const Share::ShareNotFoundException& e)
+        catch (const share::ShareNotFoundException& e)
         {
             displayShareNotFound();
         }
@@ -75,4 +75,4 @@ namespace UserInterface
         addNew<Wt::WTemplate>(tr("template-share-not-found"))->addFunction("tr", &Wt::WTemplate::Functions::tr);
     }
 
-} // namespace UserInterface
+} // namespace fs::ui

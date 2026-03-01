@@ -28,7 +28,7 @@
 
 #include "share/Types.hpp"
 
-namespace Share
+namespace fs::share
 {
     class IShare;
 
@@ -59,4 +59,4 @@ namespace Share
     };
 
     std::unique_ptr<IShareManager> createShareManager(bool enableCleaner);
-} // namespace Share
+} // namespace fs::share

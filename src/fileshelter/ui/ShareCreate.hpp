@@ -24,7 +24,7 @@
 #include <Wt/WContainerWidget.h>
 #include <Wt/WString.h>
 
-namespace UserInterface
+namespace fs::ui
 {
     class ShareCreate : public Wt::WContainerWidget
     {
@@ -40,4 +40,4 @@ namespace UserInterface
         const std::filesystem::path& _workingDirectory;
         bool _isPasswordVerified{};
     };
-} // namespace UserInterface
+} // namespace fs::ui

@@ -23,22 +23,25 @@
 
 #include "ICommand.hpp"
 
-class ListCommand : public ICommand
+namespace fs
 {
-public:
-    ListCommand(std::string_view processArg);
-    ~ListCommand() override = default;
+    class ListCommand : public ICommand
+    {
+    public:
+        ListCommand(std::string_view processArg);
+        ~ListCommand() override = default;
 
-    ListCommand(const ListCommand&) = delete;
-    ListCommand& operator=(const ListCommand&) = delete;
+        ListCommand(const ListCommand&) = delete;
+        ListCommand& operator=(const ListCommand&) = delete;
 
-private:
-    std::string_view getName() const override { return "list"; }
-    std::string_view getDescription() const override { return "List available shares"; }
+    private:
+        std::string_view getName() const override { return "list"; }
+        std::string_view getDescription() const override { return "List available shares"; }
 
-    void displayHelp(std::ostream& os) const override;
-    int process(const std::vector<std::string>& args) const override;
+        void displayHelp(std::ostream& os) const override;
+        int process(const std::vector<std::string>& args) const override;
 
-    const std::string _processArg;
-    boost::program_options::options_description _options;
-};
+        const std::string _processArg;
+        boost::program_options::options_description _options;
+    };
+} // namespace fs

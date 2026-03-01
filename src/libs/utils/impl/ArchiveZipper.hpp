@@ -30,7 +30,7 @@ extern "C"
     struct archive_entry;
 };
 
-namespace Zip
+namespace fs::zip
 {
     class ArchiveZipper : public IZipper
     {
@@ -78,4 +78,4 @@ namespace Zip
         std::uint64_t _bytesWrittenInCurrentOutputStream{};
     };
 
-} // namespace Zip
+} // namespace fs::zip

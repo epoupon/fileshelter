@@ -31,7 +31,7 @@
 #include "ShareCreateFormView.hpp"
 #include "ShareCreatePassword.hpp"
 
-namespace UserInterface
+namespace fs::ui
 {
 
     class ShareCreateProgress : public Wt::WTemplate
@@ -88,7 +88,7 @@ namespace UserInterface
 
     void ShareCreate::displayCreate()
     {
-        using namespace Share;
+        using namespace fs::share;
 
         enum CreateStack
         {
@@ -109,7 +109,7 @@ namespace UserInterface
 
         form->complete().connect([this](const ShareCreateParameters& shareParameters, const std::vector<FileCreateParameters>& filesParameters) {
             FS_LOG(UI, DEBUG) << "Upload complete!";
-            const Share::ShareDesc shareDesc{ Service<IShareManager>::get()->createShare(shareParameters, filesParameters, true /* transfer file ownership */) };
+            const share::ShareDesc shareDesc{ Service<IShareManager>::get()->createShare(shareParameters, filesParameters, true /* transfer file ownership */) };
 
             FS_LOG(UI, DEBUG) << "Redirecting...";
             wApp->setInternalPath("/share-created/" + shareDesc.editUuid.toString(), true);
@@ -121,4 +121,4 @@ namespace UserInterface
         });
     }
 
-} // namespace UserInterface
+} // namespace fs::ui

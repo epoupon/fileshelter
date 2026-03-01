@@ -19,19 +19,20 @@
 
 #include "Share.hpp"
 
-#include "ShareManager.hpp"
+#include <Wt/Auth/HashFunction.h>
+#include <Wt/WLocalDateTime.h>
 
-#include "File.hpp"
-#include "Share.hpp"
-#include "ShareCleaner.hpp"
 #include "share/Exception.hpp"
 #include "utils/IConfig.hpp"
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
-#include <Wt/Auth/HashFunction.h>
-#include <Wt/WLocalDateTime.h>
 
-namespace Share
+#include "File.hpp"
+#include "Share.hpp"
+#include "ShareCleaner.hpp"
+#include "ShareManager.hpp"
+
+namespace fs::share
 {
     static ShareDesc shareToDesc(const Share& share)
     {
@@ -193,7 +194,7 @@ namespace Share
         {
             Wt::Dbo::Transaction transaction{ session };
 
-            const Share::Share::pointer share{ Share::Share::getByUUID(session, shareUUID) };
+            const share::Share::pointer share{ Share::getByUUID(session, shareUUID) };
             if (!share || share->isExpired())
                 throw ShareNotFoundException{};
 
@@ -273,4 +274,4 @@ namespace Share
         if (shareSize >= _maxShareSize)
             throw ShareTooLargeException{};
     }
-} // namespace Share
+} // namespace fs::share

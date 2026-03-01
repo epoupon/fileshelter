@@ -27,7 +27,7 @@
 #include "PasswordUtils.hpp"
 #include "utils/Logger.hpp"
 
-namespace UserInterface
+namespace fs::ui
 {
     class ShareCreatePasswordValidator : public Wt::WValidator
     {
@@ -105,4 +105,4 @@ namespace UserInterface
 
         updateView(model.get());
     }
-} // namespace UserInterface
+} // namespace fs::ui

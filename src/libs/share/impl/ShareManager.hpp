@@ -21,10 +21,11 @@
 
 #include <Wt/Auth/PasswordVerifier.h>
 
-#include "Db.hpp"
 #include "share/IShareManager.hpp"
 
-namespace Share
+#include "Db.hpp"
+
+namespace fs::share
 {
     class ShareCleaner;
 
@@ -69,4 +70,4 @@ namespace Share
         const std::size_t _maxValidityHits{};
         const bool _canValidityPeriodBeSet{};
     };
-} // namespace Share
+} // namespace fs::share

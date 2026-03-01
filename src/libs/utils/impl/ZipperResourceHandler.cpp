@@ -21,39 +21,42 @@
 
 #include "utils/Logger.hpp"
 
-std::unique_ptr<IResourceHandler> createZipperResourceHandler(std::unique_ptr<Zip::IZipper> zipper)
+namespace fs
 {
-    return std::make_unique<ZipperResourceHandler>(std::move(zipper));
-}
-
-ZipperResourceHandler::ZipperResourceHandler(std::unique_ptr<Zip::IZipper> zipper)
-    : _zipper{ std::move(zipper) }
-{
-}
-
-void ZipperResourceHandler::processRequest(const Wt::Http::Request&, Wt::Http::Response& response)
-{
-    try
+    std::unique_ptr<IResourceHandler> createZipperResourceHandler(std::unique_ptr<zip::IZipper> zipper)
     {
-        _zipper->writeSome(response.out());
+        return std::make_unique<ZipperResourceHandler>(std::move(zipper));
     }
-    catch (const Zip::Exception& e)
+
+    ZipperResourceHandler::ZipperResourceHandler(std::unique_ptr<zip::IZipper> zipper)
+        : _zipper{ std::move(zipper) }
     {
-        FS_LOG(UTILS, ERROR) << "Caught exception while writing zip: " << e.what();
+    }
+
+    void ZipperResourceHandler::processRequest(const Wt::Http::Request&, Wt::Http::Response& response)
+    {
+        try
+        {
+            _zipper->writeSome(response.out());
+        }
+        catch (const zip::Exception& e)
+        {
+            FS_LOG(UTILS, ERROR) << "Caught exception while writing zip: " << e.what();
+            _zipper.reset();
+        }
+    }
+
+    bool ZipperResourceHandler::isComplete() const
+    {
+        return !_zipper || _zipper->isComplete();
+    }
+
+    void ZipperResourceHandler::abort()
+    {
+        if (!_zipper)
+            return;
+
+        _zipper->abort();
         _zipper.reset();
     }
-}
-
-bool ZipperResourceHandler::isComplete() const
-{
-    return !_zipper || _zipper->isComplete();
-}
-
-void ZipperResourceHandler::abort()
-{
-    if (!_zipper)
-        return;
-
-    _zipper->abort();
-    _zipper.reset();
-}
+} // namespace fs

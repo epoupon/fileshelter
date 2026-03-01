@@ -28,12 +28,12 @@
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
 
-namespace UserInterface
+namespace fs::ui
 {
     class ShareDownloadPasswordValidator : public Wt::WValidator
     {
     public:
-        ShareDownloadPasswordValidator(const Share::ShareUUID& shareUUID)
+        ShareDownloadPasswordValidator(const share::ShareUUID& shareUUID)
             : _shareUUID{ shareUUID }
         {
             setMandatory(true);
@@ -51,21 +51,21 @@ namespace UserInterface
 
             try
             {
-                _shareDesc = Service<Share::IShareManager>::get()->getShareDesc(_shareUUID, input.toUTF8());
+                _shareDesc = Service<share::IShareManager>::get()->getShareDesc(_shareUUID, input.toUTF8());
 
                 return Result{ Wt::ValidationState::Valid };
             }
-            catch (const Share::ShareNotFoundException& e)
+            catch (const share::ShareNotFoundException& e)
             {
                 return Result{ Wt::ValidationState::Invalid, Wt::WString::tr("msg-bad-password") };
             }
         }
 
-        const std::optional<Share::ShareDesc>& getShareDesc() const { return _shareDesc; }
+        const std::optional<share::ShareDesc>& getShareDesc() const { return _shareDesc; }
 
     private:
-        const Share::ShareUUID _shareUUID;
-        mutable std::optional<Share::ShareDesc> _shareDesc; // cache to save password evaluation
+        const share::ShareUUID _shareUUID;
+        mutable std::optional<share::ShareDesc> _shareDesc; // cache to save password evaluation
     };
 
     class ShareDownloadPasswordFormModel : public Wt::WFormModel
@@ -73,20 +73,20 @@ namespace UserInterface
     public:
         static inline const Field PasswordField{ "password" };
 
-        ShareDownloadPasswordFormModel(const Share::ShareUUID& shareUUID)
+        ShareDownloadPasswordFormModel(const share::ShareUUID& shareUUID)
         {
             addField(PasswordField);
 
             setValidator(PasswordField, std::make_unique<ShareDownloadPasswordValidator>(shareUUID));
         }
 
-        const std::optional<Share::ShareDesc>& getShareDesc() const
+        const std::optional<share::ShareDesc>& getShareDesc() const
         {
             return std::dynamic_pointer_cast<ShareDownloadPasswordValidator>(validator(PasswordField))->getShareDesc();
         }
     };
 
-    ShareDownloadPassword::ShareDownloadPassword(const Share::ShareUUID& shareUUID)
+    ShareDownloadPassword::ShareDownloadPassword(const share::ShareUUID& shareUUID)
     {
         auto model{ std::make_shared<ShareDownloadPasswordFormModel>(shareUUID) };
 
@@ -122,4 +122,4 @@ namespace UserInterface
 
         updateView(model.get());
     }
-} // namespace UserInterface
+} // namespace fs::ui

@@ -33,7 +33,7 @@
 
 #include "ShareUtils.hpp"
 
-namespace UserInterface
+namespace fs::ui
 {
     ShareEdit::ShareEdit()
     {
@@ -53,10 +53,10 @@ namespace UserInterface
 
         try
         {
-            const Share::ShareEditUUID editUUID{ wApp->internalPathNextPart("/share-edit/") };
+            const share::ShareEditUUID editUUID{ wApp->internalPathNextPart("/share-edit/") };
             displayEdit(editUUID);
         }
-        catch (const Share::ShareNotFoundException& e)
+        catch (const share::ShareNotFoundException& e)
         {
             displayShareNotFound();
         }
@@ -66,9 +66,9 @@ namespace UserInterface
         }
     }
 
-    void ShareEdit::displayEdit(const Share::ShareEditUUID& editUUID)
+    void ShareEdit::displayEdit(const share::ShareEditUUID& editUUID)
     {
-        const Share::ShareDesc share{ Service<Share::IShareManager>::get()->getShareDesc(editUUID) };
+        const share::ShareDesc share{ Service<share::IShareManager>::get()->getShareDesc(editUUID) };
 
         FS_LOG(UI, INFO) << "[" << share.uuid.toString() << "] Editing share from " << wApp->environment().clientAddress();
 
@@ -95,13 +95,13 @@ namespace UserInterface
                 {
                     if (btn == Wt::StandardButton::Yes)
                     {
-                        Service<Share::IShareManager>::get()->destroyShare(editUUID);
+                        Service<share::IShareManager>::get()->destroyShare(editUUID);
                         displayRemoved();
                     }
                     else
                         deleteBtn->removeChild(messageBox);
                 }
-                catch (const Share::ShareNotFoundException& e)
+                catch (const share::ShareNotFoundException& e)
                 {
                     FS_LOG(UI, DEBUG) << "Share already removed!";
                     displayShareNotFound();
@@ -123,4 +123,4 @@ namespace UserInterface
         clear();
         addNew<Wt::WTemplate>(tr("template-share-not-found"))->addFunction("tr", &Wt::WTemplate::Functions::tr);
     }
-} // namespace UserInterface
+} // namespace fs::ui

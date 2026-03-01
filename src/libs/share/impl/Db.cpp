@@ -29,7 +29,7 @@
 #include "utils/Exception.hpp"
 #include "utils/Logger.hpp"
 
-namespace Share
+namespace fs::share
 {
 
     using Version = int;
@@ -156,4 +156,4 @@ namespace Share
             throw FsException{ "Database too old, migration not supported" };
         }
     }
-} // namespace Share
+} // namespace fs::share

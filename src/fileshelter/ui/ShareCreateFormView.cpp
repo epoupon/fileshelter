@@ -34,7 +34,7 @@
 #include "utils/Logger.hpp"
 #include "utils/Service.hpp"
 
-namespace UserInterface
+namespace fs::ui
 {
     unsigned ShareCreateFormView::getProgress() const
     {
@@ -86,7 +86,7 @@ namespace UserInterface
         // Desc
         setFormWidget(ShareCreateFormModel::DescriptionField, std::make_unique<Wt::WLineEdit>());
 
-        if (Service<Share::IShareManager>::get()->canValidityPeriodBeSet())
+        if (Service<share::IShareManager>::get()->canValidityPeriodBeSet())
         {
             setCondition("if-validity-period", true);
             // Validity period
@@ -191,7 +191,7 @@ namespace UserInterface
 
     void ShareCreateFormView::emitDone()
     {
-        using namespace Share;
+        using namespace fs::share;
 
         ShareCreateParameters params;
 
@@ -200,10 +200,10 @@ namespace UserInterface
         params.password = _model->valueText(ShareCreateFormModel::PasswordField).toUTF8();
         params.creatorAddress = wApp->environment().clientAddress();
 
-        std::vector<Share::FileCreateParameters> filesParameters;
+        std::vector<share::FileCreateParameters> filesParameters;
 
         visitUploadedFiles([&](const Wt::WFileDropWidget::File& file) {
-            Share::FileCreateParameters fileParameters;
+            share::FileCreateParameters fileParameters;
 
             fileParameters.path = getRelativeToWorkingDirectoryPath(file.uploadedFile().spoolFileName());
             fileParameters.name = file.uploadedFile().clientFileName();
@@ -239,7 +239,7 @@ namespace UserInterface
 
     bool ShareCreateFormView::isShareSizeOverflow() const
     {
-        return getTotalFileSize() > Service<Share::IShareManager>::get()->getMaxShareSize();
+        return getTotalFileSize() > Service<share::IShareManager>::get()->getMaxShareSize();
     }
 
     bool ShareCreateFormView::hasDuplicateNames() const
@@ -276,7 +276,7 @@ namespace UserInterface
 
         const bool overflow{ isShareSizeOverflow() };
         if (overflow)
-            errorMsg = Wt::WString::tr("msg-max-share-size").arg(ShareUtils::fileSizeToString(Service<Share::IShareManager>::get()->getMaxShareSize()));
+            errorMsg = Wt::WString::tr("msg-max-share-size").arg(ShareUtils::fileSizeToString(Service<share::IShareManager>::get()->getMaxShareSize()));
 
         const bool duplicateNames{ hasDuplicateNames() };
         if (duplicateNames)
@@ -328,4 +328,4 @@ namespace UserInterface
 
         return res;
     }
-} // namespace UserInterface
+} // namespace fs::ui

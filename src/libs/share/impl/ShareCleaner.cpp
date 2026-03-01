@@ -21,13 +21,13 @@
 
 #include <Wt/WLocalDateTime.h>
 
+#include "utils/Logger.hpp"
+
 #include "Db.hpp"
 #include "File.hpp"
 #include "Share.hpp"
-#include "utils/Logger.hpp"
-#include "utils/Service.hpp"
 
-namespace Share
+namespace fs::share
 {
     ShareCleaner::ShareCleaner(Db& db, const std::filesystem::path& workingDirectory)
         : _db{ db }
@@ -125,4 +125,4 @@ namespace Share
             }
         });
     }
-} // namespace Share
+} // namespace fs::share

@@ -29,7 +29,7 @@ namespace Wt::Dbo
     class Session;
 }
 
-namespace UserInterface
+namespace fs::ui
 {
     class FileShelterApplication : public Wt::WApplication
     {
@@ -53,4 +53,4 @@ namespace UserInterface
 
 #define FsApp FileShelterApplication::instance()
 
-} // namespace UserInterface
+} // namespace fs::ui

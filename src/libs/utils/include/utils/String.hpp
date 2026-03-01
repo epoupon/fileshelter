@@ -25,7 +25,7 @@
 #include <string_view>
 #include <vector>
 
-namespace StringUtils
+namespace fs::stringUtils
 {
     std::vector<std::string> splitString(const std::string& string, const std::string& separators);
     std::string joinStrings(const std::vector<std::string>& strings, const std::string& delimiter);
@@ -61,4 +61,4 @@ namespace StringUtils
 
     std::optional<std::string> stringFromHex(const std::string& str);
 
-} // namespace StringUtils
+} // namespace fs::stringUtils

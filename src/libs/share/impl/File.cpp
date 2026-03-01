@@ -20,9 +20,8 @@
 #include "File.hpp"
 
 #include "Share.hpp"
-#include "Types.hpp"
 
-namespace Share
+namespace fs::share
 {
     File::pointer File::create(Wt::Dbo::Session& session, const FileCreateParameters& parameters, Share::pointer share)
     {
@@ -40,4 +39,4 @@ namespace Share
     {
         return session.find<File>().where("path = ?").bind(filePath);
     }
-} // namespace Share
+} // namespace fs::share

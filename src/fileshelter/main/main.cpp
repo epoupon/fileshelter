@@ -35,116 +35,121 @@
 
 #include "ui/FileShelterApplicationCreator.hpp"
 
-std::vector<std::string> generateWtConfig(std::string execPath)
+namespace fs
 {
-    std::vector<std::string> args;
-
-    const std::filesystem::path wtConfigPath{ Service<IConfig>::get()->getPath("working-dir") / "wt_config.xml" };
-    const std::filesystem::path wtLogFilePath{ Service<IConfig>::get()->getPath("log-file", "") };
-    const std::filesystem::path wtAccessLogFilePath{ Service<IConfig>::get()->getPath("access-log-file", "") };
-    const std::filesystem::path userMsgPath{ Service<IConfig>::get()->getPath("working-dir") / "user_messages.xml" };
-    const unsigned long configHttpServerThreadCount{ Service<IConfig>::get()->getULong("http-server-thread-count", 0) };
-
-    args.push_back(execPath);
-    args.push_back("--config=" + wtConfigPath.string());
-    args.push_back("--docroot=" + std::string{ Service<IConfig>::get()->getString("docroot") });
-    args.push_back("--approot=" + std::string{ Service<IConfig>::get()->getString("approot") });
-    args.push_back("--deploy-path=" + std::string{ Service<IConfig>::get()->getString("deploy-path", "/") });
-    args.push_back("--resources-dir=" + std::string{ Service<IConfig>::get()->getString("wt-resources") });
-
-    if (!wtAccessLogFilePath.empty())
-        args.push_back("--accesslog=" + wtAccessLogFilePath.string());
-
-    if (Service<IConfig>::get()->getBool("tls-enable", false))
+    std::vector<std::string> generateWtConfig(std::string execPath)
     {
-        args.push_back("--https-listen=" + std::string{ Service<IConfig>::get()->getString("listen", "0.0.0.0:5091") });
-        args.push_back("--ssl-certificate=" + std::string{ Service<IConfig>::get()->getString("tls-cert") });
-        args.push_back("--ssl-private-key=" + std::string{ Service<IConfig>::get()->getString("tls-key") });
-        args.push_back("--ssl-tmp-dh=" + std::string{ Service<IConfig>::get()->getString("tls-dh") });
+        std::vector<std::string> args;
+
+        const std::filesystem::path wtConfigPath{ Service<IConfig>::get()->getPath("working-dir") / "wt_config.xml" };
+        const std::filesystem::path wtLogFilePath{ Service<IConfig>::get()->getPath("log-file", "") };
+        const std::filesystem::path wtAccessLogFilePath{ Service<IConfig>::get()->getPath("access-log-file", "") };
+        const std::filesystem::path userMsgPath{ Service<IConfig>::get()->getPath("working-dir") / "user_messages.xml" };
+        const unsigned long configHttpServerThreadCount{ Service<IConfig>::get()->getULong("http-server-thread-count", 0) };
+
+        args.push_back(execPath);
+        args.push_back("--config=" + wtConfigPath.string());
+        args.push_back("--docroot=" + std::string{ Service<IConfig>::get()->getString("docroot") });
+        args.push_back("--approot=" + std::string{ Service<IConfig>::get()->getString("approot") });
+        args.push_back("--deploy-path=" + std::string{ Service<IConfig>::get()->getString("deploy-path", "/") });
+        args.push_back("--resources-dir=" + std::string{ Service<IConfig>::get()->getString("wt-resources") });
+
+        if (!wtAccessLogFilePath.empty())
+            args.push_back("--accesslog=" + wtAccessLogFilePath.string());
+
+        if (Service<IConfig>::get()->getBool("tls-enable", false))
+        {
+            args.push_back("--https-listen=" + std::string{ Service<IConfig>::get()->getString("listen", "0.0.0.0:5091") });
+            args.push_back("--ssl-certificate=" + std::string{ Service<IConfig>::get()->getString("tls-cert") });
+            args.push_back("--ssl-private-key=" + std::string{ Service<IConfig>::get()->getString("tls-key") });
+            args.push_back("--ssl-tmp-dh=" + std::string{ Service<IConfig>::get()->getString("tls-dh") });
+        }
+        else
+        {
+            args.push_back("--http-listen=" + std::string{ Service<IConfig>::get()->getString("listen", "0.0.0.0:5091") });
+        }
+
+        {
+            // Reserve at least 2 threads since we still have some blocking IO (reading on disk)
+            const unsigned long httpServerThreadCount{ configHttpServerThreadCount ? configHttpServerThreadCount : std::max<unsigned long>(2, std::thread::hardware_concurrency()) };
+            args.push_back("--threads=" + std::to_string(httpServerThreadCount));
+        }
+
+        // Generate the wt_config.xml file
+        {
+            boost::property_tree::ptree pt;
+
+            pt.put("server.application-settings.<xmlattr>.location", "*");
+            pt.put("server.application-settings.log-file", wtLogFilePath.string());
+            pt.put("server.application-settings.log-config", Service<IConfig>::get()->getString("log-config", "* -debug -info:WebRequest"));
+            pt.put("server.application-settings.max-request-size", Service<IConfig>::get()->getULong("max-share-size", 100) * 1024 /* kB */);
+
+            if (Service<IConfig>::get()->getBool("behind-reverse-proxy", false))
+            {
+                pt.put("server.application-settings.trusted-proxy-config.original-ip-header", Service<IConfig>::get()->getString("original-ip-header", "X-Forwared-For"));
+                Service<IConfig>::get()->visitStrings("trusted-proxies", [&](std::string_view trustedProxy) {
+                    pt.add("server.application-settings.trusted-proxy-config.trusted-proxies.proxy", std::string{ trustedProxy });
+                },
+                    { "127.0.0.1", "::1" });
+            }
+
+            {
+                boost::property_tree::ptree viewport;
+                viewport.put("<xmlattr>.name", "viewport");
+                viewport.put("<xmlattr>.content", "width=device-width, initial-scale=1, user-scalable=no");
+                pt.add_child("server.application-settings.head-matter.meta", viewport);
+            }
+
+            std::ofstream oss{ wtConfigPath.string().c_str(), std::ios::out };
+            boost::property_tree::xml_parser::write_xml(oss, pt);
+        }
+
+        // Generate the user_messages.xml file
+        {
+            boost::property_tree::ptree pt;
+
+            pt.put("messages.<xmlattr>.xmlns:if", "Wt.WTemplate.conditions");
+
+            {
+                boost::property_tree::ptree node;
+                node.put("<xmlattr>.id", "msg-tos-org");
+                node.put("", Service<IConfig>::get()->getString("tos-org", "**[ORG]**"));
+                pt.add_child("messages.message", node);
+            }
+
+            {
+                boost::property_tree::ptree node;
+                node.put("<xmlattr>.id", "msg-tos-url");
+                node.put("", Service<IConfig>::get()->getString("tos-url", "**[DEPLOY URL]**/tos"));
+                pt.add_child("messages.message", node);
+            }
+
+            {
+                boost::property_tree::ptree node;
+                node.add("<xmlattr>.id", "msg-tos-support-email");
+                node.put("", Service<IConfig>::get()->getString("tos-support-email", "**[SUPPORT EMAIL ADDRESS]**"));
+                pt.add_child("messages.message", node);
+            }
+
+            {
+                boost::property_tree::ptree node;
+                node.add("<xmlattr>.id", "msg-app-name");
+                node.put("", Service<IConfig>::get()->getString("app-name", "FileShelter"));
+                pt.add_child("messages.message", node);
+            }
+
+            std::ofstream oss{ userMsgPath.string().c_str(), std::ios::out };
+            boost::property_tree::xml_parser::write_xml(oss, pt);
+        }
+
+        return args;
     }
-    else
-    {
-        args.push_back("--http-listen=" + std::string{ Service<IConfig>::get()->getString("listen", "0.0.0.0:5091") });
-    }
-
-    {
-        // Reserve at least 2 threads since we still have some blocking IO (reading on disk)
-        const unsigned long httpServerThreadCount{ configHttpServerThreadCount ? configHttpServerThreadCount : std::max<unsigned long>(2, std::thread::hardware_concurrency()) };
-        args.push_back("--threads=" + std::to_string(httpServerThreadCount));
-    }
-
-    // Generate the wt_config.xml file
-    {
-        boost::property_tree::ptree pt;
-
-        pt.put("server.application-settings.<xmlattr>.location", "*");
-        pt.put("server.application-settings.log-file", wtLogFilePath.string());
-        pt.put("server.application-settings.log-config", Service<IConfig>::get()->getString("log-config", "* -debug -info:WebRequest"));
-        pt.put("server.application-settings.max-request-size", Service<IConfig>::get()->getULong("max-share-size", 100) * 1024 /* kB */);
-
-        if (Service<IConfig>::get()->getBool("behind-reverse-proxy", false))
-        {
-            pt.put("server.application-settings.trusted-proxy-config.original-ip-header", Service<IConfig>::get()->getString("original-ip-header", "X-Forwared-For"));
-            Service<IConfig>::get()->visitStrings("trusted-proxies", [&](std::string_view trustedProxy) {
-                pt.add("server.application-settings.trusted-proxy-config.trusted-proxies.proxy", std::string{ trustedProxy });
-            },
-                { "127.0.0.1", "::1" });
-        }
-
-        {
-            boost::property_tree::ptree viewport;
-            viewport.put("<xmlattr>.name", "viewport");
-            viewport.put("<xmlattr>.content", "width=device-width, initial-scale=1, user-scalable=no");
-            pt.add_child("server.application-settings.head-matter.meta", viewport);
-        }
-
-        std::ofstream oss{ wtConfigPath.string().c_str(), std::ios::out };
-        boost::property_tree::xml_parser::write_xml(oss, pt);
-    }
-
-    // Generate the user_messages.xml file
-    {
-        boost::property_tree::ptree pt;
-
-        pt.put("messages.<xmlattr>.xmlns:if", "Wt.WTemplate.conditions");
-
-        {
-            boost::property_tree::ptree node;
-            node.put("<xmlattr>.id", "msg-tos-org");
-            node.put("", Service<IConfig>::get()->getString("tos-org", "**[ORG]**"));
-            pt.add_child("messages.message", node);
-        }
-
-        {
-            boost::property_tree::ptree node;
-            node.put("<xmlattr>.id", "msg-tos-url");
-            node.put("", Service<IConfig>::get()->getString("tos-url", "**[DEPLOY URL]**/tos"));
-            pt.add_child("messages.message", node);
-        }
-
-        {
-            boost::property_tree::ptree node;
-            node.add("<xmlattr>.id", "msg-tos-support-email");
-            node.put("", Service<IConfig>::get()->getString("tos-support-email", "**[SUPPORT EMAIL ADDRESS]**"));
-            pt.add_child("messages.message", node);
-        }
-
-        {
-            boost::property_tree::ptree node;
-            node.add("<xmlattr>.id", "msg-app-name");
-            node.put("", Service<IConfig>::get()->getString("app-name", "FileShelter"));
-            pt.add_child("messages.message", node);
-        }
-
-        std::ofstream oss{ userMsgPath.string().c_str(), std::ios::out };
-        boost::property_tree::xml_parser::write_xml(oss, pt);
-    }
-
-    return args;
-}
+} // namespace fs
 
 int main(int argc, char* argv[])
 {
+    using namespace fs;
+
     std::filesystem::path configFilePath{ "/etc/fileshelter.conf" };
     int res{ EXIT_FAILURE };
 
@@ -164,7 +169,7 @@ int main(int argc, char* argv[])
             throw FsException{ "Working directory '" + workingDirectory.string() + "' is not absolute!" };
         std::filesystem::create_directories(workingDirectory);
 
-        const std::filesystem::path uploadDirectory{ UserInterface::prepareUploadDirectory() };
+        const std::filesystem::path uploadDirectory{ ui::prepareUploadDirectory() };
 
         // Construct WT configuration and get the argc/argv back
         std::vector<std::string> wtServerArgs{ generateWtConfig(argv[0]) };
@@ -182,7 +187,7 @@ int main(int argc, char* argv[])
 
         const std::string deployPath{ Service<IConfig>::get()->getString("deploy-path", "/") };
 
-        Service<Share::IShareManager> shareManager{ Share::createShareManager(true /* enableCleaner */) };
+        Service<share::IShareManager> shareManager{ share::createShareManager(true /* enableCleaner */) };
         shareManager->removeOrphanFiles(uploadDirectory);
 
         ShareResource shareResource;
@@ -193,7 +198,7 @@ int main(int argc, char* argv[])
             shareResource.setDeployPath(deployPath + "/share");
         server.addResource(&shareResource, std::string{ shareResource.getDeployPath() });
         server.addEntryPoint(Wt::EntryPointType::Application, [&](const Wt::WEnvironment& env) {
-            return UserInterface::createFileShelterApplication(env);
+            return ui::createFileShelterApplication(env);
         });
 
         FS_LOG(MAIN, INFO) << "Starting server...";

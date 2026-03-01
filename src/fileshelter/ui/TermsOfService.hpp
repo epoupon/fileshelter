@@ -23,7 +23,7 @@
 
 #include <Wt/WWidget.h>
 
-namespace UserInterface
+namespace fs::ui
 {
     std::unique_ptr<Wt::WWidget> createTermsOfService();
 }

@@ -19,42 +19,45 @@
 
 #include "utils/Logger.hpp"
 
-std::string getModuleName(Module mod)
+namespace fs
 {
-    switch (mod)
+    std::string getModuleName(Module mod)
     {
-    case Module::DB:
-        return "DB";
-    case Module::RESOURCE:
-        return "RESOURCE";
-    case Module::MAIN:
-        return "MAIN";
-    case Module::SHARE:
-        return "SHARE";
-    case Module::SHARE_CLEANER:
-        return "SHARE_CLEANER";
-    case Module::UI:
-        return "UI";
-    case Module::UTILS:
-        return "UTILS";
+        switch (mod)
+        {
+        case Module::DB:
+            return "DB";
+        case Module::RESOURCE:
+            return "RESOURCE";
+        case Module::MAIN:
+            return "MAIN";
+        case Module::SHARE:
+            return "SHARE";
+        case Module::SHARE_CLEANER:
+            return "SHARE_CLEANER";
+        case Module::UI:
+            return "UI";
+        case Module::UTILS:
+            return "UTILS";
+        }
+        return "";
     }
-    return "";
-}
 
-std::string getSeverityName(Severity sev)
-{
-    switch (sev)
+    std::string getSeverityName(Severity sev)
     {
-    case Severity::FATAL:
-        return "fatal";
-    case Severity::ERROR:
-        return "error";
-    case Severity::WARNING:
-        return "warning";
-    case Severity::INFO:
-        return "info";
-    case Severity::DEBUG:
-        return "debug";
+        switch (sev)
+        {
+        case Severity::FATAL:
+            return "fatal";
+        case Severity::ERROR:
+            return "error";
+        case Severity::WARNING:
+            return "warning";
+        case Severity::INFO:
+            return "info";
+        case Severity::DEBUG:
+            return "debug";
+        }
+        return "";
     }
-    return "";
-}
+} // namespace fs

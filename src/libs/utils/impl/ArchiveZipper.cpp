@@ -29,7 +29,7 @@
 
 #include "utils/Logger.hpp"
 
-namespace Zip
+namespace fs::zip
 {
     std::unique_ptr<IZipper> createArchiveZipper(const EntryContainer& entries)
     {
@@ -295,4 +295,4 @@ namespace Zip
 
         return bufferSize;
     }
-} // namespace Zip
+} // namespace fs::zip

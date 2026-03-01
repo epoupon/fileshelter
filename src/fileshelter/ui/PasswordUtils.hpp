@@ -21,8 +21,8 @@
 
 #include <string_view>
 
-namespace UserInterface::PasswordUtils
+namespace fs::ui::PasswordUtils
 {
     bool isUploadPassordRequired();
     bool checkUploadPassord(std::string_view uploadPassword);
-} // namespace UserInterface::PasswordUtils
+} // namespace fs::ui::PasswordUtils

@@ -19,16 +19,15 @@
 
 #pragma once
 
-#include <string>
-
 #include <Wt/Dbo/Dbo.h>
 #include <Wt/Dbo/WtSqlTraits.h>
 
-#include "Traits.hpp"
 #include "share/CreateParameters.hpp"
 #include "share/Types.hpp"
 
-namespace Share
+#include "Traits.hpp"
+
+namespace fs::share
 {
     class Share;
 
@@ -78,5 +77,4 @@ namespace Share
 
         Wt::Dbo::ptr<Share> _share;
     };
-
-} // namespace Share
+} // namespace fs::share

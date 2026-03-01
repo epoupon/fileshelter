@@ -25,7 +25,7 @@
 
 #include "Exception.hpp"
 
-namespace Zip
+namespace fs::zip
 {
     struct Entry
     {
@@ -50,4 +50,4 @@ namespace Zip
     };
 
     std::unique_ptr<IZipper> createArchiveZipper(const EntryContainer& entries);
-} // namespace Zip
+} // namespace fs::zip

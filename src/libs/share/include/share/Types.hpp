@@ -26,7 +26,7 @@
 
 #include "utils/UUID.hpp"
 
-namespace Share
+namespace fs::share
 {
     using FileSize = std::uint64_t;
 
@@ -70,4 +70,4 @@ namespace Share
         std::string creatorAddress;
         std::vector<FileDesc> files;
     };
-} // namespace Share
+} // namespace fs::share

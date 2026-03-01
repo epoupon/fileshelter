@@ -24,22 +24,22 @@
 
 #include "share/Types.hpp"
 
-namespace Share
+namespace fs::share
 {
     struct ShareDesc;
 }
 
-namespace UserInterface
+namespace fs::ui
 {
     class ShareDownloadPassword : public Wt::WTemplateFormView
     {
     public:
-        using SigSuccess = Wt::Signal<const Share::ShareDesc&, std::string>;
+        using SigSuccess = Wt::Signal<const share::ShareDesc&, std::string>;
         SigSuccess& success() { return _sigSuccess; }
 
-        ShareDownloadPassword(const Share::ShareUUID& shareUUID);
+        ShareDownloadPassword(const share::ShareUUID& shareUUID);
 
     private:
         SigSuccess _sigSuccess;
     };
-} // namespace UserInterface
+} // namespace fs::ui

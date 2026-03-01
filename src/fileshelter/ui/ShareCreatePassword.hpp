@@ -22,7 +22,7 @@
 #include <Wt/WSignal.h>
 #include <Wt/WTemplateFormView.h>
 
-namespace UserInterface
+namespace fs::ui
 {
     class ShareCreatePassword : public Wt::WTemplateFormView
     {
@@ -34,4 +34,4 @@ namespace UserInterface
     private:
         Wt::Signal<> _sigSuccess;
     };
-} // namespace UserInterface
+} // namespace fs::ui

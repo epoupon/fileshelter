@@ -38,7 +38,7 @@
 #include "ShareEdit.hpp"
 #include "TermsOfService.hpp"
 
-namespace UserInterface
+namespace fs::ui
 {
     static const char* defaultPath{ "/share-create" };
 
@@ -208,4 +208,4 @@ namespace UserInterface
             throw FsException{ "Internal error" };
         }
     }
-} // namespace UserInterface
+} // namespace fs::ui
