@@ -52,6 +52,8 @@ namespace fs
         auto begin() { return _uuid.begin(); }
         auto end() { return _uuid.end(); }
 
+        bool operator==(const UUID& other) const = default;
+
     protected:
         boost::uuids::uuid _uuid;
     };

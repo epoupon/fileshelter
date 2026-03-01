@@ -61,7 +61,7 @@ namespace fs::ui
                 fileEntry->bindString("name", file->clientFileName(), Wt::TextFormat::Plain);
                 fileEntry->bindString("size", ShareUtils::fileSizeToString(file->size()), Wt::TextFormat::Plain);
 
-                auto* delBtn{ fileEntry->bindNew<Wt::WText>("del-btn", tr("template-share-create-del-btn")) };
+                auto* delBtn{ fileEntry->bindNew<Wt::WPushButton>("del-btn", tr("template-share-create-del-btn"), Wt::TextFormat::XHTML) };
                 delBtn->clicked().connect([=, this] {
                     deleteFile(*file);
                     filesContainer->removeWidget(fileEntry);

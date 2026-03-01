@@ -62,14 +62,14 @@
 
 <message id="template-share-create-form-file">
 	<div class="fs-file-entry fs-vertical-center">
-		${del-btn}
+		${del-btn class="btn btn-sm btn-outline-danger border-0 me-2"}
 		<div class="fs-file-entry-size hidden-xs">${size}</div>
 		<div>${name}</div>
 	</div>
 </message>
 
 <message id="template-share-create-del-btn">
-	<i class="fa fa-2x fa-remove fs-file-entry-btn-remove" aria-hidden="true"></i>
+	<i class="fa fa-fw fa-remove" aria-hidden="true"></i>
 </message>
 
 <message id="template-share-create-progress">
@@ -155,9 +155,16 @@
 
 <message id="template-share-download-file">
 	<div  class="fs-file-entry fs-vertical-center">
+		${<if-download-btn>}
+		${download-btn class="btn btn-sm btn-outline-secondary border-0 me-2"}
+		${</if-download-btn>}
 		<div class="fs-file-entry-size hidden-xs">${size}</div>
 		<div>${name}</div>
 	</div>
+</message>
+
+<message id="template-share-download-download-btn">
+	<i class="fa fa-fw fa-download" aria-hidden="true"></i>
 </message>
 
 <message id="template-share-edit">

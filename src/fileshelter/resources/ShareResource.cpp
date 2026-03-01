@@ -22,10 +22,8 @@
 #include <memory>
 #include <optional>
 
-#include <Wt/Auth/PasswordHash.h>
 #include <Wt/Http/Response.h>
 #include <Wt/Utils.h>
-#include <Wt/WLocalDateTime.h>
 
 #include "share/Exception.hpp"
 #include "share/IShareManager.hpp"
@@ -37,17 +35,6 @@
 
 namespace fs
 {
-    namespace
-    {
-        std::filesystem::path getClientFileName(const share::ShareDesc& share)
-        {
-            if (share.files.size() == 1)
-                return share.files.front().clientPath;
-
-            return share.uuid.toString() + ".zip";
-        }
-    } // namespace
-
     void ShareResource::setWorkingDirectory(const std::filesystem::path& workingDirectory)
     {
         if (std::filesystem::is_directory(workingDirectory))
@@ -68,7 +55,12 @@ namespace fs
 
     Wt::WLink ShareResource::createLink(const share::ShareUUID& shareId, std::optional<std::string_view> password)
     {
-        return { Wt::LinkType::Url, std::string{ getDeployPath() } + "?id=" + shareId.toString() + (password ? ("&p=" + Wt::Utils::hexEncode(std::string{ *password })) : "") };
+        return { Wt::LinkType::Url, std::string{ getDeployPath() } + "?shareid=" + shareId.toString() + (password ? ("&p=" + Wt::Utils::hexEncode(std::string{ *password })) : "") };
+    }
+
+    Wt::WLink ShareResource::createLink(const share::ShareUUID& shareId, const share::FileUUID& fileId, std::optional<std::string_view> password)
+    {
+        return { Wt::LinkType::Url, std::string{ getDeployPath() } + "?shareid=" + shareId.toString() + "&fileid=" + fileId.toString() + (password ? ("&p=" + Wt::Utils::hexEncode(std::string{ *password })) : "") };
     }
 
     void ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Response& response)
@@ -80,29 +72,47 @@ namespace fs
             if (!continuation)
             {
                 // parse parameters
-                const std::string* uuid{ request.getParameter("id") };
-                if (!uuid)
+                const std::string* shareId{ request.getParameter("shareid") };
+                if (!shareId)
                 {
-                    FS_LOG(RESOURCE, DEBUG) << "Missing parameter 'id'!";
+                    FS_LOG(RESOURCE, DEBUG) << "Missing parameter 'shareid'!";
                     return;
                 }
-                const share::ShareUUID& shareUUID{ *uuid };
+                const share::ShareUUID shareUUID{ *shareId };
+
+                const std::string* fileId{ request.getParameter("fileid") };
+                const std::optional<share::FileUUID> fileUUID{ fileId ? std::make_optional<share::FileUUID>(*fileId) : std::nullopt };
 
                 std::optional<std::string> password;
                 if (const std::string * p{ request.getParameter("p") })
                     password = Wt::Utils::hexDecode(*p);
 
+                std::filesystem::path clientFileName;
                 const share::ShareDesc share{ Service<share::IShareManager>::get()->getShareDesc(shareUUID, password) };
-                if (share.files.size() > 1)
+                if (share.files.size() > 1 && !fileUUID)
                 {
                     std::unique_ptr<zip::IZipper> zipper{ createZipper(share) };
                     response.setMimeType("application/zip");
                     resourceHandler = createZipperResourceHandler(std::move(zipper));
+                    clientFileName = share.uuid.toString() + ".zip";
                 }
                 else
                 {
                     response.setMimeType("application/octet-stream");
-                    resourceHandler = createFileResourceHandler(getAbsolutePath(share.files.front().path));
+
+                    auto itFile{ share.files.begin() };
+                    if (fileUUID)
+                    {
+                        itFile = std::find_if(std::cbegin(share.files), std::cend(share.files), [&](const share::FileDesc& fileDesc) { return fileDesc.uuid == *fileUUID; });
+                        if (itFile == std::cend(share.files))
+                        {
+                            FS_LOG(RESOURCE, ERROR) << "Cannot find requested file in share";
+                            return;
+                        }
+                    }
+
+                    clientFileName = itFile->clientPath;
+                    resourceHandler = createFileResourceHandler(getAbsolutePath(itFile->path));
                 }
 
                 auto encodeHttpHeaderField = [](const std::string& fieldName, const std::string& fieldValue) {
@@ -110,7 +120,7 @@ namespace fs
                     return fieldName + "*=UTF-8''" + Wt::Utils::urlEncode(fieldValue);
                 };
 
-                const std::string cdp{ encodeHttpHeaderField("filename", getClientFileName(share).string()) };
+                const std::string cdp{ encodeHttpHeaderField("filename", clientFileName.string()) };
                 response.addHeader("Content-Disposition", "attachment; " + cdp);
 
                 Service<share::IShareManager>::get()->incrementReadCount(shareUUID);
@@ -131,7 +141,7 @@ namespace fs
         }
         catch (const UUIDException& e)
         {
-            FS_LOG(RESOURCE, DEBUG) << "Bad parameter 'id'!";
+            FS_LOG(RESOURCE, DEBUG) << "Bad parameter 'shareid' or 'fileid'!";
         }
         catch (const share::Exception& e)
         {

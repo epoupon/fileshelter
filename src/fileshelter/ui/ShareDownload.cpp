@@ -98,13 +98,19 @@ namespace fs::ui
 
                 fileTemplate->bindString("name", Wt::WString::fromUTF8(std::string{ file.clientPath }), Wt::TextFormat::Plain);
                 fileTemplate->bindString("size", ShareUtils::fileSizeToString(file.size), Wt::TextFormat::Plain);
+                if (share.files.size() > 1)
+                {
+                    fileTemplate->setCondition("if-download-btn", true);
+                    auto* downloadBtn{ fileTemplate->bindNew<Wt::WPushButton>("download-btn", tr("template-share-download-download-btn"), Wt::TextFormat::XHTML) };
+                    downloadBtn->setLink(ShareResource::createLink(share.uuid, file.uuid, password));
+                }
             }
         }
     }
 
     void ShareDownload::displayPassword(const share::ShareUUID& shareUUID)
     {
-        auto view = addNew<ShareDownloadPassword>(shareUUID);
+        auto* view = addNew<ShareDownloadPassword>(shareUUID);
         view->success().connect([this](const share::ShareDesc& share, std::string_view password) {
             clear();
             displayDownload(share, password);

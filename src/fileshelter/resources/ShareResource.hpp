@@ -49,6 +49,7 @@ namespace fs
         static void setDeployPath(std::string_view deployPath) { _deployPath = deployPath; }
         static std::string_view getDeployPath() { return _deployPath; }
         static Wt::WLink createLink(const share::ShareUUID& shareId, std::optional<std::string_view> password);
+        static Wt::WLink createLink(const share::ShareUUID& shareId, const share::FileUUID& fileId, std::optional<std::string_view> password);
 
     private:
         std::filesystem::path getAbsolutePath(const std::filesystem::path& p);
