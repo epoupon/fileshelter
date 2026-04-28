@@ -24,6 +24,9 @@
 
 #include <Wt/Http/Response.h>
 #include <Wt/Utils.h>
+#include <Wt/WLocalDateTime.h>
+#include <Wt/WApplication.h>
+#include <Wt/WEnvironment.h>
 
 #include "share/Exception.hpp"
 #include "share/IShareManager.hpp"
@@ -60,7 +63,7 @@ namespace fs
 
     Wt::WLink ShareResource::createLink(const share::ShareUUID& shareId, const share::FileUUID& fileId, std::optional<std::string_view> password)
     {
-        return { Wt::LinkType::Url, std::string{ getDeployPath() } + "?shareid=" + shareId.toString() + "&fileid=" + fileId.toString() + (password ? ("&p=" + Wt::Utils::hexEncode(std::string{ *password })) : "") };
+        return { Wt::LinkType::Url, wApp->environment().urlScheme() + "://" + wApp->environment().hostName() + (wApp->environment().deploymentPath() == "/" ? "" : wApp->environment().deploymentPath()) + "?shareid=" + shareId.toString() + "&fileid=" + fileId.toString() + (password ? ("&p=" + Wt::Utils::hexEncode(std::string{ *password })) : "") };
     }
 
     void ShareResource::handleRequest(const Wt::Http::Request& request, Wt::Http::Response& response)
