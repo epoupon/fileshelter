@@ -26,5 +26,3 @@ target_link_libraries(fileshelterutils PUBLIC
 	Wt::Wt
 	)
 
-install(TARGETS fileshelterutils DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
